@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -47,27 +48,36 @@ class FollowedContentPage extends StatelessWidget {
             ),
           ],
         ),
-        body: TabBarView(
-          children: [
-            _FollowedList<Topic>(
-              items: context.select(
-                (AppBloc bloc) =>
-                    bloc.state.userContentPreferences?.followedTopics ?? [],
-              ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppLayout.maxDialogContentWidth,
             ),
-            _FollowedList<Source>(
-              items: context.select(
-                (AppBloc bloc) =>
-                    bloc.state.userContentPreferences?.followedSources ?? [],
-              ),
+            child: TabBarView(
+              children: [
+                _FollowedList<Topic>(
+                  items: context.select(
+                    (AppBloc bloc) =>
+                        bloc.state.userContentPreferences?.followedTopics ?? [],
+                  ),
+                ),
+                _FollowedList<Source>(
+                  items: context.select(
+                    (AppBloc bloc) =>
+                        bloc.state.userContentPreferences?.followedSources ??
+                        [],
+                  ),
+                ),
+                _FollowedList<Country>(
+                  items: context.select(
+                    (AppBloc bloc) =>
+                        bloc.state.userContentPreferences?.followedCountries ??
+                        [],
+                  ),
+                ),
+              ],
             ),
-            _FollowedList<Country>(
-              items: context.select(
-                (AppBloc bloc) =>
-                    bloc.state.userContentPreferences?.followedCountries ?? [],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

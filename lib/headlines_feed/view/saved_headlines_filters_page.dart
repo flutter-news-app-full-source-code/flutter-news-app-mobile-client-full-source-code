@@ -64,7 +64,6 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                 sources: [],
                 countries: [],
               ),
-              'filterToEdit': null,
             },
           );
         },

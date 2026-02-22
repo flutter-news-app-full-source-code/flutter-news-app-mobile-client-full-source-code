@@ -1,10 +1,12 @@
 import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
@@ -129,69 +131,77 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     final textTheme = theme.textTheme;
     final reasons = _getReasons(l10n);
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.reportContentTitle, style: textTheme.headlineSmall),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                l10n.reportReasonSelectionPrompt,
-                style: textTheme.bodyLarge,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ...reasons.entries.map((entry) {
-                return RadioListTile<String>(
-                  title: Text(entry.key),
-                  value: entry.value,
-                  groupValue: _selectedReason,
-                  onChanged: (value) => setState(() => _selectedReason = value),
-                  contentPadding: EdgeInsets.zero,
-                );
-              }),
-              const SizedBox(height: AppSpacing.md),
-              TextFormField(
-                controller: _textController,
-                decoration: InputDecoration(
-                  labelText: l10n.reportAdditionalCommentsLabel,
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Row(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: AppLayout.maxDialogContentWidth,
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(l10n.cancelButtonLabel),
-                    ),
+                  Text(l10n.reportContentTitle, style: textTheme.headlineSmall),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    l10n.reportReasonSelectionPrompt,
+                    style: textTheme.bodyLarge,
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _selectedReason != null && !_isSubmitting
-                          ? _submitReport
-                          : null,
-                      child: _isSubmitting
-                          ? const SizedBox.square(
-                              dimension: 24,
-                              child: CircularProgressIndicator(),
-                            )
-                          : Text(l10n.reportSubmitButtonLabel),
+                  const SizedBox(height: AppSpacing.md),
+                  ...reasons.entries.map((entry) {
+                    return RadioListTile<String>(
+                      title: Text(entry.key),
+                      value: entry.value,
+                      groupValue: _selectedReason,
+                      onChanged: (value) =>
+                          setState(() => _selectedReason = value),
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  }),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _textController,
+                    decoration: InputDecoration(
+                      labelText: l10n.reportAdditionalCommentsLabel,
                     ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(l10n.cancelButtonLabel),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _selectedReason != null && !_isSubmitting
+                              ? _submitReport
+                              : null,
+                          child: _isSubmitting
+                              ? const SizedBox.square(
+                                  dimension: 24,
+                                  child: CircularProgressIndicator(),
+                                )
+                              : Text(l10n.reportSubmitButtonLabel),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -54,29 +55,38 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
       minChildSize: 0.4,
       maxChildSize: 0.9,
       builder: (context, sheetScrollController) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Text(
-                  l10n.commentsPageTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppLayout.maxDialogContentWidth,
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              const Divider(height: 1),
-              Expanded(child: _buildContent(context, sheetScrollController)),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: _CommentInputField(
-                  key: _CommentsBottomSheetView._inputFieldKey,
-                  headlineId: widget.headlineId,
-                ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      l10n.commentsPageTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: _buildContent(context, sheetScrollController),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: _CommentInputField(
+                      key: _CommentsBottomSheetView._inputFieldKey,
+                      headlineId: widget.headlineId,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

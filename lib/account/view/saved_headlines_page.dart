@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -71,45 +72,59 @@ class SavedHeadlinesPage extends StatelessWidget {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(
-              vertical: AppSpacing.paddingSmall,
-            ),
-            itemCount: savedHeadlines.length,
-            separatorBuilder: (context, index) => const Divider(
-              height: 1,
-              indent: AppSpacing.paddingMedium,
-              endIndent: AppSpacing.paddingMedium,
-            ),
-            itemBuilder: (context, index) {
-              final headline = savedHeadlines[index];
-              final imageStyle =
-                  appState.settings?.feedSettings.feedItemImageStyle ??
-                  FeedItemImageStyle.smallThumbnail;
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppLayout.maxContentWidth,
+              ),
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.paddingSmall,
+                ),
+                itemCount: savedHeadlines.length,
+                separatorBuilder: (context, index) => const Divider(
+                  height: 1,
+                  indent: AppSpacing.paddingMedium,
+                  endIndent: AppSpacing.paddingMedium,
+                ),
+                itemBuilder: (context, index) {
+                  final headline = savedHeadlines[index];
+                  final imageStyle =
+                      appState.settings?.feedSettings.feedItemImageStyle ??
+                      FeedItemImageStyle.smallThumbnail;
 
-              Widget tile;
-              switch (imageStyle) {
-                case FeedItemImageStyle.hidden:
-                  tile = HeadlineTileTextOnly(
-                    headline: headline,
-                    onHeadlineTap: () =>
-                        HeadlineTapHandler.handleHeadlineTap(context, headline),
-                  );
-                case FeedItemImageStyle.smallThumbnail:
-                  tile = HeadlineTileImageStart(
-                    headline: headline,
-                    onHeadlineTap: () =>
-                        HeadlineTapHandler.handleHeadlineTap(context, headline),
-                  );
-                case FeedItemImageStyle.largeThumbnail:
-                  tile = HeadlineTileImageTop(
-                    headline: headline,
-                    onHeadlineTap: () =>
-                        HeadlineTapHandler.handleHeadlineTap(context, headline),
-                  );
-              }
-              return tile;
-            },
+                  switch (imageStyle) {
+                    case FeedItemImageStyle.hidden:
+                      return HeadlineTileTextOnly(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
+                    case FeedItemImageStyle.smallThumbnail:
+                      return HeadlineTileImageStart(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
+                    case FeedItemImageStyle.largeThumbnail:
+                      return HeadlineTileImageTop(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
+                  }
+                },
+              ),
+            ),
           );
         },
       ),

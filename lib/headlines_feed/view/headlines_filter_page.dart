@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/w
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
@@ -48,47 +49,6 @@ class HeadlinesFilterPage extends StatelessWidget {
       filterToEdit: filterToEdit,
     );
   }
-}
-
-/// Builds a [ListTile] representing a filter criterion (e.g., Categories).
-///
-/// Displays the criterion [title], the number of currently selected items
-/// ([selectedCount]), and navigates to the corresponding selection page
-/// specified by [routeName] when tapped.
-Widget _buildFilterTile({
-  required BuildContext context,
-  required AppLocalizations l10n,
-  required String title,
-  required int selectedCount,
-  required String routeName,
-  bool enabled = true,
-}) {
-  final l10n = AppLocalizationsX(context).l10n;
-  final allLabel = l10n.headlinesFeedFilterAllLabel;
-  final selectedLabel = l10n.headlinesFeedFilterSelectedCountLabel(
-    selectedCount,
-  );
-
-  final subtitle = selectedCount == 0 ? allLabel : selectedLabel;
-
-  return ListTile(
-    key: Key(routeName),
-    title: Text(title),
-    subtitle: Text(subtitle),
-    trailing: const Icon(Icons.chevron_right),
-    enabled: enabled,
-    onTap: enabled
-        ? () {
-            // Navigate to the child filter page, passing the current
-            // HeadlinesFilterBloc instance as an extra argument.
-            // This ensures the child page can access the bloc directly.
-            context.pushNamed(
-              routeName,
-              extra: context.read<HeadlinesFilterBloc>(),
-            );
-          }
-        : null,
-  );
 }
 
 /// Shows the dialog to let the user choose between applying the filter
@@ -441,38 +401,124 @@ class _HeadlinesFilterView extends StatelessWidget {
       );
     }
 
-    // Use a Map to define the filter tiles for cleaner code.
-    final filterTiles = {
-      l10n.headlinesFeedFilterTopicLabel: Routes.feedFilterTopicsName,
-      l10n.headlinesFeedFilterSourceLabel: Routes.feedFilterSourcesName,
-      l10n.headlinesFeedFilterEventCountryLabel:
-          Routes.feedFilterEventCountriesName,
-    };
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: AppLayout.maxDialogContentWidth,
+        ),
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text(l10n.headlinesFeedFilterTopicLabel),
+              subtitle: Text(
+                filterState.selectedTopics.isEmpty
+                    ? l10n.headlinesFeedFilterAllLabel
+                    : l10n.headlinesFeedFilterSelectedCountLabel(
+                        filterState.selectedTopics.length,
+                      ),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                final result = await context.pushNamed<Set<dynamic>>(
+                  Routes.multiSelectSearchName,
+                  extra: {
+                    'title': l10n.headlinesFeedFilterTopicLabel,
+                    'allItems': filterState.allTopics,
+                    'initialSelectedItems': filterState.selectedTopics,
+                    'itemBuilder': (Topic topic) => topic.name,
+                  },
+                );
 
-    return ListView.separated(
-      itemCount: filterTiles.length,
-      separatorBuilder: (context, index) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final title = filterTiles.keys.elementAt(index);
-        final routeName = filterTiles.values.elementAt(index);
-        int selectedCount;
+                if (result != null && context.mounted) {
+                  context.read<HeadlinesFilterBloc>().add(
+                    FilterTopicsChanged(topics: result.cast<Topic>().toSet()),
+                  );
+                }
+              },
+            ),
+            const Divider(height: 1),
+            ListTile(
+              title: Text(l10n.headlinesFeedFilterSourceLabel),
+              subtitle: Text(
+                filterState.selectedSources.isEmpty
+                    ? l10n.headlinesFeedFilterAllLabel
+                    : l10n.headlinesFeedFilterSelectedCountLabel(
+                        filterState.selectedSources.length,
+                      ),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                // Filter sources based on selected countries and types
+                final displayableSources = filterState.allSources.where((
+                  source,
+                ) {
+                  final matchesCountry =
+                      filterState.selectedSourceHeadquarterCountries.isEmpty ||
+                      filterState.selectedSourceHeadquarterCountries.any(
+                        (c) => c.isoCode == source.headquarters.isoCode,
+                      );
 
-        if (routeName == Routes.feedFilterTopicsName) {
-          selectedCount = filterState.selectedTopics.length;
-        } else if (routeName == Routes.feedFilterSourcesName) {
-          selectedCount = filterState.selectedSources.length;
-        } else {
-          selectedCount = filterState.selectedCountries.length;
-        }
+                  final matchesType =
+                      filterState.selectedSourceTypes.isEmpty ||
+                      filterState.selectedSourceTypes.contains(
+                        source.sourceType,
+                      );
+                  return matchesCountry && matchesType;
+                }).toList();
 
-        return _buildFilterTile(
-          context: context,
-          l10n: l10n,
-          title: title,
-          selectedCount: selectedCount,
-          routeName: routeName,
-        );
-      },
+                final result = await context.pushNamed<Set<dynamic>>(
+                  Routes.multiSelectSearchName,
+                  extra: {
+                    'title': l10n.headlinesFeedFilterSourceLabel,
+                    'allItems': displayableSources,
+                    'initialSelectedItems': filterState.selectedSources,
+                    'itemBuilder': (Source source) => source.name,
+                  },
+                );
+
+                if (result != null && context.mounted) {
+                  context.read<HeadlinesFilterBloc>().add(
+                    FilterSourcesChanged(
+                      sources: result.cast<Source>().toSet(),
+                    ),
+                  );
+                }
+              },
+            ),
+            const Divider(height: 1),
+            ListTile(
+              title: Text(l10n.headlinesFeedFilterEventCountryLabel),
+              subtitle: Text(
+                filterState.selectedCountries.isEmpty
+                    ? l10n.headlinesFeedFilterAllLabel
+                    : l10n.headlinesFeedFilterSelectedCountLabel(
+                        filterState.selectedCountries.length,
+                      ),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                final result = await context.pushNamed<Set<dynamic>>(
+                  Routes.multiSelectSearchName,
+                  extra: {
+                    'title': l10n.headlinesFeedFilterEventCountryLabel,
+                    'allItems': filterState.allCountries,
+                    'initialSelectedItems': filterState.selectedCountries,
+                    'itemBuilder': (Country country) => country.name,
+                  },
+                );
+
+                if (result != null && context.mounted) {
+                  context.read<HeadlinesFilterBloc>().add(
+                    FilterCountriesChanged(
+                      countries: result.cast<Country>().toSet(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

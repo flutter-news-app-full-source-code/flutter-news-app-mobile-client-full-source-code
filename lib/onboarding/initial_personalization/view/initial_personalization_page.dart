@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -109,29 +110,33 @@ class _InitialPersonalizationView extends StatelessWidget {
             ),
         ],
       ),
-      body:
-          BlocConsumer<InitialPersonalizationBloc, InitialPersonalizationState>(
-            listener: (context, state) {
-              // Listener can handle side effects if needed.
-            },
-            builder: (context, state) {
-              if (state.status == InitialPersonalizationStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state.status == InitialPersonalizationStatus.failure) {
-                return FailureStateWidget(
-                  exception:
-                      state.error ??
-                      const UnknownException(
-                        'An unknown error occurred during personalization.',
-                      ),
-                  onRetry: () => context.read<InitialPersonalizationBloc>().add(
-                    InitialPersonalizationDataRequested(),
+      body: BlocConsumer<InitialPersonalizationBloc, InitialPersonalizationState>(
+        listener: (context, state) {
+          // Listener can handle side effects if needed.
+        },
+        builder: (context, state) {
+          if (state.status == InitialPersonalizationStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state.status == InitialPersonalizationStatus.failure) {
+            return FailureStateWidget(
+              exception:
+                  state.error ??
+                  const UnknownException(
+                    'An unknown error occurred during personalization.',
                   ),
-                );
-              }
+              onRetry: () => context.read<InitialPersonalizationBloc>().add(
+                InitialPersonalizationDataRequested(),
+              ),
+            );
+          }
 
-              return SafeArea(
+          return SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppLayout.maxDialogContentWidth,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
@@ -183,9 +188,11 @@ class _InitialPersonalizationView extends StatelessWidget {
                     ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

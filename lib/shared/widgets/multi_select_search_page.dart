@@ -222,88 +222,94 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: TextFormField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: l10n.searchHintTextGeneric,
-                prefixIcon: const Icon(Icons.search),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(AppSpacing.sm),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: TextFormField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchHintTextGeneric,
+                    prefixIcon: const Icon(Icons.search),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(AppSpacing.sm),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          if (_isPaginated && _error != null)
-            Expanded(
-              child: FailureStateWidget(
-                exception: _error!,
-                onRetry: _resetAndFetch,
-              ),
-            )
-          else
-            Expanded(
-              child: ListView.builder(
-                controller: _isPaginated ? _scrollController : null,
-                itemCount:
-                    displayItems.length + (_isPaginated && _isLoading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (_isPaginated &&
-                      _isLoading &&
-                      index == displayItems.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
+              if (_isPaginated && _error != null)
+                Expanded(
+                  child: FailureStateWidget(
+                    exception: _error!,
+                    onRetry: _resetAndFetch,
+                  ),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    controller: _isPaginated ? _scrollController : null,
+                    itemCount:
+                        displayItems.length +
+                        (_isPaginated && _isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (_isPaginated &&
+                          _isLoading &&
+                          index == displayItems.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(AppSpacing.md),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
 
-                  final item = displayItems[index];
-                  final isSelected = _selectedItems.contains(item);
-                  final isLimitReached =
-                      widget.maxSelectionCount != null &&
-                      _selectedItems.length >= widget.maxSelectionCount!;
-                  final canSelectItem = !(!isSelected && isLimitReached);
+                      final item = displayItems[index];
+                      final isSelected = _selectedItems.contains(item);
+                      final isLimitReached =
+                          widget.maxSelectionCount != null &&
+                          _selectedItems.length >= widget.maxSelectionCount!;
+                      final canSelectItem = !(!isSelected && isLimitReached);
 
-                  return ListTile(
-                    leading: _buildLeadingForItem(item),
-                    title: Text(widget.itemBuilder(item)),
-                    trailing: Checkbox(
-                      value: isSelected,
-                      onChanged: canSelectItem
-                          ? (value) {
-                              setState(() {
-                                if (value == true) {
-                                  _selectedItems.add(item);
-                                } else {
-                                  _selectedItems.remove(item);
+                      return ListTile(
+                        leading: _buildLeadingForItem(item),
+                        title: Text(widget.itemBuilder(item)),
+                        trailing: Checkbox(
+                          value: isSelected,
+                          onChanged: canSelectItem
+                              ? (value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      _selectedItems.add(item);
+                                    } else {
+                                      _selectedItems.remove(item);
+                                    }
+                                  });
                                 }
-                              });
-                            }
-                          : null,
-                    ),
-                    onTap: canSelectItem
-                        ? () {
-                            setState(() {
-                              if (isSelected) {
-                                _selectedItems.remove(item);
-                              } else {
-                                _selectedItems.add(item);
+                              : null,
+                        ),
+                        onTap: canSelectItem
+                            ? () {
+                                setState(() {
+                                  if (isSelected) {
+                                    _selectedItems.remove(item);
+                                  } else {
+                                    _selectedItems.add(item);
+                                  }
+                                });
                               }
-                            });
-                          }
-                        : null,
-                  );
-                },
-              ),
-            ),
-        ],
+                            : null,
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

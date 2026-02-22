@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/profile_bloc/profile_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -127,116 +129,130 @@ class _EditProfileViewState extends State<_EditProfileView> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            children: [
-              BlocBuilder<ProfileBloc, ProfileState>(
-                builder: (context, state) {
-                  final isSaving = state.status == ProfileStatus.loading;
-                  return GestureDetector(
-                    onTap: isUploading || isSaving
-                        ? null
-                        : () => _pickImage(context),
-                    child: Stack(
-                      children: [
-                        UserAvatar(
-                          user: user,
-                          radius: 60,
-                          overrideImage: _selectedImageBytes != null
-                              ? MemoryImage(_selectedImageBytes!)
-                              : (optimisticAvatar != null
-                                    ? MemoryImage(optimisticAvatar)
-                                    : null),
-                        ),
-                        Positioned(
-                          bottom: 4,
-                          right: 4,
-                          child: Container(
-                            padding: const EdgeInsets.all(AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.secondary,
-                              shape: BoxShape.circle,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppLayout.maxDialogContentWidth,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                children: [
+                  BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                      final isSaving = state.status == ProfileStatus.loading;
+                      return GestureDetector(
+                        onTap: isUploading || isSaving
+                            ? null
+                            : () => _pickImage(context),
+                        child: Stack(
+                          children: [
+                            UserAvatar(
+                              user: user,
+                              radius: 60,
+                              overrideImage: _selectedImageBytes != null
+                                  ? MemoryImage(_selectedImageBytes!)
+                                  : (optimisticAvatar != null
+                                        ? MemoryImage(optimisticAvatar)
+                                        : null),
                             ),
-                            child: Icon(
-                              Icons.edit,
-                              size: 20,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                          ),
-                        ),
-                        if (isUploading || isSaving)
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 30,
-                                  height: 30,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
+                            Positioned(
+                              bottom: 4,
+                              right: 4,
+                              child: Container(
+                                padding: const EdgeInsets.all(AppSpacing.xs),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondary,
                                 ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              BlocBuilder<ProfileBloc, ProfileState>(
-                builder: (context, state) {
-                  return TextFormField(
-                    initialValue: state.name,
-                    decoration: InputDecoration(
-                      labelText: l10n.editProfileNameInputLabel,
-                    ),
-                    onChanged: (value) => context.read<ProfileBloc>().add(
-                      ProfileNameChanged(value),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const Divider(),
-              const SizedBox(height: AppSpacing.lg),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.error,
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  onPressed: () async {
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => ConfirmationDialog(
-                        title: l10n.deleteAccountDialogTitle,
-                        content: l10n.deleteAccountDialogContent,
-                        confirmButtonText: l10n.deleteAccountDialogConfirm,
-                      ),
-                    );
-                    if (confirmed == true && context.mounted) {
-                      context.read<ProfileBloc>().add(
-                        const ProfileDeletionRequested(),
+                            if (isUploading || isSaving)
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 30,
+                                      height: 30,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       );
-                    }
-                  },
-                  child: Text(l10n.deleteAccountButton),
-                ),
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                  BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                      return TextFormField(
+                        initialValue: state.name,
+                        decoration: InputDecoration(
+                          labelText: l10n.editProfileNameInputLabel,
+                        ),
+                        onChanged: (value) => context.read<ProfileBloc>().add(
+                          ProfileNameChanged(value),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  const Divider(),
+                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    child: _buildDeleteAccountButton(context, l10n),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDeleteAccountButton(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Theme.of(context).colorScheme.error,
+        side: BorderSide(color: Theme.of(context).colorScheme.error),
+      ),
+      onPressed: () async {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => ConfirmationDialog(
+            title: l10n.deleteAccountDialogTitle,
+            content: l10n.deleteAccountDialogContent,
+            confirmButtonText: l10n.deleteAccountDialogConfirm,
+          ),
+        );
+        if (confirmed == true && context.mounted) {
+          context.read<ProfileBloc>().add(const ProfileDeletionRequested());
+        }
+      },
+      child: Text(l10n.deleteAccountButton),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
@@ -48,35 +49,42 @@ class _ContentLimitationBottomSheetState
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.block,
-              size: AppSpacing.xxl * 1.5,
-              color: colorScheme.primary,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: AppLayout.maxDialogContentWidth,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.block,
+                  size: AppSpacing.xxl * 1.5,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  widget.title,
+                  style: textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  widget.body,
+                  style: textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton(
+                  onPressed: widget.onButtonPressed,
+                  child: Text(widget.buttonText),
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              widget.title,
-              style: textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              widget.body,
-              style: textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            ElevatedButton(
-              onPressed: widget.onButtonPressed,
-              child: Text(widget.buttonText),
-            ),
-          ],
+          ),
         ),
       ),
     );

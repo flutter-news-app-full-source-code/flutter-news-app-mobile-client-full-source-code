@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:ui_kit/ui_kit.dart' hide UiKitL10n;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,108 +41,115 @@ class UpdateRequiredPage extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.system_update_alt,
-                size: 80,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                l10n.updateRequiredHeadline,
-                style: theme.textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                l10n.updateRequiredSubheadline,
-                style: theme.textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              if (currentAppVersion != null &&
-                  latestRequiredVersion != null) ...[
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppLayout.maxDialogContentWidth,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.system_update_alt,
+                  size: 80,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  l10n.updateRequiredHeadline,
+                  style: theme.textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  l10n.currentAppVersionLabel(currentAppVersion!),
-                  style: theme.textTheme.bodySmall,
+                  l10n.updateRequiredSubheadline,
+                  style: theme.textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
-                Text(
-                  l10n.latestRequiredVersionLabel(latestRequiredVersion!),
-                  style: theme.textTheme.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              const SizedBox(height: AppSpacing.xl),
-              if (!kIsWeb) ...[
-                // Show platform-specific update buttons for mobile
-                if (Theme.of(context).platform == TargetPlatform.iOS &&
-                    (iosUpdateUrl?.isNotEmpty ?? false))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        final url = Uri.parse(iosUpdateUrl!);
-                        if (!await launchUrl(
-                          url,
-                          mode: LaunchMode.externalApplication,
-                        )) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.couldNotOpenUpdateUrl(iosUpdateUrl!),
-                                ),
-                              ),
-                            );
-                        }
-                      },
-                      icon: const Icon(Icons.apple),
-                      label: Text(l10n.updateRequiredButton),
-                    ),
+                if (currentAppVersion != null &&
+                    latestRequiredVersion != null) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    l10n.currentAppVersionLabel(currentAppVersion!),
+                    style: theme.textTheme.bodySmall,
+                    textAlign: TextAlign.center,
                   ),
-                if (Theme.of(context).platform == TargetPlatform.android &&
-                    (androidUpdateUrl?.isNotEmpty ?? false))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        final url = Uri.parse(androidUpdateUrl!);
-                        if (!await launchUrl(
-                          url,
-                          mode: LaunchMode.externalApplication,
-                        )) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.couldNotOpenUpdateUrl(androidUpdateUrl!),
-                                ),
-                              ),
-                            );
-                        }
-                      },
-                      icon: const Icon(Icons.shop),
-                      label: Text(l10n.updateRequiredButton),
-                    ),
+                  Text(
+                    l10n.latestRequiredVersionLabel(latestRequiredVersion!),
+                    style: theme.textTheme.bodySmall,
+                    textAlign: TextAlign.center,
                   ),
-              ] else ...[
-                // Generic message for web
-                Text(
-                  l10n.updateRequiredButton,
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
+                ],
+                const SizedBox(height: AppSpacing.xl),
+                if (!kIsWeb) ...[
+                  // Show platform-specific update buttons for mobile
+                  if (Theme.of(context).platform == TargetPlatform.iOS &&
+                      (iosUpdateUrl?.isNotEmpty ?? false))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final url = Uri.parse(iosUpdateUrl!);
+                          if (!await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          )) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.couldNotOpenUpdateUrl(iosUpdateUrl!),
+                                  ),
+                                ),
+                              );
+                          }
+                        },
+                        icon: const Icon(Icons.apple),
+                        label: Text(l10n.updateRequiredButton),
+                      ),
+                    ),
+                  if (Theme.of(context).platform == TargetPlatform.android &&
+                      (androidUpdateUrl?.isNotEmpty ?? false))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final url = Uri.parse(androidUpdateUrl!);
+                          if (!await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          )) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.couldNotOpenUpdateUrl(
+                                      androidUpdateUrl!,
+                                    ),
+                                  ),
+                                ),
+                              );
+                          }
+                        },
+                        icon: const Icon(Icons.shop),
+                        label: Text(l10n.updateRequiredButton),
+                      ),
+                    ),
+                ] else ...[
+                  // Generic message for web
+                  Text(
+                    l10n.updateRequiredButton,
+                    style: theme.textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

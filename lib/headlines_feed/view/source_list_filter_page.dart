@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -113,11 +114,23 @@ class _SourceListFilterView extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   // Navigate to the new dedicated source type filter page.
-                  // The logic is similar to the country filter.
-                  await context.pushNamed(
-                    Routes.sourceTypeFilterName, // New route
-                    extra: context.read<HeadlinesFilterBloc>(),
+                  final result = await context.pushNamed<Set<dynamic>>(
+                    Routes.multiSelectSearchName,
+                    extra: {
+                      'title': l10n.headlinesFeedFilterSourceTypeLabel,
+                      'allItems': state.allSourceTypes,
+                      'initialSelectedItems': state.selectedSourceTypes,
+                      'itemBuilder': (SourceType type) => type.l10n(l10n),
+                    },
                   );
+
+                  if (result != null && context.mounted) {
+                    context.read<HeadlinesFilterBloc>().add(
+                      FilterSourceCriteriaChanged(
+                        selectedSourceTypes: result.cast<SourceType>().toSet(),
+                      ),
+                    );
+                  }
                 },
               ),
             ],

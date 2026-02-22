@@ -8,7 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/extensions/feed_decorator_type_l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/content_collection_decorator_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';

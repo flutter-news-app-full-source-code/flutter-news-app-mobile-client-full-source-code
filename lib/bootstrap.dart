@@ -29,7 +29,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/pac
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/firebase_push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/no_op_push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/one_signal_push_notification_provider.dart';

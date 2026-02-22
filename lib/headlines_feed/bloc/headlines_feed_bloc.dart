@@ -13,8 +13,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inl
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/models/cached_feed.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:logging/logging.dart';

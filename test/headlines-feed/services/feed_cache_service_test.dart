@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/models/cached_feed.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/services/feed_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';

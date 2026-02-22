@@ -48,33 +48,24 @@ abstract final class Routes {
   // These routes are defined with relative paths and are intended to be
   // nested within other routes.
 
-  // Generic
+  // --- Generic, Top-Level Routes ---
   static const multiSelectSearchName = 'multiSelectSearch';
 
-  // Feed
+  // --- Feed Sub-Routes ---
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
-  static const feedFilterTopics = 'topics';
-  static const feedFilterTopicsName = 'feedFilterTopics';
-  static const feedFilterSources = 'sources';
-  static const feedFilterSourcesName = 'feedFilterSources';
-  static const sourceListFilterName = 'sourceListFilter';
-  static const feedFilterEventCountries = 'event-countries';
-  static const feedFilterEventCountriesName = 'feedFilterEventCountries';
-  static const sourceTypeFilter = 'source-type-filter';
-  static const sourceTypeFilterName = 'sourceTypeFilter';
   static const savedHeadlineFilters = 'saved-headline-filters';
   static const savedHeadlineFiltersName = 'savedHeadlineFilters';
   static const engagement = 'engagement/:headlineId';
   static const engagementName = 'engagement';
 
-  // Discover
+  // --- Discover Sub-Routes ---
   static const sourceList = 'source-list/:sourceType';
   static const sourceListName = 'sourceList';
   static const sourceListFilter = 'filter';
   static const discoverSourceListFilterName = 'discoverSourceListFilter';
 
-  // Settings
+  // --- Settings Sub-Routes ---
   static const settingsAccentColorAndFonts = 'theme-and-font';
   static const settingsAccentColorAndFontsName = 'settingsAccentColorAndFonts';
   static const settingsFeed = 'feed';
@@ -84,7 +75,7 @@ abstract final class Routes {
   static const settingsLanguage = 'language';
   static const settingsLanguageName = 'settingsLanguage';
 
-  // Manage Followed Items
+  // --- Manage Followed Items Sub-Routes ---
   static const followedTopicsList = 'topics';
   static const followedTopicsListName = 'followedTopicsList';
 }

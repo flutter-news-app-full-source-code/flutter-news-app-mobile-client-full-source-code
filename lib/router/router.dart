@@ -448,20 +448,21 @@ GoRouter createRouter({
         name: Routes.multiSelectSearchName,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final title = extra['title'] as String;
-          final allItems = extra['allItems'] as List<FeedItem>?;
-          final repository = extra['repository'] as DataRepository<FeedItem>?;
-          final initialSelectedItems =
-              extra['initialSelectedItems'] as Set<FeedItem>;
-          final itemBuilder = extra['itemBuilder'] as String Function(FeedItem);
+          final title = extra['title'] as String? ?? '';
+          final allItems = extra['allItems'] as List<dynamic>?;
+          final repository = extra['repository'] as DataRepository<dynamic>?;
+          final initialSelectedItems = extra['initialSelectedItems'] as Set?;
+          final itemBuilder = extra['itemBuilder'] as Function;
           final maxSelectionCount = extra['maxSelectionCount'] as int?;
 
-          return MultiSelectSearchPage<FeedItem>(
+          // Use dynamic type to accommodate various item types.
+          return MultiSelectSearchPage<dynamic>(
             title: title,
             allItems: allItems,
             repository: repository,
-            initialSelectedItems: initialSelectedItems,
-            itemBuilder: itemBuilder,
+            initialSelectedItems: initialSelectedItems?.cast<dynamic>() ?? {},
+            // The itemBuilder is passed as a dynamic function.
+            itemBuilder: (item) => itemBuilder(item) as String,
             maxSelectionCount: maxSelectionCount,
           );
         },
@@ -469,64 +470,88 @@ GoRouter createRouter({
 
       // --- Feed Route ---
       // The HeadlinesFeedPage itself now provides the HeadlinesFeedBloc.
-      // This simplifies the router by removing the need for a wrapping ShellRoute.
       // Child routes like 'filter' can access the BLoC because HeadlinesFeedPage
       // remains in the widget tree when they are pushed on top.
-      GoRoute(
-        path: Routes.feed,
-        name: Routes.feedName,
-        builder: (context, state) => const HeadlinesFeedPage(),
+      ShellRoute(
+        builder: (context, state, child) {
+          // This ShellRoute provides the HeadlinesFeedBloc to the feed page
+          // and all its sub-routes, ensuring consistent access.
+          return BlocProvider<HeadlinesFeedBloc>(
+            create: (context) {
+              final appBloc = context.read<AppBloc>();
+              final initialUserContentPreferences =
+                  appBloc.state.userContentPreferences;
+              return HeadlinesFeedBloc(
+                headlinesRepository: context.read<DataRepository<Headline>>(),
+                feedDecoratorService: FeedDecoratorService(),
+                adService: context.read<AdService>(),
+                appBloc: appBloc,
+                inlineAdCacheService: context.read<InlineAdCacheService>(),
+                feedCacheService: context.read<FeedCacheService>(),
+                initialUserContentPreferences: initialUserContentPreferences,
+                engagementRepository: context
+                    .read<DataRepository<Engagement>>(),
+                contentLimitationService: context
+                    .read<ContentLimitationService>(),
+                analyticsService: context.read<AnalyticsService>(),
+              );
+            },
+            child: child,
+          );
+        },
         routes: [
           GoRoute(
-            path: Routes.savedHeadlineFilters,
-            name: Routes.savedHeadlineFiltersName,
-            pageBuilder: (context, state) {
-              // The SavedHeadlinesFiltersPage is presented as a
-              // full-screen dialog for a modal-like user experience.
-              return const MaterialPage(
-                fullscreenDialog: true,
-                child: SavedHeadlinesFiltersPage(),
-              );
-            },
-          ),
-          GoRoute(
-            path: Routes.feedFilter,
-            name: Routes.feedFilterName,
-            pageBuilder: (context, state) {
-              // The 'extra' parameter contains a map with the
-              // initial filter.
-              final extra = state.extra! as Map<String, dynamic>;
-              final initialFilter =
-                  extra['initialFilter'] as HeadlineFilterCriteria;
-              // The filter to edit, if any. This is passed when the user
-              // taps 'Edit' on a saved filter.
-              final filterToEdit =
-                  extra['filterToEdit'] as SavedHeadlineFilter?;
+            path: Routes.feed,
+            name: Routes.feedName,
+            builder: (context, state) => const HeadlinesFeedPage(),
+            routes: [
+              GoRoute(
+                path: Routes.savedHeadlineFilters,
+                name: Routes.savedHeadlineFiltersName,
+                pageBuilder: (context, state) {
+                  return const MaterialPage(
+                    fullscreenDialog: true,
+                    child: SavedHeadlinesFiltersPage(),
+                  );
+                },
+              ),
+              GoRoute(
+                path: Routes.feedFilter,
+                name: Routes.feedFilterName,
+                pageBuilder: (context, state) {
+                  final extra = state.extra! as Map<String, dynamic>;
+                  final initialFilter =
+                      extra['initialFilter'] as HeadlineFilterCriteria;
+                  final filterToEdit =
+                      extra['filterToEdit'] as SavedHeadlineFilter?;
 
-              return MaterialPage(
-                fullscreenDialog: true,
-                child: BlocProvider(
-                  create: (context) =>
-                      HeadlinesFilterBloc(
-                        topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository: context
-                            .read<DataRepository<Source>>(),
-                        countriesRepository: context
-                            .read<DataRepository<Country>>(),
-                      )..add(
-                        FilterDataLoaded(
-                          initialSelectedTopics: initialFilter.topics,
-                          initialSelectedSources: initialFilter.sources,
-                          initialSelectedCountries: initialFilter.countries,
-                        ),
+                  return MaterialPage(
+                    fullscreenDialog: true,
+                    child: BlocProvider(
+                      create: (context) =>
+                          HeadlinesFilterBloc(
+                            topicsRepository: context
+                                .read<DataRepository<Topic>>(),
+                            sourcesRepository: context
+                                .read<DataRepository<Source>>(),
+                            countriesRepository: context
+                                .read<DataRepository<Country>>(),
+                          )..add(
+                            FilterDataLoaded(
+                              initialSelectedTopics: initialFilter.topics,
+                              initialSelectedSources: initialFilter.sources,
+                              initialSelectedCountries: initialFilter.countries,
+                            ),
+                          ),
+                      child: HeadlinesFilterPage(
+                        initialFilter: initialFilter,
+                        filterToEdit: filterToEdit,
                       ),
-                  child: HeadlinesFilterPage(
-                    initialFilter: initialFilter,
-                    filterToEdit: filterToEdit,
-                  ),
-                ),
-              );
-            },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),

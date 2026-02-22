@@ -37,26 +37,7 @@ class HeadlinesFeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HeadlinesFeedBloc>(
-      create: (context) {
-        final appBloc = context.read<AppBloc>();
-        final initialUserContentPreferences =
-            appBloc.state.userContentPreferences;
-        return HeadlinesFeedBloc(
-          headlinesRepository: context.read<DataRepository<Headline>>(),
-          feedDecoratorService: FeedDecoratorService(),
-          adService: context.read<AdService>(),
-          appBloc: appBloc,
-          inlineAdCacheService: context.read<InlineAdCacheService>(),
-          feedCacheService: context.read<FeedCacheService>(),
-          initialUserContentPreferences: initialUserContentPreferences,
-          engagementRepository: context.read<DataRepository<Engagement>>(),
-          contentLimitationService: context.read<ContentLimitationService>(),
-          analyticsService: context.read<AnalyticsService>(),
-        );
-      },
-      child: const _HeadlinesFeedView(),
-    );
+    return const _HeadlinesFeedView();
   }
 }
 

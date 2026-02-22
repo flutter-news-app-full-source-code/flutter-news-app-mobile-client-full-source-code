@@ -106,6 +106,12 @@ class _OpenLinksInSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RadioListTile<FeedItemClickBehavior>(
+          title: Text(l10n.settingsFeedClickBehaviorDefault),
+          value: FeedItemClickBehavior.defaultBehavior,
+          groupValue: settings.feedSettings.feedItemClickBehavior,
+          onChanged: (value) => _onChanged(context, value),
+        ),
+        RadioListTile<FeedItemClickBehavior>(
           title: Text(l10n.settingsFeedClickBehaviorInApp),
           value: FeedItemClickBehavior.internalNavigation,
           groupValue: settings.feedSettings.feedItemClickBehavior,

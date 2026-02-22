@@ -8,6 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/bloc/rewards_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template rewards_page}
@@ -117,38 +118,47 @@ class _RewardsPageView extends StatelessWidget {
                   .toList() ??
               [];
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            itemCount: availableRewards.length,
-            separatorBuilder: (context, index) =>
-                const SizedBox(height: AppSpacing.md),
-            itemBuilder: (context, index) {
-              final entry = availableRewards[index];
-              final type = entry.key;
-              final details = entry.value;
-              final isActive = userRewards?.isRewardActive(type) ?? false;
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppLayout.maxDialogContentWidth,
+              ),
+              child: ListView.separated(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                itemCount: availableRewards.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSpacing.md),
+                itemBuilder: (context, index) {
+                  final entry = availableRewards[index];
+                  final type = entry.key;
+                  final details = entry.value;
+                  final isActive = userRewards?.isRewardActive(type) ?? false;
 
-              final isVerifying =
-                  state is RewardsVerifying && state.activeRewardType == type;
-              final isLoading =
-                  state is RewardsLoadingAd && state.activeRewardType == type;
+                  final isVerifying =
+                      state is RewardsVerifying &&
+                      state.activeRewardType == type;
+                  final isLoading =
+                      state is RewardsLoadingAd &&
+                      state.activeRewardType == type;
 
-              // Calculate expiration if active
-              DateTime? expiry;
-              if (isActive) {
-                expiry = userRewards?.activeRewards[type];
-              }
+                  // Calculate expiration if active
+                  DateTime? expiry;
+                  if (isActive) {
+                    expiry = userRewards?.activeRewards[type];
+                  }
 
-              return _RewardOfferCard(
-                type: type,
-                durationDays: details.durationDays,
-                isActive: isActive,
-                isVerifying: isVerifying,
-                isLoading: isLoading,
-                expiry: expiry,
-                onTap: () => handleWatchAd(type),
-              );
-            },
+                  return _RewardOfferCard(
+                    type: type,
+                    durationDays: details.durationDays,
+                    isActive: isActive,
+                    isVerifying: isVerifying,
+                    isLoading: isLoading,
+                    expiry: expiry,
+                    onTap: () => handleWatchAd(type),
+                  );
+                },
+              ),
+            ),
           );
         },
       ),

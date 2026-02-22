@@ -100,11 +100,11 @@ class _AccentThemeSelector extends StatelessWidget {
     final FlexScheme scheme;
     switch (theme) {
       case AppAccentTheme.defaultBlue:
-        scheme = FlexScheme.blue;
+        scheme = FlexScheme.shadBlue;
       case AppAccentTheme.newsRed:
-        scheme = FlexScheme.red;
+        scheme = FlexScheme.shadRed;
       case AppAccentTheme.graphiteGray:
-        scheme = FlexScheme.material;
+        scheme = FlexScheme.shadGray;
     }
     final themeData = FlexThemeData.light(scheme: scheme);
     return themeData.primaryColor;

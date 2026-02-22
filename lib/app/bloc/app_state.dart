@@ -120,16 +120,16 @@ class AppState extends Equatable {
   }
 
   /// The current FlexColorScheme scheme for accent colors, derived from [settings].
-  /// Defaults to [FlexScheme.blue] if [settings] are not yet loaded.
+  /// Defaults to [FlexScheme.shadBlue] if [settings] are not yet loaded.
   FlexScheme get flexScheme {
     switch (settings?.displaySettings.accentTheme) {
       case AppAccentTheme.newsRed:
-        return FlexScheme.red;
+        return FlexScheme.shadRed;
       case AppAccentTheme.graphiteGray:
-        return FlexScheme.material;
+        return FlexScheme.shadGray;
       case AppAccentTheme.defaultBlue:
       case null:
-        return FlexScheme.blue;
+        return FlexScheme.shadBlue;
     }
   }
 

@@ -213,12 +213,12 @@ class AppInitializationPage extends StatelessWidget {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: lightTheme(
-                  scheme: FlexScheme.blue,
+                  scheme: FlexScheme.shadBlue,
                   appTextScaleFactor: AppTextScaleFactor.medium,
                   appFontWeight: AppFontWeight.regular,
                 ),
                 darkTheme: darkTheme(
-                  scheme: FlexScheme.blue,
+                  scheme: FlexScheme.shadBlue,
                   appTextScaleFactor: AppTextScaleFactor.medium,
                   appFontWeight: AppFontWeight.regular,
                 ),
@@ -259,12 +259,12 @@ class AppInitializationPage extends StatelessWidget {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: lightTheme(
-                  scheme: FlexScheme.blue,
+                  scheme: FlexScheme.shadBlue,
                   appTextScaleFactor: AppTextScaleFactor.medium,
                   appFontWeight: AppFontWeight.regular,
                 ),
                 darkTheme: darkTheme(
-                  scheme: FlexScheme.blue,
+                  scheme: FlexScheme.shadBlue,
                   appTextScaleFactor: AppTextScaleFactor.medium,
                   appFontWeight: AppFontWeight.regular,
                 ),

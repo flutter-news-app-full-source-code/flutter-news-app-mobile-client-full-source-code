@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -43,85 +44,90 @@ class AuthenticationPage extends StatelessWidget {
           builder: (context, state) {
             final isLoading = state.status == AuthenticationStatus.loading;
 
-            return Padding(
-              padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // --- Icon ---
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                        child: Icon(
-                          Icons.newspaper,
-                          size: AppSpacing.xxl * 2,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      // const SizedBox(height: AppSpacing.lg),
-                      // --- Headline and Subheadline ---
-                      Text(
-                        l10n.authenticationSignInHeadline,
-                        style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        l10n.authenticationSignInSubheadline,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-
-                      // --- Email Sign-In Button ---
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.email_outlined),
-                        onPressed: isLoading
-                            ? null
-                            : () {
-                                context.pushNamed(Routes.requestCodeName);
-                              },
-                        label: Text(l10n.authenticationEmailSignInButton),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.md,
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppLayout.maxAuthFormWidth,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // --- Icon ---
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          child: Icon(
+                            Icons.newspaper,
+                            size: AppSpacing.xxl * 2,
+                            color: colorScheme.primary,
                           ),
-                          textStyle: textTheme.labelLarge,
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // --- Anonymous Sign-In Button ---
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.person_outline),
-                        onPressed: isLoading
-                            ? null
-                            : () => context.read<AuthenticationBloc>().add(
-                                const AuthenticationAnonymousSignInRequested(),
-                              ),
-                        label: Text(l10n.authenticationAnonymousSignInButton),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.md,
+                        // const SizedBox(height: AppSpacing.lg),
+                        // --- Headline and Subheadline ---
+                        Text(
+                          l10n.authenticationSignInHeadline,
+                          style: textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                          textStyle: textTheme.labelLarge,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          l10n.authenticationSignInSubheadline,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xxl),
 
-                      // --- Loading Indicator ---
-                      if (isLoading) ...[
-                        const Padding(
-                          padding: EdgeInsets.only(top: AppSpacing.xl),
-                          child: Center(child: CircularProgressIndicator()),
+                        // --- Email Sign-In Button ---
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.email_outlined),
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  context.pushNamed(Routes.requestCodeName);
+                                },
+                          label: Text(l10n.authenticationEmailSignInButton),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                            textStyle: textTheme.labelLarge,
+                          ),
                         ),
+                        const SizedBox(height: AppSpacing.lg),
+
+                        // --- Anonymous Sign-In Button ---
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.person_outline),
+                          onPressed: isLoading
+                              ? null
+                              : () => context.read<AuthenticationBloc>().add(
+                                  const AuthenticationAnonymousSignInRequested(),
+                                ),
+                          label: Text(l10n.authenticationAnonymousSignInButton),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                            textStyle: textTheme.labelLarge,
+                          ),
+                        ),
+
+                        // --- Loading Indicator ---
+                        if (isLoading) ...[
+                          const Padding(
+                            padding: EdgeInsets.only(top: AppSpacing.xl),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),

@@ -435,6 +435,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsNotificationsCountriesLabel => 'Followed Countries';
 
   @override
+  String get settingsAppearanceSectionTitle => 'APPEARANCE';
+
+  @override
+  String get settingsFeedSectionTitle => 'FEED';
+
+  @override
+  String get settingsGeneralSectionTitle => 'GENERAL';
+
+  @override
+  String get settingsAccentColorAndFontsTitle => 'Accent Color & Fonts';
+
+  @override
+  String get settingsAccentColorLabel => 'Accent Color';
+
+  @override
+  String get settingsFontFamilyLabel => 'Font Family';
+
+  @override
+  String get settingsLayoutAndReadingTitle => 'Layout & Reading';
+
+  @override
+  String get appName => 'Headlines Toolkit';
+
+  @override
   String get unknownError => 'An unknown error occurred.';
 
   @override

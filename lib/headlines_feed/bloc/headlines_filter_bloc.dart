@@ -36,9 +36,12 @@ class HeadlinesFilterBloc
        super(const HeadlinesFilterState()) {
     on<FilterDataLoaded>(_onFilterDataLoaded, transformer: restartable());
     on<FilterTopicToggled>(_onFilterTopicToggled);
+    on<FilterTopicsChanged>(_onFilterTopicsChanged);
     on<FilterSourceToggled>(_onFilterSourceToggled);
+    on<FilterSourcesChanged>(_onFilterSourcesChanged);
     on<FilterCountryToggled>(_onFilterCountryToggled);
     on<FilterSelectionsCleared>(_onFilterSelectionsCleared);
+    on<FilterCountriesChanged>(_onFilterCountriesChanged);
     on<FilterSourceCriteriaChanged>(_onFilterSourceCriteriaChanged);
   }
 
@@ -143,6 +146,17 @@ class HeadlinesFilterBloc
     emit(state.copyWith(selectedTopics: updatedSelectedTopics));
   }
 
+  /// Handles the [FilterTopicsChanged] event, replacing the selected topics.
+  void _onFilterTopicsChanged(
+    FilterTopicsChanged event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    _logger.finer(
+      'Replacing selected topics with a new set of ${event.topics.length} items.',
+    );
+    emit(state.copyWith(selectedTopics: event.topics));
+  }
+
   /// Handles the [FilterSourceToggled] event, updating the selected sources.
   void _onFilterSourceToggled(
     FilterSourceToggled event,
@@ -160,6 +174,17 @@ class HeadlinesFilterBloc
     emit(state.copyWith(selectedSources: updatedSelectedSources));
   }
 
+  /// Handles the [FilterSourcesChanged] event, replacing the selected sources.
+  void _onFilterSourcesChanged(
+    FilterSourcesChanged event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    _logger.finer(
+      'Replacing selected sources with a new set of ${event.sources.length} items.',
+    );
+    emit(state.copyWith(selectedSources: event.sources));
+  }
+
   /// Handles the [FilterCountryToggled] event, updating the selected countries.
   void _onFilterCountryToggled(
     FilterCountryToggled event,
@@ -175,6 +200,17 @@ class HeadlinesFilterBloc
       updatedSelectedCountries.remove(event.country);
     }
     emit(state.copyWith(selectedCountries: updatedSelectedCountries));
+  }
+
+  /// Handles the [FilterCountriesChanged] event, replacing the selected countries.
+  void _onFilterCountriesChanged(
+    FilterCountriesChanged event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    _logger.finer(
+      'Replacing selected countries with a new set of ${event.countries.length} items.',
+    );
+    emit(state.copyWith(selectedCountries: event.countries));
   }
 
   /// Handles the [FilterSelectionsCleared] event, clearing all filter selections.

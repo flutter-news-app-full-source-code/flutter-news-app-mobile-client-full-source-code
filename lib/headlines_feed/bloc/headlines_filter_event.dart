@@ -58,6 +58,20 @@ final class FilterTopicToggled extends HeadlinesFilterEvent {
   List<Object> get props => [topic, isSelected];
 }
 
+/// {@template filter_topics_changed}
+/// Event triggered when the entire set of selected topics is replaced.
+/// {@endtemplate}
+final class FilterTopicsChanged extends HeadlinesFilterEvent {
+  /// {@macro filter_topics_changed}
+  const FilterTopicsChanged({required this.topics});
+
+  /// The new set of selected topics.
+  final Set<Topic> topics;
+
+  @override
+  List<Object> get props => [topics];
+}
+
 /// {@template filter_source_toggled}
 /// Event triggered when a source checkbox is toggled.
 /// {@endtemplate}
@@ -75,6 +89,20 @@ final class FilterSourceToggled extends HeadlinesFilterEvent {
   List<Object> get props => [source, isSelected];
 }
 
+/// {@template filter_sources_changed}
+/// Event triggered when the entire set of selected sources is replaced.
+/// {@endtemplate}
+final class FilterSourcesChanged extends HeadlinesFilterEvent {
+  /// {@macro filter_sources_changed}
+  const FilterSourcesChanged({required this.sources});
+
+  /// The new set of selected sources.
+  final Set<Source> sources;
+
+  @override
+  List<Object> get props => [sources];
+}
+
 /// {@template filter_country_toggled}
 /// Event triggered when a country checkbox is toggled.
 /// {@endtemplate}
@@ -90,6 +118,20 @@ final class FilterCountryToggled extends HeadlinesFilterEvent {
 
   @override
   List<Object> get props => [country, isSelected];
+}
+
+/// {@template filter_countries_changed}
+/// Event triggered when the entire set of selected countries is replaced.
+/// {@endtemplate}
+final class FilterCountriesChanged extends HeadlinesFilterEvent {
+  /// {@macro filter_countries_changed}
+  const FilterCountriesChanged({required this.countries});
+
+  /// The new set of selected countries.
+  final Set<Country> countries;
+
+  @override
+  List<Object> get props => [countries];
 }
 
 /// {@template filter_selections_cleared}

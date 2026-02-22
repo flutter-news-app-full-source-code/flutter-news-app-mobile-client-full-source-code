@@ -596,6 +596,14 @@
     "@settingsAppearanceFontFamilySystemDefault": {
         "description": "Label for the system default font family option"
     },
+    "settingsAppearanceFontFamilyRoboto": "Roboto",
+    "@settingsAppearanceFontFamilyRoboto": {
+        "description": "Label for the Roboto font family option"
+    },
+    "settingsAppearanceFontFamilyOpenSans": "Open Sans",
+    "@settingsAppearanceFontFamilyOpenSans": {
+        "description": "Label for the Open Sans font family option"
+    },
     "settingsAppearanceThemeSubPageTitle": "Theme Settings",
     "@settingsAppearanceThemeSubPageTitle": {
         "description": "Title for the theme settings sub-page under appearance"

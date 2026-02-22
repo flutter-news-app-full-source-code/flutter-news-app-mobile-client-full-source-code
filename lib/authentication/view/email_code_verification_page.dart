@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:pinput/pinput.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -42,41 +43,46 @@ class EmailCodeVerificationPage extends StatelessWidget {
           builder: (context, state) {
             final isLoading = state.status == AuthenticationStatus.loading;
 
-            return Padding(
-              padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(
-                        Icons.mark_email_read_outlined,
-                        size: AppSpacing.xxl * 2,
-                        color: colorScheme.primary,
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      Text(
-                        l10n.emailCodeSentConfirmation(email),
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppLayout.maxAuthFormWidth,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Icon(
+                          Icons.mark_email_read_outlined,
+                          size: AppSpacing.xxl * 2,
+                          color: colorScheme.primary,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        l10n.emailCodeSentInstructions,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                        const SizedBox(height: AppSpacing.xl),
+                        Text(
+                          l10n.emailCodeSentConfirmation(email),
+                          style: textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      _EmailCodeVerificationForm(
-                        email: email,
-                        isLoading: isLoading,
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          l10n.emailCodeSentInstructions,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        _EmailCodeVerificationForm(
+                          email: email,
+                          isLoading: isLoading,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

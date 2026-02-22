@@ -154,14 +154,23 @@ class _FontFamilySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final fontDisplayNames = {
+      'SystemDefault': l10n.settingsAppearanceFontFamilySystemDefault,
+      'Roboto': l10n.settingsAppearanceFontFamilyRoboto,
+      'OpenSans': l10n.settingsAppearanceFontFamilyOpenSans,
+    };
+
     return DropdownButtonFormField<String>(
       value: settings.displaySettings.fontFamily,
       decoration: InputDecoration(
         labelText: l10n.settingsFontFamilyLabel,
         border: const OutlineInputBorder(),
       ),
-      items: const ['SystemDefault', 'Roboto', 'OpenSans']
-          .map((font) => DropdownMenuItem(value: font, child: Text(font)))
+      items: fontDisplayNames.entries
+          .map(
+            (entry) =>
+                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+          )
           .toList(),
       onChanged: (value) {
         if (value != null) {

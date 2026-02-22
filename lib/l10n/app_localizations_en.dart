@@ -471,6 +471,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceFontFamilySystemDefault => 'System Default';
 
   @override
+  String get settingsAppearanceFontFamilyRoboto => 'Roboto';
+
+  @override
+  String get settingsAppearanceFontFamilyOpenSans => 'Open Sans';
+
+  @override
   String get settingsAppearanceThemeSubPageTitle => 'Theme Settings';
 
   @override

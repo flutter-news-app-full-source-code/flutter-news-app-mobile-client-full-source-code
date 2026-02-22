@@ -974,6 +974,18 @@ abstract class AppLocalizations {
   /// **'System Default'**
   String get settingsAppearanceFontFamilySystemDefault;
 
+  /// Label for the Roboto font family option
+  ///
+  /// In en, this message translates to:
+  /// **'Roboto'**
+  String get settingsAppearanceFontFamilyRoboto;
+
+  /// Label for the Open Sans font family option
+  ///
+  /// In en, this message translates to:
+  /// **'Open Sans'**
+  String get settingsAppearanceFontFamilyOpenSans;
+
   /// Title for the theme settings sub-page under appearance
   ///
   /// In en, this message translates to:

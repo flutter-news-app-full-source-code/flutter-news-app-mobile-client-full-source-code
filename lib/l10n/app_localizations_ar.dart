@@ -468,6 +468,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsAppearanceFontFamilySystemDefault => 'افتراضي النظام';
 
   @override
+  String get settingsAppearanceFontFamilyRoboto => 'روبوتو';
+
+  @override
+  String get settingsAppearanceFontFamilyOpenSans => 'أوبن سانس';
+
+  @override
   String get settingsAppearanceThemeSubPageTitle => 'إعدادات المظهر';
 
   @override

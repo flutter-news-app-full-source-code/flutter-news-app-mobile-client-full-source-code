@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -30,83 +31,90 @@ class AccountLinkingPage extends StatelessWidget {
           color: colorScheme.onSurface,
         ),
       ),
-      body: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-        listener: (context, state) {
-          if (state.status == AuthenticationStatus.failure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.exception!.toFriendlyMessage(context)),
-                  backgroundColor: colorScheme.error,
-                ),
-              );
-          }
-        },
-        builder: (context, state) {
-          final isLoading = state.status == AuthenticationStatus.loading;
+      body: SafeArea(
+        child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            if (state.status == AuthenticationStatus.failure) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.exception!.toFriendlyMessage(context)),
+                    backgroundColor: colorScheme.error,
+                  ),
+                );
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state.status == AuthenticationStatus.loading;
 
-          return Padding(
-            padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                      child: Icon(
-                        Icons.sync,
-                        size: AppSpacing.xxl * 2,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                    Text(
-                      l10n.accountLinkingHeadline,
-                      style: textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      l10n.accountLinkingBody,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.email_outlined),
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              context.goNamed(
-                                Routes.accountLinkingRequestCodeName,
-                              );
-                            },
-                      label: Text(l10n.accountLinkingSendLinkButton),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.md,
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppLayout.maxAuthFormWidth,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          child: Icon(
+                            Icons.sync,
+                            size: AppSpacing.xxl * 2,
+                            color: colorScheme.primary,
+                          ),
                         ),
-                        textStyle: textTheme.labelLarge,
-                      ),
+                        Text(
+                          l10n.accountLinkingHeadline,
+                          style: textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          l10n.accountLinkingBody,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xxl),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.email_outlined),
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  context.goNamed(
+                                    Routes.accountLinkingRequestCodeName,
+                                  );
+                                },
+                          label: Text(l10n.accountLinkingSendLinkButton),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                            textStyle: textTheme.labelLarge,
+                          ),
+                        ),
+                        if (isLoading) ...[
+                          const Padding(
+                            padding: EdgeInsets.only(top: AppSpacing.xl),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        ],
+                      ],
                     ),
-                    if (isLoading) ...[
-                      const Padding(
-                        padding: EdgeInsets.only(top: AppSpacing.xl),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

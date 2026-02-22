@@ -432,6 +432,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsNotificationsCountriesLabel => 'البلدان المتابعة';
 
   @override
+  String get settingsAppearanceSectionTitle => 'المظهر';
+
+  @override
+  String get settingsFeedSectionTitle => 'الموجز';
+
+  @override
+  String get settingsGeneralSectionTitle => 'عام';
+
+  @override
+  String get settingsAccentColorAndFontsTitle => 'لون التمييز والخطوط';
+
+  @override
+  String get settingsAccentColorLabel => 'لون التمييز';
+
+  @override
+  String get settingsFontFamilyLabel => 'عائلة الخط';
+
+  @override
+  String get settingsLayoutAndReadingTitle => 'التخطيط والقراءة';
+
+  @override
+  String get appName => 'Headlines Toolkit';
+
+  @override
   String get unknownError => 'حدث خطأ غير معروف.';
 
   @override
@@ -442,6 +466,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsAppearanceFontFamilySystemDefault => 'افتراضي النظام';
+
+  @override
+  String get settingsAppearanceFontFamilyRoboto => 'روبوتو';
+
+  @override
+  String get settingsAppearanceFontFamilyOpenSans => 'أوبن سانس';
 
   @override
   String get settingsAppearanceThemeSubPageTitle => 'إعدادات المظهر';

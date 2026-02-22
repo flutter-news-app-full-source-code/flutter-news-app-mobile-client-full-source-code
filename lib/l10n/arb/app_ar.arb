@@ -548,6 +548,38 @@
     "@settingsNotificationsCountriesLabel": {
         "description": "Label for the section to select notification countries"
     },
+    "settingsAppearanceSectionTitle": "المظهر",
+    "@settingsAppearanceSectionTitle": {
+        "description": "Section title for appearance settings."
+    },
+    "settingsFeedSectionTitle": "الموجز",
+    "@settingsFeedSectionTitle": {
+        "description": "Section title for feed settings."
+    },
+    "settingsGeneralSectionTitle": "عام",
+    "@settingsGeneralSectionTitle": {
+        "description": "Section title for general settings."
+    },
+    "settingsAccentColorAndFontsTitle": "لون التمييز والخطوط",
+    "@settingsAccentColorAndFontsTitle": {
+        "description": "Title for the consolidated theme and font settings page."
+    },
+    "settingsAccentColorLabel": "لون التمييز",
+    "@settingsAccentColorLabel": {
+        "description": "Label for the accent color selection."
+    },
+    "settingsFontFamilyLabel": "عائلة الخط",
+    "@settingsFontFamilyLabel": {
+        "description": "Label for the font family selection."
+    },
+    "settingsLayoutAndReadingTitle": "التخطيط والقراءة",
+    "@settingsLayoutAndReadingTitle": {
+        "description": "Title for the feed layout and reading settings page."
+    },
+    "appName": "Headlines Toolkit",
+    "@appName": {
+        "description": "The name of the application."
+    },
     "unknownError": "حدث خطأ غير معروف.",
     "@unknownError": {
         "description": "Generic error message shown when an operation fails unexpectedly"
@@ -563,6 +595,14 @@
     "settingsAppearanceFontFamilySystemDefault": "افتراضي النظام",
     "@settingsAppearanceFontFamilySystemDefault": {
         "description": "Label for the system default font family option"
+    },
+    "settingsAppearanceFontFamilyRoboto": "روبوتو",
+    "@settingsAppearanceFontFamilyRoboto": {
+        "description": "Label for the Roboto font family option"
+    },
+    "settingsAppearanceFontFamilyOpenSans": "أوبن سانس",
+    "@settingsAppearanceFontFamilyOpenSans": {
+        "description": "Label for the Open Sans font family option"
     },
     "settingsAppearanceThemeSubPageTitle": "إعدادات المظهر",
     "@settingsAppearanceThemeSubPageTitle": {

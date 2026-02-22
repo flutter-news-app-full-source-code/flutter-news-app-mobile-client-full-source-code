@@ -902,6 +902,54 @@ abstract class AppLocalizations {
   /// **'Followed Countries'**
   String get settingsNotificationsCountriesLabel;
 
+  /// Section title for appearance settings.
+  ///
+  /// In en, this message translates to:
+  /// **'APPEARANCE'**
+  String get settingsAppearanceSectionTitle;
+
+  /// Section title for feed settings.
+  ///
+  /// In en, this message translates to:
+  /// **'FEED'**
+  String get settingsFeedSectionTitle;
+
+  /// Section title for general settings.
+  ///
+  /// In en, this message translates to:
+  /// **'GENERAL'**
+  String get settingsGeneralSectionTitle;
+
+  /// Title for the consolidated theme and font settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent Color & Fonts'**
+  String get settingsAccentColorAndFontsTitle;
+
+  /// Label for the accent color selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent Color'**
+  String get settingsAccentColorLabel;
+
+  /// Label for the font family selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Family'**
+  String get settingsFontFamilyLabel;
+
+  /// Title for the feed layout and reading settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout & Reading'**
+  String get settingsLayoutAndReadingTitle;
+
+  /// The name of the application.
+  ///
+  /// In en, this message translates to:
+  /// **'Headlines Toolkit'**
+  String get appName;
+
   /// Generic error message shown when an operation fails unexpectedly
   ///
   /// In en, this message translates to:
@@ -925,6 +973,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System Default'**
   String get settingsAppearanceFontFamilySystemDefault;
+
+  /// Label for the Roboto font family option
+  ///
+  /// In en, this message translates to:
+  /// **'Roboto'**
+  String get settingsAppearanceFontFamilyRoboto;
+
+  /// Label for the Open Sans font family option
+  ///
+  /// In en, this message translates to:
+  /// **'Open Sans'**
+  String get settingsAppearanceFontFamilyOpenSans;
 
   /// Title for the theme settings sub-page under appearance
   ///

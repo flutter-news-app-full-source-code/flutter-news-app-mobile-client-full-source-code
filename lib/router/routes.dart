@@ -23,18 +23,10 @@ abstract final class Routes {
   static const discoverName = 'discover';
 
   // --- Global, Top-Level Routes ---
-  static const entityDetails = '/entity-details/:type/:id';
-  static const entityDetailsName = 'entityDetails';
-
-  // --- Onboarding Routes ---
-  static const appTour = '/app-tour';
-  static const appTourName = 'appTour';
-  static const initialPersonalization = '/initial-personalization';
-  static const initialPersonalizationName = 'initialPersonalization';
-
-  // --- Account Sub-Routes ---
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
+  static const entityDetails = '/entity-details/:type/:id';
+  static const entityDetailsName = 'entityDetails';
   static const settings = 'settings';
   static const settingsName = 'settings';
   static const manageFollowedItems = 'manage-followed-items';
@@ -45,6 +37,12 @@ abstract final class Routes {
   static const rewardsName = 'rewards';
   static const editProfile = 'edit-profile';
   static const editProfileName = 'editProfile';
+
+  // --- Onboarding Routes ---
+  static const appTour = '/app-tour';
+  static const appTourName = 'appTour';
+  static const initialPersonalization = '/initial-personalization';
+  static const initialPersonalizationName = 'initialPersonalization';
 
   // --- Relative Sub-Routes ---
   // These routes are defined with relative paths and are intended to be
@@ -77,12 +75,8 @@ abstract final class Routes {
   static const discoverSourceListFilterName = 'discoverSourceListFilter';
 
   // Settings
-  static const settingsAppearance = 'appearance';
-  static const settingsAppearanceName = 'settingsAppearance';
-  static const settingsAppearanceTheme = 'theme';
-  static const settingsAppearanceThemeName = 'settingsAppearanceTheme';
-  static const settingsAppearanceFont = 'font';
-  static const settingsAppearanceFontName = 'settingsAppearanceFont';
+  static const settingsAccentColorAndFonts = 'theme-and-font';
+  static const settingsAccentColorAndFontsName = 'settingsAccentColorAndFonts';
   static const settingsFeed = 'feed';
   static const settingsFeedName = 'settingsFeed';
   static const settingsArticle = 'article';

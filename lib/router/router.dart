@@ -49,13 +49,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/appearance_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/feed_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/font_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/language_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_and_font_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
@@ -341,7 +337,8 @@ GoRouter createRouter({
             name: Routes.notificationsCenterName,
             builder: (context, state) {
               // Provide the InAppNotificationCenterBloc here so it's available
-              // in the BuildContext when InAppNotificationCenterPage's initState runs.
+              // in the BuildContext when InAppNotificationCenterPage's
+              // initState runs.
               return BlocProvider(
                 create: (context) => InAppNotificationCenterBloc(
                   inAppNotificationRepository: context
@@ -353,68 +350,20 @@ GoRouter createRouter({
               );
             },
           ),
-          // The settings section within the account modal. It uses a
-          // ShellRoute to provide a SettingsBloc to all its children.
-          ShellRoute(
-            builder: (BuildContext context, GoRouterState state, Widget child) {
-              final appBloc = context.read<AppBloc>();
-              final userId = appBloc.state.user?.id;
-
-              return BlocProvider<SettingsBloc>(
-                create: (context) {
-                  final settingsBloc = SettingsBloc(
-                    appSettingsRepository: context
-                        .read<DataRepository<AppSettings>>(),
-                    inlineAdCacheService: context.read<InlineAdCacheService>(),
-                  );
-                  if (userId != null) {
-                    settingsBloc.add(SettingsLoadRequested(userId: userId));
-                  } else {
-                    logger.warning(
-                      'User ID is null when creating SettingsBloc. '
-                      'Settings will not be loaded.',
-                    );
-                  }
-                  return settingsBloc;
-                },
-                child: child,
-              );
-            },
+          GoRoute(
+            path: Routes.settings,
+            name: Routes.settingsName,
+            builder: (context, state) => const SettingsPage(),
             routes: [
               GoRoute(
-                path: Routes.settings,
-                name: Routes.settingsName,
-                builder: (context, state) => const SettingsPage(),
-                routes: [
-                  GoRoute(
-                    path: Routes.settingsAppearance,
-                    name: Routes.settingsAppearanceName,
-                    builder: (context, state) => const AppearanceSettingsPage(),
-                    routes: [
-                      GoRoute(
-                        path: Routes.settingsAppearanceTheme,
-                        name: Routes.settingsAppearanceThemeName,
-                        builder: (context, state) => const ThemeSettingsPage(),
-                      ),
-                      GoRoute(
-                        path: Routes.settingsAppearanceFont,
-                        name: Routes.settingsAppearanceFontName,
-                        builder: (context, state) => const FontSettingsPage(),
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: Routes.settingsFeed,
-                    name: Routes.settingsFeedName,
-                    builder: (context, state) => const FeedSettingsPage(),
-                  ),
-
-                  GoRoute(
-                    path: Routes.settingsLanguage,
-                    name: Routes.settingsLanguageName,
-                    builder: (context, state) => const LanguageSettingsPage(),
-                  ),
-                ],
+                path: Routes.settingsAccentColorAndFonts,
+                name: Routes.settingsAccentColorAndFontsName,
+                builder: (context, state) => const ThemeAndFontSettingsPage(),
+              ),
+              GoRoute(
+                path: Routes.settingsFeed,
+                name: Routes.settingsFeedName,
+                builder: (context, state) => const FeedSettingsPage(),
               ),
             ],
           ),

@@ -2,7 +2,7 @@
 abstract final class AppLayout {
   /// The maximum width for primary content containers to ensure readability on
   /// wide screens.
-  static const double maxContentWidth = 960;
+  static const double maxContentWidth = 720;
 
   /// The maximum width for content inside dialogs or secondary pages.
   static const double maxDialogContentWidth = 720;

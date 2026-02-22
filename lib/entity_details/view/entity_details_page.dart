@@ -173,36 +173,43 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             _ => null,
           };
 
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < AppLayout.tabletBreakpoint) {
-                // Compact view (phones)
-                return _buildCompactView(
-                  context,
-                  state,
-                  l10n,
-                  textTheme,
-                  colorScheme,
-                  appBarTitleText,
-                  appBarIconData,
-                  entityIconUrl,
-                  isSourceReportingEnabled,
-                );
-              } else {
-                // Expanded view (tablets)
-                return _buildExpandedView(
-                  context,
-                  state,
-                  l10n,
-                  textTheme,
-                  colorScheme,
-                  appBarTitleText,
-                  appBarIconData,
-                  entityIconUrl,
-                  isSourceReportingEnabled,
-                );
-              }
-            },
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppLayout.maxContentWidth,
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < AppLayout.tabletBreakpoint) {
+                    // Compact view (phones)
+                    return _buildCompactView(
+                      context,
+                      state,
+                      l10n,
+                      textTheme,
+                      colorScheme,
+                      appBarTitleText,
+                      appBarIconData,
+                      entityIconUrl,
+                      isSourceReportingEnabled,
+                    );
+                  } else {
+                    // Expanded view (tablets)
+                    return _buildExpandedView(
+                      context,
+                      state,
+                      l10n,
+                      textTheme,
+                      colorScheme,
+                      appBarTitleText,
+                      appBarIconData,
+                      entityIconUrl,
+                      isSourceReportingEnabled,
+                    );
+                  }
+                },
+              ),
+            ),
           );
         },
       ),

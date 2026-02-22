@@ -77,85 +77,50 @@ class SavedHeadlinesPage extends StatelessWidget {
               constraints: const BoxConstraints(
                 maxWidth: AppLayout.maxContentWidth,
               ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth < AppLayout.tabletBreakpoint) {
-                    // Phone layout: ListView
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.paddingSmall,
-                      ),
-                      itemCount: savedHeadlines.length,
-                      separatorBuilder: (context, index) => const Divider(
-                        height: 1,
-                        indent: AppSpacing.paddingMedium,
-                        endIndent: AppSpacing.paddingMedium,
-                      ),
-                      itemBuilder: (context, index) {
-                        final headline = savedHeadlines[index];
-                        final imageStyle =
-                            appState
-                                .settings
-                                ?.feedSettings
-                                .feedItemImageStyle ??
-                            FeedItemImageStyle.smallThumbnail;
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.paddingSmall,
+                ),
+                itemCount: savedHeadlines.length,
+                separatorBuilder: (context, index) => const Divider(
+                  height: 1,
+                  indent: AppSpacing.paddingMedium,
+                  endIndent: AppSpacing.paddingMedium,
+                ),
+                itemBuilder: (context, index) {
+                  final headline = savedHeadlines[index];
+                  final imageStyle =
+                      appState.settings?.feedSettings.feedItemImageStyle ??
+                      FeedItemImageStyle.smallThumbnail;
 
-                        switch (imageStyle) {
-                          case FeedItemImageStyle.hidden:
-                            return HeadlineTileTextOnly(
-                              headline: headline,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    headline,
-                                  ),
-                            );
-                          case FeedItemImageStyle.smallThumbnail:
-                            return HeadlineTileImageStart(
-                              headline: headline,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    headline,
-                                  ),
-                            );
-                          case FeedItemImageStyle.largeThumbnail:
-                            return HeadlineTileImageTop(
-                              headline: headline,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    headline,
-                                  ),
-                            );
-                        }
-                      },
-                    );
-                  } else {
-                    // Tablet layout: GridView
-                    return GridView.builder(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent:
-                                AppLayout.gridMaxCrossAxisExtent,
-                            mainAxisSpacing: AppSpacing.md,
-                            crossAxisSpacing: AppSpacing.md,
-                            childAspectRatio: AppLayout.gridChildAspectRatio,
-                          ),
-                      itemCount: savedHeadlines.length,
-                      itemBuilder: (context, index) {
-                        final headline = savedHeadlines[index];
-                        return HeadlineTileImageTop(
-                          headline: headline,
-                          onHeadlineTap: () =>
-                              HeadlineTapHandler.handleHeadlineTap(
-                                context,
-                                headline,
-                              ),
-                        );
-                      },
-                    );
+                  switch (imageStyle) {
+                    case FeedItemImageStyle.hidden:
+                      return HeadlineTileTextOnly(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
+                    case FeedItemImageStyle.smallThumbnail:
+                      return HeadlineTileImageStart(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
+                    case FeedItemImageStyle.largeThumbnail:
+                      return HeadlineTileImageTop(
+                        headline: headline,
+                        onHeadlineTap: () =>
+                            HeadlineTapHandler.handleHeadlineTap(
+                              context,
+                              headline,
+                            ),
+                      );
                   }
                 },
               ),

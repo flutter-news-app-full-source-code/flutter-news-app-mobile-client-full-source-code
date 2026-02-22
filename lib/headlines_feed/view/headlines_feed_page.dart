@@ -269,16 +269,7 @@ class __HeadlinesFeedViewState extends State<_HeadlinesFeedView>
                           ),
                         )
                       else
-                        SliverLayoutBuilder(
-                          builder: (context, constraints) {
-                            if (constraints.crossAxisExtent <
-                                AppLayout.tabletBreakpoint) {
-                              return _buildSliverList(state, theme);
-                            } else {
-                              return _buildSliverGrid(state, theme);
-                            }
-                          },
-                        ),
+                        _buildSliverList(state, theme),
                     ],
                   ),
                 ),
@@ -321,37 +312,6 @@ class __HeadlinesFeedViewState extends State<_HeadlinesFeedView>
           final item = state.feedItems[index];
           return _buildFeedItem(context, item, state, theme);
         },
-      ),
-    );
-  }
-
-  Widget _buildSliverGrid(HeadlinesFeedState state, ThemeData theme) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: AppSpacing.md,
-        bottom: AppSpacing.xxl,
-        left: AppSpacing.md,
-        right: AppSpacing.md,
-      ),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: AppLayout.gridMaxCrossAxisExtent,
-          mainAxisSpacing: AppSpacing.md,
-          crossAxisSpacing: AppSpacing.md,
-          childAspectRatio: AppLayout.gridChildAspectRatio,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            if (index >= state.feedItems.length) {
-              return _buildLoadingIndicator(state);
-            }
-            final item = state.feedItems[index];
-            return _buildFeedItem(context, item, state, theme);
-          },
-          childCount: state.hasMore
-              ? state.feedItems.length + 1
-              : state.feedItems.length,
-        ),
       ),
     );
   }

@@ -8,7 +8,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ui_kit/ui_kit.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// {@template settings_page}
 /// The main page for accessing different application settings categories.
@@ -133,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: const Icon(Icons.info_outline),
               applicationName: l10n.appName,
               applicationVersion: _appVersion,
-              applicationLegalese: '© 2024 Headlines Toolkit',
+              applicationLegalese: '© ${DateTime.now().year}',
               aboutBoxChildren: const [_SocialMediaLinks()],
             ),
           ],
@@ -277,28 +276,13 @@ class _SocialMediaLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(fulleni): Move these to remote config
-    const twitterUrl = 'https://twitter.com/your_handle';
-    const githubUrl = 'https://github.com/your_repo';
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.link), // Placeholder for Twitter/X icon
-          onPressed: () => _launchUrl(twitterUrl),
-        ),
-        IconButton(
-          icon: const Icon(Icons.code), // Placeholder for GitHub icon
-          onPressed: () => _launchUrl(githubUrl),
-        ),
-      ],
-    );
+    // TODO(fulleni): Move social media URLs to remote config and re-enable this UI.
+    return const SizedBox.shrink();
   }
 
-  Future<void> _launchUrl(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      // Could show a snackbar here if needed
-    }
-  }
+  // Future<void> _launchUrl(String url) async {
+  //   if (!await launchUrl(Uri.parse(url))) {
+  //     // Could show a snackbar here if needed
+  //   }
+  // }
 }

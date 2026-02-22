@@ -16,33 +16,20 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/rew
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/account_linking_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/source_list_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_filter_page.dart'
-    as discover_filter;
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/saved_headlines_filters_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/source_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/source_list_filter_page.dart'
-    as feed_filter;
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/source_type_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/topic_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
@@ -480,212 +467,66 @@ GoRouter createRouter({
         },
       ),
 
-      // --- Main App Shell with Bottom Navigation ---
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return AppShell(navigationShell: navigationShell);
-        },
-        branches: [
-          // --- Branch 1: Feed ---
-          StatefulShellBranch(
-            routes: [
-              ShellRoute(
-                builder: (context, state, child) {
-                  // The HeadlinesFeedBloc is provided at the root of the feed
-                  // branch. This ensures that all child routes, including the
-                  // filter pages, have access to the same BLoC instance.
-                  return BlocProvider<HeadlinesFeedBloc>(
-                    create: (context) {
-                      final appBloc = context.read<AppBloc>();
-                      final initialUserContentPreferences =
-                          appBloc.state.userContentPreferences;
-                      return HeadlinesFeedBloc(
-                        headlinesRepository: context
-                            .read<DataRepository<Headline>>(),
-                        feedDecoratorService: FeedDecoratorService(),
-                        adService: context.read<AdService>(),
-                        appBloc: appBloc,
-                        inlineAdCacheService: context
-                            .read<InlineAdCacheService>(),
-                        feedCacheService: context.read<FeedCacheService>(),
-                        initialUserContentPreferences:
-                            initialUserContentPreferences,
-                        engagementRepository: context
-                            .read<DataRepository<Engagement>>(),
-                        contentLimitationService: context
-                            .read<ContentLimitationService>(),
-                        analyticsService: context.read<AnalyticsService>(),
-                      );
-                    },
-                    child: child,
-                  );
-                },
-                routes: [
-                  GoRoute(
-                    path: Routes.feed,
-                    name: Routes.feedName,
-                    builder: (context, state) => const HeadlinesFeedPage(),
-                    routes: [
-                      GoRoute(
-                        path: Routes.savedHeadlineFilters,
-                        name: Routes.savedHeadlineFiltersName,
-                        pageBuilder: (context, state) {
-                          // The SavedHeadlinesFiltersPage is presented as a
-                          // full-screen dialog for a modal-like user experience.
-                          return const MaterialPage(
-                            fullscreenDialog: true,
-                            child: SavedHeadlinesFiltersPage(),
-                          );
-                        },
-                      ),
-                      GoRoute(
-                        path: Routes.feedFilter,
-                        name: Routes.feedFilterName,
-                        pageBuilder: (context, state) {
-                          // The 'extra' parameter contains a map with the
-                          // initial filter.
-                          final extra = state.extra! as Map<String, dynamic>;
-                          final initialFilter =
-                              extra['initialFilter'] as HeadlineFilterCriteria;
-                          // The filter to edit, if any. This is passed when the user
-                          // taps 'Edit' on a saved filter.
-                          final filterToEdit =
-                              extra['filterToEdit'] as SavedHeadlineFilter?;
-
-                          return MaterialPage(
-                            fullscreenDialog: true,
-                            child: BlocProvider(
-                              create: (context) =>
-                                  HeadlinesFilterBloc(
-                                    topicsRepository: context
-                                        .read<DataRepository<Topic>>(),
-                                    sourcesRepository: context
-                                        .read<DataRepository<Source>>(),
-                                    countriesRepository: context
-                                        .read<DataRepository<Country>>(),
-                                  )..add(
-                                    FilterDataLoaded(
-                                      initialSelectedTopics:
-                                          initialFilter.topics,
-                                      initialSelectedSources:
-                                          initialFilter.sources,
-                                      initialSelectedCountries:
-                                          initialFilter.countries,
-                                    ),
-                                  ),
-                              child: HeadlinesFilterPage(
-                                initialFilter: initialFilter,
-                                filterToEdit: filterToEdit,
-                              ),
-                            ),
-                          );
-                        },
-                        routes: [
-                          GoRoute(
-                            path: Routes.feedFilterTopics,
-                            name: Routes.feedFilterTopicsName,
-                            builder: (context, state) {
-                              final filterBloc =
-                                  state.extra! as HeadlinesFilterBloc;
-                              return TopicFilterPage(filterBloc: filterBloc);
-                            },
-                          ),
-                          GoRoute(
-                            path: Routes.feedFilterSources,
-                            name: Routes.feedFilterSourcesName,
-                            builder: (context, state) {
-                              final filterBloc =
-                                  state.extra! as HeadlinesFilterBloc;
-                              return SourceFilterPage(filterBloc: filterBloc);
-                            },
-                            routes: [
-                              GoRoute(
-                                path: 'source-list-filter',
-                                name: Routes.sourceListFilterName,
-                                builder: (context, state) {
-                                  final filterBloc =
-                                      state.extra! as HeadlinesFilterBloc;
-                                  return feed_filter.SourceListFilterPage(
-                                    filterBloc: filterBloc,
-                                  );
-                                },
-                              ),
-                              GoRoute(
-                                path: Routes.sourceTypeFilter,
-                                name: Routes.sourceTypeFilterName,
-                                builder: (context, state) {
-                                  final filterBloc =
-                                      state.extra! as HeadlinesFilterBloc;
-                                  return SourceTypeFilterPage(
-                                    filterBloc: filterBloc,
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          GoRoute(
-                            path: Routes.feedFilterEventCountries,
-                            name: Routes.feedFilterEventCountriesName,
-                            pageBuilder: (context, state) {
-                              final l10n = context.l10n;
-                              final filterBloc =
-                                  state.extra! as HeadlinesFilterBloc;
-                              return MaterialPage(
-                                child: CountryFilterPage(
-                                  title:
-                                      l10n.headlinesFeedFilterEventCountryLabel,
-                                  filterBloc: filterBloc,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+      // --- Feed Route ---
+      // The HeadlinesFeedPage itself now provides the HeadlinesFeedBloc.
+      // This simplifies the router by removing the need for a wrapping ShellRoute.
+      // Child routes like 'filter' can access the BLoC because HeadlinesFeedPage
+      // remains in the widget tree when they are pushed on top.
+      GoRoute(
+        path: Routes.feed,
+        name: Routes.feedName,
+        builder: (context, state) => const HeadlinesFeedPage(),
+        routes: [
+          GoRoute(
+            path: Routes.savedHeadlineFilters,
+            name: Routes.savedHeadlineFiltersName,
+            pageBuilder: (context, state) {
+              // The SavedHeadlinesFiltersPage is presented as a
+              // full-screen dialog for a modal-like user experience.
+              return const MaterialPage(
+                fullscreenDialog: true,
+                child: SavedHeadlinesFiltersPage(),
+              );
+            },
           ),
-          // --- Branch 2: Discover ---
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.discover,
-                name: Routes.discoverName,
-                builder: (context, state) => const DiscoverPage(),
-                routes: [
-                  GoRoute(
-                    path: Routes.sourceList,
-                    name: Routes.sourceListName,
-                    builder: (context, state) {
-                      final sourceTypeName = state.pathParameters['sourceType'];
-                      if (sourceTypeName == null) {
-                        return const Scaffold(
-                          body: Center(child: Text('Source Type missing')),
-                        );
-                      }
-                      final sourceType = SourceType.values.firstWhere(
-                        (e) => e.name == sourceTypeName,
-                      );
-                      return SourceListPage(sourceType: sourceType);
-                    },
-                    routes: [
-                      GoRoute(
-                        path: Routes.sourceListFilter,
-                        name: Routes.discoverSourceListFilterName,
-                        builder: (context, state) {
-                          final sourceListBloc = state.extra! as SourceListBloc;
-                          return discover_filter.SourceListFilterPage(
-                            sourceListBloc: sourceListBloc,
-                          );
-                        },
+          GoRoute(
+            path: Routes.feedFilter,
+            name: Routes.feedFilterName,
+            pageBuilder: (context, state) {
+              // The 'extra' parameter contains a map with the
+              // initial filter.
+              final extra = state.extra! as Map<String, dynamic>;
+              final initialFilter =
+                  extra['initialFilter'] as HeadlineFilterCriteria;
+              // The filter to edit, if any. This is passed when the user
+              // taps 'Edit' on a saved filter.
+              final filterToEdit =
+                  extra['filterToEdit'] as SavedHeadlineFilter?;
+
+              return MaterialPage(
+                fullscreenDialog: true,
+                child: BlocProvider(
+                  create: (context) =>
+                      HeadlinesFilterBloc(
+                        topicsRepository: context.read<DataRepository<Topic>>(),
+                        sourcesRepository: context
+                            .read<DataRepository<Source>>(),
+                        countriesRepository: context
+                            .read<DataRepository<Country>>(),
+                      )..add(
+                        FilterDataLoaded(
+                          initialSelectedTopics: initialFilter.topics,
+                          initialSelectedSources: initialFilter.sources,
+                          initialSelectedCountries: initialFilter.countries,
+                        ),
                       ),
-                    ],
+                  child: HeadlinesFilterPage(
+                    initialFilter: initialFilter,
+                    filterToEdit: filterToEdit,
                   ),
-                ],
-              ),
-            ],
+                ),
+              );
+            },
           ),
         ],
       ),

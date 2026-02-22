@@ -2,9 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template feed_settings_page}
@@ -14,125 +12,126 @@ class FeedSettingsPage extends StatelessWidget {
   /// {@macro feed_settings_page}
   const FeedSettingsPage({super.key});
 
-  // Helper to map HeadlineImageStyle enum to user-friendly strings
-  String _imageStyleToString(FeedItemImageStyle style, AppLocalizations l10n) {
-    switch (style) {
-      case FeedItemImageStyle.hidden:
-        return l10n.settingsFeedTileTypeTextOnly;
-      case FeedItemImageStyle.smallThumbnail:
-        return l10n.settingsFeedTileTypeImageStart;
-      case FeedItemImageStyle.largeThumbnail:
-        return l10n.settingsFeedTileTypeImageTop;
-    }
-  }
-
-  String _clickBehaviorToString(
-    FeedItemClickBehavior behavior,
-    AppLocalizations l10n,
-  ) {
-    switch (behavior) {
-      case FeedItemClickBehavior.defaultBehavior:
-        return l10n.settingsFeedClickBehaviorDefault;
-      case FeedItemClickBehavior.internalNavigation:
-        return l10n.settingsFeedClickBehaviorInApp;
-      case FeedItemClickBehavior.externalNavigation:
-        return l10n.settingsFeedClickBehaviorSystem;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final settingsBloc = context.watch<SettingsBloc>();
-    final state = settingsBloc.state;
+    final settings = context.select((AppBloc bloc) => bloc.state.settings);
 
-    // Ensure we have loaded state before building controls
-    if (state.status != SettingsStatus.success || state.appSettings == null) {
+    if (settings == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)),
+        appBar: AppBar(title: Text(l10n.settingsLayoutAndReadingTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, settingsState) {
-        if (settingsState.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppSettingsRefreshed());
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)),
-        body: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            // --- Feed Tile Type ---
-            _buildDropdownSetting<FeedItemImageStyle>(
-              context: context,
-              title: l10n.settingsFeedTileTypeLabel,
-              currentValue: state.appSettings!.feedSettings.feedItemImageStyle,
-              items: FeedItemImageStyle.values,
-              itemToString: (style) => _imageStyleToString(style, l10n),
-              onChanged: (value) {
-                if (value != null) {
-                  settingsBloc.add(SettingsFeedItemImageStyleChanged(value));
-                }
-              },
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            // --- Feed Item Click Behavior ---
-            _buildDropdownSetting<FeedItemClickBehavior>(
-              context: context,
-              title: l10n.settingsFeedClickBehaviorLabel,
-              currentValue:
-                  state.appSettings!.feedSettings.feedItemClickBehavior,
-              items: FeedItemClickBehavior.values,
-              itemToString: (behavior) =>
-                  _clickBehaviorToString(behavior, l10n),
-              onChanged: (value) {
-                if (value != null) {
-                  settingsBloc.add(SettingsFeedItemClickBehaviorChanged(value));
-                }
-              },
-            ),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.settingsLayoutAndReadingTitle)),
+      body: ListView(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        children: [
+          _SectionTitle(title: l10n.settingsFeedTileTypeLabel),
+          const SizedBox(height: AppSpacing.md),
+          _LayoutStyleSelector(settings: settings),
+          const SizedBox(height: AppSpacing.xxl),
+          _SectionTitle(title: l10n.settingsFeedClickBehaviorLabel),
+          const SizedBox(height: AppSpacing.md),
+          _OpenLinksInSelector(settings: settings),
+        ],
       ),
     );
   }
+}
 
-  /// Generic helper to build a setting row with a title and a dropdown.
-  Widget _buildDropdownSetting<T>({
-    required BuildContext context,
-    required String title,
-    required T currentValue,
-    required List<T> items,
-    required String Function(T) itemToString,
-    required ValueChanged<T?> onChanged,
-  }) {
-    final textTheme = Theme.of(context).textTheme;
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(title, style: Theme.of(context).textTheme.titleMedium);
+  }
+}
+
+class _LayoutStyleSelector extends StatelessWidget {
+  const _LayoutStyleSelector({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    return SegmentedButton<FeedItemImageStyle>(
+      segments: [
+        ButtonSegment(
+          value: FeedItemImageStyle.largeThumbnail,
+          label: Text(l10n.settingsFeedTileTypeImageTop),
+          icon: const Icon(Icons.image_outlined),
+        ),
+        ButtonSegment(
+          value: FeedItemImageStyle.smallThumbnail,
+          label: Text(l10n.settingsFeedTileTypeImageStart),
+          icon: const Icon(Icons.image_aspect_ratio_outlined),
+        ),
+        ButtonSegment(
+          value: FeedItemImageStyle.hidden,
+          label: Text(l10n.settingsFeedTileTypeTextOnly),
+          icon: const Icon(Icons.short_text),
+        ),
+      ],
+      selected: {settings.feedSettings.feedItemImageStyle},
+      onSelectionChanged: (newSelection) {
+        context.read<AppBloc>().add(
+          AppSettingsChanged(
+            settings.copyWith(
+              feedSettings: settings.feedSettings.copyWith(
+                feedItemImageStyle: newSelection.first,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _OpenLinksInSelector extends StatelessWidget {
+  const _OpenLinksInSelector({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.sm),
-        DropdownButtonFormField<T>(
-          value: currentValue,
-          items: items.map((T value) {
-            return DropdownMenuItem<T>(
-              value: value,
-              child: Text(itemToString(value)),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-          ),
+        RadioListTile<FeedItemClickBehavior>(
+          title: Text(l10n.settingsFeedClickBehaviorInApp),
+          value: FeedItemClickBehavior.internalNavigation,
+          groupValue: settings.feedSettings.feedItemClickBehavior,
+          onChanged: (value) => _onChanged(context, value),
+        ),
+        RadioListTile<FeedItemClickBehavior>(
+          title: Text(l10n.settingsFeedClickBehaviorSystem),
+          value: FeedItemClickBehavior.externalNavigation,
+          groupValue: settings.feedSettings.feedItemClickBehavior,
+          onChanged: (value) => _onChanged(context, value),
         ),
       ],
     );
+  }
+
+  void _onChanged(BuildContext context, FeedItemClickBehavior? value) {
+    if (value != null) {
+      context.read<AppBloc>().add(
+        AppSettingsChanged(
+          settings.copyWith(
+            feedSettings: settings.feedSettings.copyWith(
+              feedItemClickBehavior: value,
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

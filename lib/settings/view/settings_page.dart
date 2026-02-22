@@ -5,6 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -97,45 +98,52 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            _SectionTitle(title: l10n.settingsAppearanceSectionTitle),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeModeSetting(settings: settings),
-            const SizedBox(height: AppSpacing.lg),
-            ListTile(
-              title: Text(l10n.settingsAccentColorAndFontsTitle),
-              subtitle: Text(
-                '${_accentThemeToString(settings.displaySettings.accentTheme, l10n)}, '
-                '${_fontWeightToString(settings.displaySettings.fontWeight, l10n)}',
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () =>
-                  context.pushNamed(Routes.settingsAccentColorAndFontsName),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppLayout.maxDialogContentWidth,
             ),
-            const Divider(),
-            _SectionTitle(title: l10n.settingsFeedSectionTitle),
-            ListTile(
-              title: Text(l10n.settingsLayoutAndReadingTitle),
-              subtitle: Text(
-                '${_imageStyleToString(settings.feedSettings.feedItemImageStyle, l10n)}, '
-                '${_clickBehaviorToString(settings.feedSettings.feedItemClickBehavior, l10n)}',
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed(Routes.settingsFeedName),
+            child: ListView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              children: [
+                _SectionTitle(title: l10n.settingsAppearanceSectionTitle),
+                const SizedBox(height: AppSpacing.md),
+                _ThemeModeSetting(settings: settings),
+                const SizedBox(height: AppSpacing.lg),
+                ListTile(
+                  title: Text(l10n.settingsAccentColorAndFontsTitle),
+                  subtitle: Text(
+                    '${_accentThemeToString(settings.displaySettings.accentTheme, l10n)}, '
+                    '${_fontWeightToString(settings.displaySettings.fontWeight, l10n)}',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () =>
+                      context.pushNamed(Routes.settingsAccentColorAndFontsName),
+                ),
+                const Divider(),
+                _SectionTitle(title: l10n.settingsFeedSectionTitle),
+                ListTile(
+                  title: Text(l10n.settingsLayoutAndReadingTitle),
+                  subtitle: Text(
+                    '${_imageStyleToString(settings.feedSettings.feedItemImageStyle, l10n)}, '
+                    '${_clickBehaviorToString(settings.feedSettings.feedItemClickBehavior, l10n)}',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.pushNamed(Routes.settingsFeedName),
+                ),
+                const Divider(),
+                _SectionTitle(title: l10n.settingsGeneralSectionTitle),
+                _LanguageSetting(settings: settings),
+                AboutListTile(
+                  icon: const Icon(Icons.info_outline),
+                  applicationName: l10n.appName,
+                  applicationVersion: _appVersion,
+                  applicationLegalese: '© ${DateTime.now().year}',
+                  aboutBoxChildren: const [_SocialMediaLinks()],
+                ),
+              ],
             ),
-            const Divider(),
-            _SectionTitle(title: l10n.settingsGeneralSectionTitle),
-            _LanguageSetting(settings: settings),
-            AboutListTile(
-              icon: const Icon(Icons.info_outline),
-              applicationName: l10n.appName,
-              applicationVersion: _appVersion,
-              applicationLegalese: '© ${DateTime.now().year}',
-              aboutBoxChildren: const [_SocialMediaLinks()],
-            ),
-          ],
+          ),
         ),
       ),
     );

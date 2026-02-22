@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -96,14 +97,17 @@ class _AccentThemeSelector extends StatelessWidget {
   }
 
   Color _getThemeColor(BuildContext context, AppAccentTheme theme) {
+    final FlexScheme scheme;
     switch (theme) {
       case AppAccentTheme.defaultBlue:
-        return Colors.blue.shade700;
+        scheme = FlexScheme.blue;
       case AppAccentTheme.newsRed:
-        return Colors.red.shade700;
+        scheme = FlexScheme.red;
       case AppAccentTheme.graphiteGray:
-        return Colors.grey.shade700;
+        scheme = FlexScheme.material;
     }
+    final themeData = FlexThemeData.light(scheme: scheme);
+    return themeData.primaryColor;
   }
 }
 

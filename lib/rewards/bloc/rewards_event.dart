@@ -13,10 +13,7 @@ final class RewardsAdFailed extends RewardsEvent {}
 
 final class RewardsAdDismissed extends RewardsEvent {}
 
-final class RewardsAdRequested extends RewardsEvent {
-  const RewardsAdRequested({required this.type});
-  final RewardType type;
-}
+final class RewardsAdRequested extends RewardsEvent {}
 
 final class RewardsAdWatched extends RewardsEvent {}
 

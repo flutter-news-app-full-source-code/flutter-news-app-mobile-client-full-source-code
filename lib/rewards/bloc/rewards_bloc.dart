@@ -54,19 +54,18 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
       emit(const RewardsInitial(snackbarMessage: 'rewardsAdDismissedSnackbar'));
 
   void _onSnackbarShown(SnackbarShown event, Emitter<RewardsState> emit) {
-    emit(state.copyWith(snackbarMessage: () => null));
+    emit(const RewardsInitial());
   }
 
   void _onRewardsAdRequested(
     RewardsAdRequested event,
     Emitter<RewardsState> emit,
   ) {
-    emit(RewardsLoadingAd(activeRewardType: event.type));
+    emit(RewardsLoadingAd());
   }
 
   void _onRewardsAdWatched(RewardsAdWatched event, Emitter<RewardsState> emit) {
-    if (state.activeRewardType == null) return;
-    emit(RewardsVerifying(activeRewardType: state.activeRewardType));
+    emit(RewardsVerifying());
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
       add(RewardsTimerTicked());
@@ -77,28 +76,28 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     RewardsTimerTicked event,
     Emitter<RewardsState> emit,
   ) async {
-    final rewardType = state.activeRewardType;
-    if (rewardType == null) {
+    if (_appBloc.state.user == null) {
       _logger.warning('Timer ticked but no active reward type to verify.');
       _timer?.cancel();
       return;
     }
 
-    _logger.info('Verifying reward status for: $rewardType');
+    _logger.info('Verifying reward status for: adFree');
     final completer = Completer<UserRewards?>();
     _appBloc.add(UserRewardsRefreshed(completer: completer));
 
     try {
       final userRewards = await completer.future;
-      final isRewardActive = userRewards?.isRewardActive(rewardType) ?? false;
+      final isRewardActive =
+          userRewards?.isRewardActive(RewardType.adFree) ?? false;
 
       _logger.info('Verification check result: $isRewardActive');
 
       if (isRewardActive) {
-        _logger.info('Reward $rewardType is active. Stopping timer.');
+        _logger.info('Reward adFree is active. Stopping timer.');
         _timer?.cancel();
         if (state is! RewardsSuccess) {
-          emit(RewardsSuccess(activeRewardType: rewardType));
+          emit(RewardsSuccess());
 
           final duration =
               _appBloc
@@ -106,7 +105,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
                   .remoteConfig
                   ?.features
                   .rewards
-                  .rewards[rewardType]
+                  .rewards[RewardType.adFree]
                   ?.durationDays ??
               0;
 
@@ -114,7 +113,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
             _analyticsService.logEvent(
               AnalyticsEvent.rewardGranted,
               payload: RewardGrantedPayload(
-                rewardType: rewardType,
+                rewardType: RewardType.adFree,
                 durationDays: duration,
               ),
             ),

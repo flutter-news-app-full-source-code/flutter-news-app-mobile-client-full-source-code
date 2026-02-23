@@ -1445,11 +1445,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _logger.fine(
         'Calling repository to update engagement with new comment...',
       );
-      await _engagementRepository.update(
+      final confirmedEngagement = await _engagementRepository.update(
         id: updatedEngagement.id,
         item: updatedEngagement,
         userId: userId,
       );
+
+      // Update state with confirmed engagement (handling potential status change to pendingReview)
+      final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      );
+      final confirmedList =
+          List<Engagement>.from(confirmedEngagementsMap[event.headlineId] ?? [])
+            ..removeWhere((e) => e.userId == userId)
+            ..add(confirmedEngagement);
+      confirmedEngagementsMap[event.headlineId] = confirmedList;
+      emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
+
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
       _logger.info('Successfully updated comment.');
     } catch (e, s) {

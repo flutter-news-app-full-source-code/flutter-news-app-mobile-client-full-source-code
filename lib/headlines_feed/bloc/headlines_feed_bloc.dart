@@ -230,6 +230,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   Future<Map<String, List<Engagement>>> _fetchEngagementsForHeadlines(
     List<String> headlineIds,
   ) async {
+    final currentUserId = _appBloc.state.user?.id;
     if (headlineIds.isEmpty) return {};
     try {
       final response = await _engagementRepository.readAll(
@@ -237,8 +238,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           'entityId': {r'$in': headlineIds},
         },
       );
+
+      // Filter out comments that are pending review, unless they belong to the
+      // current user.
+      final visibleItems = response.items.where((e) {
+        if (e.comment == null) return true;
+        if (e.comment!.status == ModerationStatus.pendingReview) {
+          return e.userId == currentUserId;
+        }
+        return true;
+      });
+
       // Group engagements by their entityId.
-      return groupBy(response.items, (e) => e.entityId);
+      return groupBy(visibleItems, (e) => e.entityId);
     } catch (e, s) {
       _logger.severe('Failed to fetch engagements for headlines.', e, s);
       return {}; // Return empty map on failure to avoid breaking the feed.
@@ -1175,10 +1187,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       } else {
         // Creating new
         _logger.fine('Creating new engagement...');
-        await _engagementRepository.create(
+        final createdEngagement = await _engagementRepository.create(
           item: updatedEngagement!,
           userId: userId,
         );
+
+        // Update the state with the created engagement from the server.
+        // This is crucial because the server generates the valid ObjectId,
+        // whereas our optimistic update used a UUID.
+        final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+          state.engagementsMap,
+        );
+        final engagementsForHeadline = List<Engagement>.from(
+          newEngagementsForHeadline,
+        );
+        engagementsForHeadline.removeLast(); // Remove optimistic
+        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
+
+        emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
+
         unawaited(
           _analyticsService.logEvent(
             AnalyticsEvent.reactionCreated,
@@ -1302,10 +1330,24 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         );
       } else {
         _logger.fine('Calling repository to create engagement...');
-        await _engagementRepository.create(
+        final createdEngagement = await _engagementRepository.create(
           item: engagementToUpsert,
           userId: userId,
         );
+
+        // Update the state with the created engagement from the server.
+        // This ensures we have the correct ID for future updates.
+        final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+          state.engagementsMap,
+        );
+        final engagementsForHeadline = List<Engagement>.from(
+          newEngagementsForHeadline,
+        );
+        engagementsForHeadline.removeLast(); // Remove optimistic
+        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
+
+        emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
       }
       unawaited(
         _analyticsService.logEvent(
@@ -1403,11 +1445,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _logger.fine(
         'Calling repository to update engagement with new comment...',
       );
-      await _engagementRepository.update(
+      final confirmedEngagement = await _engagementRepository.update(
         id: updatedEngagement.id,
         item: updatedEngagement,
         userId: userId,
       );
+
+      // Update state with confirmed engagement (handling potential status change to pendingReview)
+      final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      );
+      final confirmedList =
+          List<Engagement>.from(confirmedEngagementsMap[event.headlineId] ?? [])
+            ..removeWhere((e) => e.userId == userId)
+            ..add(confirmedEngagement);
+      confirmedEngagementsMap[event.headlineId] = confirmedList;
+      emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
+
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
       _logger.info('Successfully updated comment.');
     } catch (e, s) {

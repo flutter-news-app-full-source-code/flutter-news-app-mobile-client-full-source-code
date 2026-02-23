@@ -1861,4 +1861,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get applyButtonLabel => 'Apply';
+
+  @override
+  String get commentStatusPending => 'Under Review';
 }

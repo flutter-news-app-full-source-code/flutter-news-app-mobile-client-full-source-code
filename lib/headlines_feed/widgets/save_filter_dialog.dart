@@ -327,52 +327,37 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
               // Only show the notifications section if the feature is enabled
               // in the remote config.
               if (pushNotificationConfig?.enabled == true) ...[
-                const SizedBox(height: AppSpacing.md),
-                const Divider(),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.saveFilterDialogNotificationsLabel,
-                  style: Theme.of(context).textTheme.titleMedium,
+                Builder(
+                  builder: (context) {
+                    const type =
+                        PushNotificationSubscriptionDeliveryType.breakingOnly;
+                    final isGloballyEnabled =
+                        pushNotificationConfig?.deliveryConfigs[type] ?? false;
+                    final isAlreadySubscribed = _selectedDeliveryTypes.contains(
+                      type,
+                    );
+                    final canInteract =
+                        isGloballyEnabled &&
+                        (_canSubscribePerType[type] ?? false);
+
+                    return SwitchListTile(
+                      title: Text(type.toL10n(l10n)),
+                      value: isAlreadySubscribed,
+                      onChanged: canInteract
+                          ? (value) {
+                              setState(() {
+                                if (value) {
+                                  _selectedDeliveryTypes.add(type);
+                                } else {
+                                  _selectedDeliveryTypes.remove(type);
+                                }
+                              });
+                            }
+                          : null,
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  },
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                // Generate a CheckboxListTile for each available delivery type.
-                ...PushNotificationSubscriptionDeliveryType.values.map((type) {
-                  // Check if this specific delivery type is enabled globally.
-                  final isGloballyEnabled =
-                      pushNotificationConfig?.deliveryConfigs[type] ?? false;
-                  final isAlreadySubscribed = _selectedDeliveryTypes.contains(
-                    type,
-                  );
-
-                  // The checkbox is interactable if it's globally enabled AND
-                  // the user has permission for this specific type OR if they
-                  // are already subscribed (which allows them to unsubscribe).
-                  final canInteract =
-                      isGloballyEnabled &&
-                      (_canSubscribePerType[type] ?? false);
-
-                  return CheckboxListTile(
-                    title: Text(type.toL10n(l10n)),
-                    subtitle: null,
-                    value: isAlreadySubscribed,
-                    // The checkbox is disabled if it's not globally enabled or
-                    // if the user has hit their limit (and isn't already
-                    // subscribed). This preserves the checked state for users
-                    // who had a subscription before a limit was imposed.
-                    onChanged: canInteract
-                        ? (bool? isSelected) {
-                            setState(() {
-                              if (isSelected == true) {
-                                _selectedDeliveryTypes.add(type);
-                              } else {
-                                _selectedDeliveryTypes.remove(type);
-                              }
-                            });
-                          }
-                        : null,
-                    contentPadding: EdgeInsets.zero,
-                  );
-                }),
               ],
             ],
           ),

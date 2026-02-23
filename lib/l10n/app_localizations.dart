@@ -3445,6 +3445,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply'**
   String get applyButtonLabel;
+
+  /// Status label for a comment that is pending moderation.
+  ///
+  /// In en, this message translates to:
+  /// **'Under Review'**
+  String get commentStatusPending;
 }
 
 class _AppLocalizationsDelegate

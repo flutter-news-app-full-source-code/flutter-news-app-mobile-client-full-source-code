@@ -1871,4 +1871,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get applyButtonLabel => 'تطبيق';
+
+  @override
+  String get commentStatusPending => 'قيد المراجعة';
 }

@@ -45,19 +45,6 @@ void main() {
       createdAt: DateTime.now(),
     );
 
-    final notificationDigest = InAppNotification(
-      id: 'digest-1',
-      userId: user.id,
-      payload: const PushNotificationPayload(
-        title: 'Daily Digest',
-        notificationId: 'digest-1',
-        notificationType: PushNotificationSubscriptionDeliveryType.dailyDigest,
-        contentType: ContentType.headline,
-        contentId: 'd1',
-      ),
-      createdAt: DateTime.now(),
-    );
-
     setUpAll(() {
       registerFallbackValue(FakeInAppNotification());
     });
@@ -89,20 +76,12 @@ void main() {
           when(
             () => inAppNotificationRepository.readAll(
               userId: any(named: 'userId'),
-              filter: any(named: 'filter'),
               pagination: any(named: 'pagination'),
               sort: any(named: 'sort'),
             ),
-          ).thenAnswer((invocation) async {
-            final filter =
-                invocation.namedArguments[#filter] as Map<String, dynamic>;
-            // Check if it's the digest filter
-            final isDigest =
-                // ignore: avoid_dynamic_calls
-                filter['payload.data.notificationType']?[r'$in'] != null;
-
+          ).thenAnswer((_) async {
             return PaginatedResponse<InAppNotification>(
-              items: isDigest ? [notificationDigest] : [notificationBreaking],
+              items: [notificationBreaking],
               cursor: null,
               hasMore: false,
             );
@@ -117,10 +96,8 @@ void main() {
           ),
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [notificationBreaking],
-            digestNotifications: [notificationDigest],
-            breakingNewsHasMore: false,
-            digestHasMore: false,
+            notifications: [notificationBreaking],
+            hasMore: false,
           ),
         ],
       );
@@ -151,7 +128,6 @@ void main() {
           when(
             () => inAppNotificationRepository.readAll(
               userId: any(named: 'userId'),
-              filter: any(named: 'filter'),
               pagination: any(named: 'pagination'),
               sort: any(named: 'sort'),
             ),
@@ -192,13 +168,11 @@ void main() {
         'does nothing if hasMore is false for current tab (Breaking News)',
         seed: () => const InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsHasMore: false,
-          currentTabIndex: 0,
+          hasMore: false,
         ),
         build: () => bloc,
         act: (bloc) =>
             bloc.add(const InAppNotificationCenterFetchMoreRequested()),
-        // ignore: inference_failure_on_collection_literal
         expect: () => [],
       );
 
@@ -206,16 +180,14 @@ void main() {
         'emits [loadingMore, success] with appended items for Breaking News',
         seed: () => InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [notificationBreaking],
-          breakingNewsHasMore: true,
-          breakingNewsCursor: 'cursor-1',
-          currentTabIndex: 0,
+          notifications: [notificationBreaking],
+          hasMore: true,
+          cursor: 'cursor-1',
         ),
         setUp: () {
           when(
             () => inAppNotificationRepository.readAll(
               userId: any(named: 'userId'),
-              filter: any(named: 'filter'),
               pagination: any(named: 'pagination'),
               sort: any(named: 'sort'),
             ),
@@ -233,31 +205,17 @@ void main() {
         expect: () => [
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.loadingMore,
-            breakingNewsNotifications: [notificationBreaking],
-            breakingNewsHasMore: true,
-            breakingNewsCursor: 'cursor-1',
-            currentTabIndex: 0,
+            notifications: [notificationBreaking],
+            hasMore: true,
+            cursor: 'cursor-1',
           ),
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [
-              notificationBreaking,
-              notificationBreaking,
-            ],
-            breakingNewsHasMore: false,
-            breakingNewsCursor: 'cursor-2',
-            currentTabIndex: 0,
+            notifications: [notificationBreaking, notificationBreaking],
+            hasMore: false,
+            cursor: 'cursor-2',
           ),
         ],
-      );
-    });
-
-    group('InAppNotificationCenterTabChanged', () {
-      blocTest<InAppNotificationCenterBloc, InAppNotificationCenterState>(
-        'updates currentTabIndex',
-        build: () => bloc,
-        act: (bloc) => bloc.add(const InAppNotificationCenterTabChanged(1)),
-        expect: () => [const InAppNotificationCenterState(currentTabIndex: 1)],
       );
     });
 
@@ -269,9 +227,8 @@ void main() {
 
       blocTest<InAppNotificationCenterBloc, InAppNotificationCenterState>(
         'updates notification locally and calls repository',
-        seed: () => InAppNotificationCenterState(
-          breakingNewsNotifications: [unreadNotification],
-        ),
+        seed: () =>
+            InAppNotificationCenterState(notifications: [unreadNotification]),
         setUp: () {
           when(
             () => inAppNotificationRepository.update(
@@ -302,7 +259,7 @@ void main() {
         // abstraction, but we can check if the item is updated in the list.
         expect: () => [
           isA<InAppNotificationCenterState>().having(
-            (s) => s.breakingNewsNotifications.first.isRead,
+            (s) => s.notifications.first.isRead,
             'notification is read',
             true,
           ),
@@ -316,18 +273,10 @@ void main() {
         readAt: null,
         payload: notificationBreaking.payload.copyWith(notificationId: '1'),
       );
-      final unread2 = notificationDigest.copyWith(
-        id: '2',
-        readAt: null,
-        payload: notificationDigest.payload.copyWith(notificationId: '2'),
-      );
 
       blocTest<InAppNotificationCenterBloc, InAppNotificationCenterState>(
         'marks all unread notifications as read and updates repository',
-        seed: () => InAppNotificationCenterState(
-          breakingNewsNotifications: [unread1],
-          digestNotifications: [unread2],
-        ),
+        seed: () => InAppNotificationCenterState(notifications: [unread1]),
         setUp: () {
           when(
             () => inAppNotificationRepository.update(
@@ -349,23 +298,17 @@ void main() {
               item: any(named: 'item'),
               userId: user.id,
             ),
-          ).called(2);
+          ).called(1);
           verify(
             () => appBloc.add(const AppAllInAppNotificationsMarkedAsRead()),
           ).called(1);
         },
         expect: () => [
-          isA<InAppNotificationCenterState>()
-              .having(
-                (s) => s.breakingNewsNotifications.first.isRead,
-                'breaking news is read',
-                true,
-              )
-              .having(
-                (s) => s.digestNotifications.first.isRead,
-                'digest is read',
-                true,
-              ),
+          isA<InAppNotificationCenterState>().having(
+            (s) => s.notifications.every((n) => n.isRead),
+            'all notifications are read',
+            true,
+          ),
         ],
       );
     });
@@ -384,8 +327,7 @@ void main() {
         'deletes read items and refreshes the list',
         seed: () => InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [readNotif, unreadNotif],
-          currentTabIndex: 0,
+          notifications: [readNotif, unreadNotif],
         ),
         setUp: () {
           when(
@@ -399,7 +341,6 @@ void main() {
           when(
             () => inAppNotificationRepository.readAll(
               userId: any(named: 'userId'),
-              filter: any(named: 'filter'),
               pagination: any(named: 'pagination'),
               sort: any(named: 'sort'),
             ),
@@ -432,14 +373,12 @@ void main() {
         expect: () => [
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.deleting,
-            breakingNewsNotifications: [readNotif, unreadNotif],
-            currentTabIndex: 0,
+            notifications: [readNotif, unreadNotif],
           ),
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [unreadNotif],
-            breakingNewsHasMore: false,
-            currentTabIndex: 0,
+            notifications: [unreadNotif],
+            hasMore: false,
           ),
         ],
       );
@@ -448,8 +387,7 @@ void main() {
         'does nothing if no read items exist',
         seed: () => InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [unreadNotif],
-          currentTabIndex: 0,
+          notifications: [unreadNotif],
         ),
         build: () => bloc,
         act: (bloc) =>
@@ -457,13 +395,11 @@ void main() {
         expect: () => [
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.deleting,
-            breakingNewsNotifications: [unreadNotif],
-            currentTabIndex: 0,
+            notifications: [unreadNotif],
           ),
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [unreadNotif],
-            currentTabIndex: 0,
+            notifications: [unreadNotif],
           ),
         ],
       );
@@ -477,9 +413,8 @@ void main() {
 
       blocTest<InAppNotificationCenterBloc, InAppNotificationCenterState>(
         'marks notification as read when it exists and is unread',
-        seed: () => InAppNotificationCenterState(
-          breakingNewsNotifications: [unreadNotification],
-        ),
+        seed: () =>
+            InAppNotificationCenterState(notifications: [unreadNotification]),
         setUp: () {
           when(
             () => inAppNotificationRepository.update(
@@ -507,7 +442,7 @@ void main() {
         },
         expect: () => [
           isA<InAppNotificationCenterState>().having(
-            (s) => s.breakingNewsNotifications.first.isRead,
+            (s) => s.notifications.first.isRead,
             'notification is read',
             true,
           ),

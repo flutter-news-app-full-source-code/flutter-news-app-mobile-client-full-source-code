@@ -356,6 +356,15 @@ void main() {
           onRewardEarned: onRewardEarned,
         );
 
+        // Verify Server-Side Verification options are set correctly
+        final verificationCaptor = verify(
+          () => mockAdmobAd.setServerSideOptions(captureAny()),
+        ).captured;
+        final options =
+            verificationCaptor.first as admob.ServerSideVerificationOptions;
+        expect(options.userId, 'test-user-id');
+        expect(options.customData, RewardType.adFree.name);
+
         // Simulate callbacks
         expect(capturedCallback, isNotNull);
         capturedCallback!.onAdShowedFullScreenContent!(mockAdmobAd);

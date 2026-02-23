@@ -96,8 +96,7 @@ void main() {
       when(() => mockBloc.state).thenReturn(
         const InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [],
-          digestNotifications: [],
+          notifications: [],
         ),
       );
 
@@ -112,8 +111,7 @@ void main() {
       when(() => mockBloc.state).thenReturn(
         InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [testNotification],
-          digestNotifications: const [],
+          notifications: [testNotification],
         ),
       );
 
@@ -129,8 +127,7 @@ void main() {
       when(() => mockBloc.state).thenReturn(
         InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [unreadNotification],
-          digestNotifications: const [],
+          notifications: [unreadNotification],
         ),
       );
 
@@ -150,28 +147,6 @@ void main() {
       ).called(1);
     });
 
-    testWidgets('switching tabs adds InAppNotificationCenterTabChanged event', (
-      tester,
-    ) async {
-      when(() => mockBloc.state).thenReturn(
-        const InAppNotificationCenterState(
-          status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: [],
-          digestNotifications: [],
-        ),
-      );
-
-      await tester.pumpWidget(buildWidget());
-
-      // Tap the "Digests" tab
-      await tester.tap(find.text('Digests'));
-      await tester.pumpAndSettle();
-
-      verify(
-        () => mockBloc.add(const InAppNotificationCenterTabChanged(1)),
-      ).called(1);
-    });
-
     testWidgets(
       'tapping delete button shows dialog and adds event on confirm',
       (tester) async {
@@ -181,8 +156,7 @@ void main() {
         when(() => mockBloc.state).thenReturn(
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [readNotification],
-            digestNotifications: const [],
+            notifications: [readNotification],
           ),
         );
 
@@ -222,8 +196,8 @@ void main() {
       when(() => mockBloc.state).thenReturn(
         InAppNotificationCenterState(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: notifications,
-          breakingNewsHasMore: true,
+          notifications: notifications,
+          hasMore: true,
         ),
       );
 

@@ -17,38 +17,49 @@ class EntityListTile extends StatelessWidget {
   /// The feed item to display.
   final FeedItem item;
 
-  @override
-  Widget build(BuildContext context) {
-    String title;
-    Widget leading;
-
+  /// A static method to build the leading widget for a given [FeedItem].
+  /// This allows reusing the leading widget logic in other parts of the app,
+  /// such as the [MultiSelectSearchPage].
+  static Widget buildLeading(FeedItem item) {
     switch (item) {
       case final Topic topic:
-        title = topic.name;
-        leading = CircleAvatar(
+        return CircleAvatar(
           backgroundImage: topic.iconUrl != null
               ? NetworkImage(topic.iconUrl!)
               : null,
           child: topic.iconUrl == null ? const Icon(Icons.tag) : null,
         );
       case final Source source:
-        title = source.name;
-        leading = CircleAvatar(
+        return CircleAvatar(
           backgroundImage: source.logoUrl != null
               ? NetworkImage(source.logoUrl!)
               : null,
           child: source.logoUrl == null ? const Icon(Icons.public) : null,
         );
       case final Country country:
+        return CircleAvatar(backgroundImage: NetworkImage(country.flagUrl));
+      default:
+        return const Icon(Icons.question_mark);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String title;
+
+    switch (item) {
+      case final Topic topic:
+        title = topic.name;
+      case final Source source:
+        title = source.name;
+      case final Country country:
         title = country.name;
-        leading = CircleAvatar(backgroundImage: NetworkImage(country.flagUrl));
       default:
         title = 'Unknown Item';
-        leading = const Icon(Icons.question_mark);
     }
 
     return ListTile(
-      leading: leading,
+      leading: buildLeading(item),
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {

@@ -61,11 +61,11 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     RewardsAdRequested event,
     Emitter<RewardsState> emit,
   ) {
-    emit(RewardsLoadingAd());
+    emit(const RewardsLoadingAd());
   }
 
   void _onRewardsAdWatched(RewardsAdWatched event, Emitter<RewardsState> emit) {
-    emit(RewardsVerifying());
+    emit(const RewardsVerifying());
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
       add(RewardsTimerTicked());
@@ -97,7 +97,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
         _logger.info('Reward adFree is active. Stopping timer.');
         _timer?.cancel();
         if (state is! RewardsSuccess) {
-          emit(RewardsSuccess());
+          emit(const RewardsSuccess());
 
           final duration =
               _appBloc

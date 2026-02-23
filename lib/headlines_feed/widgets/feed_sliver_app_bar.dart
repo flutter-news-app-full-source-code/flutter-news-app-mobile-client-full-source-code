@@ -79,6 +79,40 @@ class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
+              const SizedBox(width: AppSpacing.sm),
+              BlocSelector<AppBloc, AppState, bool>(
+                selector: (state) =>
+                    state
+                        .remoteConfig
+                        ?.features
+                        .rewards
+                        .rewards[RewardType.adFree]
+                        ?.enabled ==
+                    true,
+                builder: (context, isAdFreeEnabled) {
+                  if (!isAdFreeEnabled) {
+                    return const SizedBox.shrink();
+                  }
+                  return BlocSelector<AppBloc, AppState, bool>(
+                    selector: (state) =>
+                        state.userRewards?.isRewardActive(RewardType.adFree) ??
+                        false,
+                    builder: (context, isAdFreeActive) {
+                      return IconButton(
+                        icon: Icon(
+                          isAdFreeActive
+                              ? Icons.card_giftcard
+                              : Icons.card_giftcard_outlined,
+                          color: isAdFreeActive
+                              ? theme.colorScheme.primary
+                              : null,
+                        ),
+                        onPressed: () => context.pushNamed(Routes.rewardsName),
+                      );
+                    },
+                  );
+                },
+              ),
               // The user avatar is also tappable to open the account sheet.
               GestureDetector(
                 onTap: () {

@@ -3260,6 +3260,36 @@ abstract class AppLocalizations {
   /// **'Active'**
   String get rewardsOfferActiveButton;
 
+  /// Title for the dedicated Ad-Free reward page.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad-Free Experience'**
+  String get rewardsAdFreePageTitle;
+
+  /// Headline for the ad-free reward page when the reward is not active.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoy an Ad-Free Experience'**
+  String get rewardsAdFreeInactiveHeadline;
+
+  /// Body text for the ad-free reward page when the reward is not active.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch a short ad to enjoy the app without interruptions for {duration}.'**
+  String rewardsAdFreeInactiveBody(String duration);
+
+  /// Headline for the ad-free reward page when the reward is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad-Free Experience is Active'**
+  String get rewardsAdFreeActiveHeadline;
+
+  /// Body text for the ad-free reward page when the reward is active, preceding the countdown timer.
+  ///
+  /// In en, this message translates to:
+  /// **'Your ad-free access expires in:'**
+  String get rewardsAdFreeActiveBody;
+
   /// Title for the first step of the app tour.
   ///
   /// In en, this message translates to:

@@ -1,3 +1,5 @@
+// lib/headlines_feed/view/headlines_filter_page.dart
+
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -409,6 +411,7 @@ class _HeadlinesFilterView extends StatelessWidget {
         child: ListView(
           children: [
             ListTile(
+              key: const Key('filter_topics_tile'),
               title: Text(l10n.headlinesFeedFilterTopicLabel),
               subtitle: Text(
                 filterState.selectedTopics.isEmpty
@@ -441,6 +444,7 @@ class _HeadlinesFilterView extends StatelessWidget {
             ),
             const Divider(height: 1),
             ListTile(
+              key: const Key('filter_sources_tile'),
               title: Text(l10n.headlinesFeedFilterSourceLabel),
               subtitle: Text(
                 filterState.selectedSources.isEmpty
@@ -473,6 +477,7 @@ class _HeadlinesFilterView extends StatelessWidget {
             ),
             const Divider(height: 1),
             ListTile(
+              key: const Key('filter_countries_tile'),
               title: Text(l10n.headlinesFeedFilterEventCountryLabel),
               subtitle: Text(
                 filterState.selectedCountries.isEmpty

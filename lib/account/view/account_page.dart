@@ -167,13 +167,6 @@ class _NavigationSections extends StatelessWidget {
             );
           },
         ),
-        if (areRewardsEnabled)
-          ListTile(
-            leading: const Icon(Icons.card_giftcard_outlined),
-            title: Text(l10n.accountRewardsTile),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed(Routes.rewardsName),
-          ),
         ListTile(
           leading: const Icon(Icons.settings_outlined),
           title: Text(l10n.accountSettingsTile),

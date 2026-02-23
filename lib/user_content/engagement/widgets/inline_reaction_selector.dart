@@ -12,6 +12,7 @@ class InlineReactionSelector extends StatelessWidget {
   const InlineReactionSelector({
     this.selectedReaction,
     this.onReactionSelected,
+    this.onCommentTap,
     this.unselectedColor,
     super.key,
   });
@@ -25,23 +26,46 @@ class InlineReactionSelector extends StatelessWidget {
   /// Callback for when a reaction is selected.
   final ValueChanged<ReactionType?>? onReactionSelected;
 
+  /// Optional callback for when the comment button is tapped.
+  /// If provided, a comment icon will be shown at the start of the row.
+  final VoidCallback? onCommentTap;
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(ReactionType.values.length, (index) {
-        final reaction = ReactionType.values[index];
-        final isSelected = selectedReaction == reaction;
-        return Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.sm),
-          child: _ReactionIcon(
-            reaction: reaction,
-            isSelected: isSelected,
-            unselectedColor: unselectedColor,
-            onTap: () => onReactionSelected?.call(isSelected ? null : reaction),
+      children: [
+        if (onCommentTap != null) ...[
+          GestureDetector(
+            onTap: onCommentTap,
+            child: Icon(
+              Icons.chat_bubble,
+              color: unselectedColor ?? colorScheme.onSurfaceVariant,
+              size: 22,
+            ),
           ),
-        );
-      }),
+          const SizedBox(width: AppSpacing.sm),
+        ],
+        ...List.generate(ReactionType.values.length, (index) {
+          final reaction = ReactionType.values[index];
+          final isSelected = selectedReaction == reaction;
+          return Padding(
+            padding: index != ReactionType.values.length - 1
+                ? const EdgeInsets.only(right: AppSpacing.sm)
+                : EdgeInsets.zero,
+            child: _ReactionIcon(
+              reaction: reaction,
+              isSelected: isSelected,
+              unselectedColor: unselectedColor,
+              onTap: () =>
+                  onReactionSelected?.call(isSelected ? null : reaction),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

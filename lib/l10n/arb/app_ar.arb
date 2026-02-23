@@ -2397,5 +2397,9 @@
     "applyButtonLabel": "تطبيق",
     "@applyButtonLabel": {
         "description": "Generic label for an apply button."
+    },
+    "commentStatusPending": "قيد المراجعة",
+    "@commentStatusPending": {
+        "description": "Status label for a comment that is pending moderation."
     }
 }

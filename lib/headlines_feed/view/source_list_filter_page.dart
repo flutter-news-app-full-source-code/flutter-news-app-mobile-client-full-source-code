@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -76,25 +76,26 @@ class _SourceListFilterView extends StatelessWidget {
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
-                  // Navigate to a generic multi-select search page, passing
-                  // the necessary data and the shared BLoC instance.
-                  final result = await context.pushNamed<Set<dynamic>>(
-                    Routes.multiSelectSearchName,
-                    extra: {
-                      'title': l10n.headlinesFeedFilterSourceCountryLabel,
-                      'allItems': state.allHeadquarterCountries,
-                      'initialSelectedItems':
-                          state.selectedSourceHeadquarterCountries,
-                      'itemBuilder': (Country country) => country.name,
-                    },
-                  );
+                  final selectedCountries = await Navigator.of(context)
+                      .push<Set<Country>>(
+                        MaterialPageRoute(
+                          builder: (_) => MultiSelectSearchPage<Country>(
+                            title: l10n.headlinesFeedFilterSourceCountryLabel,
+                            allItems: state.allHeadquarterCountries,
+                            initialSelectedItems: state
+                                .selectedSourceHeadquarterCountries
+                                .toSet(),
+                            itemBuilder: (country) => country.name,
+                          ),
+                        ),
+                      );
 
-                  if (result != null && context.mounted) {
+                  if (selectedCountries != null && context.mounted) {
                     // When the page returns, dispatch an event to the
                     // shared BLoC to update the source filter criteria.
                     context.read<HeadlinesFilterBloc>().add(
                       FilterSourceCriteriaChanged(
-                        selectedCountries: result.cast<Country>(),
+                        selectedCountries: selectedCountries,
                       ),
                     );
                   }
@@ -112,31 +113,77 @@ class _SourceListFilterView extends StatelessWidget {
                         ),
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  // Navigate to the new dedicated source type filter page.
-                  final result = await context.pushNamed<Set<dynamic>>(
-                    Routes.multiSelectSearchName,
-                    extra: {
-                      'title': l10n.headlinesFeedFilterSourceTypeLabel,
-                      'allItems': state.allSourceTypes,
-                      'initialSelectedItems': state.selectedSourceTypes,
-                      'itemBuilder': (SourceType type) => type.l10n(l10n),
-                    },
-                  );
-
-                  if (result != null && context.mounted) {
-                    context.read<HeadlinesFilterBloc>().add(
-                      FilterSourceCriteriaChanged(
-                        selectedSourceTypes: result.cast<SourceType>().toSet(),
-                      ),
-                    );
-                  }
-                },
+                onTap: () => _showSourceTypeFilterDialog(context, state),
               ),
             ],
           );
         },
       ),
     );
+  }
+
+  Future<void> _showSourceTypeFilterDialog(
+    BuildContext context,
+    HeadlinesFilterState state,
+  ) async {
+    final l10n = AppLocalizationsX(context).l10n;
+    final selectedTypes = await showDialog<Set<SourceType>>(
+      context: context,
+      builder: (dialogContext) {
+        // Use a StatefulBuilder to manage the temporary selection state
+        // within the dialog itself.
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final tempSelected = Set<SourceType>.from(
+              state.selectedSourceTypes,
+            );
+
+            return AlertDialog(
+              title: Text(l10n.headlinesFeedFilterSourceTypeLabel),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.allSourceTypes.length,
+                  itemBuilder: (context, index) {
+                    final type = state.allSourceTypes[index];
+                    final isSelected = tempSelected.contains(type);
+                    return CheckboxListTile(
+                      title: Text(type.l10n(l10n)),
+                      value: isSelected,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value == true) {
+                            tempSelected.add(type);
+                          } else {
+                            tempSelected.remove(type);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.cancelButtonLabel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(tempSelected),
+                  child: Text(l10n.applyButtonLabel),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (selectedTypes != null && context.mounted) {
+      context.read<HeadlinesFilterBloc>().add(
+        FilterSourceCriteriaChanged(selectedSourceTypes: selectedTypes),
+      );
+    }
   }
 }

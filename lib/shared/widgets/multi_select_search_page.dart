@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template multi_select_search_page}
@@ -13,7 +14,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// This widget is designed to be pushed onto the navigation stack and return
 /// a `Set<T>` of the selected items when popped.
 /// {@endtemplate}
-class MultiSelectSearchPage<T> extends StatefulWidget {
+class MultiSelectSearchPage<T extends FeedItem> extends StatefulWidget {
   /// {@macro multi_select_search_page}
   const MultiSelectSearchPage({
     required this.title,
@@ -56,7 +57,8 @@ class MultiSelectSearchPage<T> extends StatefulWidget {
       _MultiSelectSearchPageState<T>();
 }
 
-class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
+class _MultiSelectSearchPageState<T extends FeedItem>
+    extends State<MultiSelectSearchPage<T>> {
   late final Set<T> _selectedItems;
   late final bool _isPaginated;
 
@@ -134,28 +136,6 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
         _isLoading = false;
       });
     }
-  }
-
-  Widget _buildLeadingForItem(T item) {
-    if (item is Topic) {
-      return CircleAvatar(
-        backgroundImage: item.iconUrl != null
-            ? NetworkImage(item.iconUrl!)
-            : null,
-        child: item.iconUrl == null ? const Icon(Icons.tag) : null,
-      );
-    } else if (item is Source) {
-      return CircleAvatar(
-        backgroundImage: item.logoUrl != null
-            ? NetworkImage(item.logoUrl!)
-            : null,
-        child: item.logoUrl == null ? const Icon(Icons.public) : null,
-      );
-    } else if (item is Country) {
-      return CircleAvatar(backgroundImage: NetworkImage(item.flagUrl));
-    }
-    // Fallback for any other type that might be used with this page.
-    return const CircleAvatar(child: Icon(Icons.article_outlined));
   }
 
   void _onScroll() {
@@ -276,7 +256,7 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
                       final canSelectItem = !(!isSelected && isLimitReached);
 
                       return ListTile(
-                        leading: _buildLeadingForItem(item),
+                        leading: EntityListTile.buildLeading(item),
                         title: Text(widget.itemBuilder(item)),
                         trailing: Checkbox(
                           value: isSelected,

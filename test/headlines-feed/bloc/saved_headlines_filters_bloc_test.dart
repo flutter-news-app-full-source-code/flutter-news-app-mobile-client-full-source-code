@@ -43,7 +43,6 @@ void main() {
       followedTopics: [],
       savedHeadlines: [],
       savedHeadlineFilters: [filter1, filter2],
-      savedSourceFilters: [],
     );
 
     const initialAppState = app_bloc.AppState(

@@ -1757,6 +1757,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsOfferActiveButton => 'Active';
 
   @override
+  String get rewardsAdFreePageTitle => 'Ad-Free Experience';
+
+  @override
+  String get rewardsAdFreeInactiveHeadline => 'Enjoy an Ad-Free Experience';
+
+  @override
+  String rewardsAdFreeInactiveBody(String duration) {
+    return 'Watch a short ad to enjoy the app without interruptions for $duration.';
+  }
+
+  @override
+  String get rewardsAdFreeActiveHeadline => 'Ad-Free Experience is Active';
+
+  @override
+  String get rewardsAdFreeActiveBody => 'Your ad-free access expires in:';
+
+  @override
   String get appTourStep1Title => 'Your News, Perfectly Tailored';
 
   @override

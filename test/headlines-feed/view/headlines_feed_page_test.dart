@@ -170,7 +170,6 @@ void main() {
         followedItems: {},
         savedHeadlines: {},
         savedHeadlineFilters: {},
-        savedSourceFilters: {},
         commentsPerDay: {},
         reactionsPerDay: {},
         reportsPerDay: {},
@@ -198,7 +197,6 @@ void main() {
           followedTopics: [],
           savedHeadlines: [],
           savedHeadlineFilters: [],
-          savedSourceFilters: [],
         ),
         settings: AppSettings(
           id: 'settings-id',

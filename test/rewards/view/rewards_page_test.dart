@@ -45,10 +45,7 @@ void main() {
   late UserRewards userRewards;
 
   const rewardDetails = RewardDetails(enabled: true, durationDays: 7);
-  final rewardsMap = {
-    RewardType.adFree: rewardDetails,
-    RewardType.dailyDigest: rewardDetails,
-  };
+  final rewardsMap = {RewardType.adFree: rewardDetails};
 
   setUp(() {
     appBloc = MockAppBloc();
@@ -100,10 +97,10 @@ void main() {
   group('RewardsPage', () {
     testWidgets('renders available rewards from remote config', (tester) async {
       await tester.pumpWidget(buildSubject());
+      final l10n = AppLocalizations.of(tester.element(find.byType(Scaffold)));
 
-      expect(find.textContaining('Ad-Free'), findsOneWidget);
-      expect(find.textContaining('Daily Digest'), findsOneWidget);
-      expect(find.byType(FilledButton), findsNWidgets(2));
+      expect(find.text(l10n.rewardsAdFreeInactiveHeadline), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget);
 
       verify(
         () => analyticsService.logEvent(
@@ -116,7 +113,6 @@ void main() {
     testWidgets('triggers ad flow when "Watch Ad" is tapped', (tester) async {
       when(
         () => rewardedAdManager.showAd(
-          rewardType: any(named: 'rewardType'),
           onAdShowed: any(named: 'onAdShowed'),
           onAdFailedToShow: any(named: 'onAdFailedToShow'),
           onAdDismissed: any(named: 'onAdDismissed'),
@@ -136,7 +132,6 @@ void main() {
 
       verify(
         () => rewardedAdManager.showAd(
-          rewardType: RewardType.adFree,
           onAdShowed: any(named: 'onAdShowed'),
           onAdFailedToShow: any(named: 'onAdFailedToShow'),
           onAdDismissed: any(named: 'onAdDismissed'),
@@ -155,7 +150,6 @@ void main() {
     testWidgets('shows snackbar on ad failure', (tester) async {
       when(
         () => rewardedAdManager.showAd(
-          rewardType: any(named: 'rewardType'),
           onAdShowed: any(named: 'onAdShowed'),
           onAdFailedToShow: any(named: 'onAdFailedToShow'),
           onAdDismissed: any(named: 'onAdDismissed'),
@@ -183,7 +177,6 @@ void main() {
       // 1. Mock the ad manager to call onRewardEarned
       when(
         () => rewardedAdManager.showAd(
-          rewardType: any(named: 'rewardType'),
           onAdShowed: any(named: 'onAdShowed'),
           onAdFailedToShow: any(named: 'onAdFailedToShow'),
           onAdDismissed: any(named: 'onAdDismissed'),
@@ -206,7 +199,7 @@ void main() {
       await tester.pump(); // Enters verifying state
 
       // 4. Verify UI state
-      final l10n = AppLocalizations.of(tester.element(find.byType(ListView)));
+      final l10n = AppLocalizations.of(tester.element(find.byType(Scaffold)));
       expect(find.text(l10n.rewardsOfferVerifyingButton), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
@@ -226,9 +219,6 @@ void main() {
         when(
           () => activeUserRewards.isRewardActive(RewardType.adFree),
         ).thenReturn(true);
-        when(
-          () => activeUserRewards.isRewardActive(RewardType.dailyDigest),
-        ).thenReturn(false);
         when(() => activeUserRewards.activeRewards).thenReturn({
           RewardType.adFree: DateTime.now().add(const Duration(days: 7)),
         });
@@ -258,7 +248,6 @@ void main() {
         // 3. Mock ad manager
         when(
           () => rewardedAdManager.showAd(
-            rewardType: any(named: 'rewardType'),
             onAdShowed: any(named: 'onAdShowed'),
             onAdFailedToShow: any(named: 'onAdFailedToShow'),
             onAdDismissed: any(named: 'onAdDismissed'),
@@ -282,7 +271,7 @@ void main() {
         await tester.pumpAndSettle(); // Settle UI animations
 
         // 6. Get l10n instance for verification
-        final l10n = AppLocalizations.of(tester.element(find.byType(ListView)));
+        final l10n = AppLocalizations.of(tester.element(find.byType(Scaffold)));
         final rewardName = l10n.rewardTypeAdFree;
 
         // 7. Verify
@@ -291,10 +280,7 @@ void main() {
           find.text(l10n.rewardsSnackbarSuccess(rewardName)),
           findsOneWidget,
         );
-        expect(
-          find.text(l10n.rewardsOfferActiveTitle(rewardName)),
-          findsOneWidget,
-        );
+        expect(find.text(l10n.rewardsAdFreeActiveHeadline), findsOneWidget);
         expect(find.byIcon(Icons.check_circle), findsOneWidget);
         expect(find.text(l10n.rewardsOfferActiveButton), findsOneWidget);
 

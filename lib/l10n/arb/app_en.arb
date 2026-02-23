@@ -2256,6 +2256,31 @@
     "@rewardsOfferActiveButton": {
         "description": "Button text for a reward that is currently active."
     },
+    "rewardsAdFreePageTitle": "Ad-Free Experience",
+    "@rewardsAdFreePageTitle": {
+        "description": "Title for the dedicated Ad-Free reward page."
+    },
+    "rewardsAdFreeInactiveHeadline": "Enjoy an Ad-Free Experience",
+    "@rewardsAdFreeInactiveHeadline": {
+        "description": "Headline for the ad-free reward page when the reward is not active."
+    },
+    "rewardsAdFreeInactiveBody": "Watch a short ad to enjoy the app without interruptions for {duration}.",
+    "@rewardsAdFreeInactiveBody": {
+        "description": "Body text for the ad-free reward page when the reward is not active.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "Ad-Free Experience is Active",
+    "@rewardsAdFreeActiveHeadline": {
+        "description": "Headline for the ad-free reward page when the reward is active."
+    },
+    "rewardsAdFreeActiveBody": "Your ad-free access expires in:",
+    "@rewardsAdFreeActiveBody": {
+        "description": "Body text for the ad-free reward page when the reward is active, preceding the countdown timer."
+    },
     "appTourStep1Title": "Your News, Perfectly Tailored",
     "@appTourStep1Title": {
         "description": "Title for the first step of the app tour."

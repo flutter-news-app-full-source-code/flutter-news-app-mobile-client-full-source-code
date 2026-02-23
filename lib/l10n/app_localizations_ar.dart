@@ -1756,6 +1756,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rewardsOfferActiveButton => 'نشط';
 
   @override
+  String get rewardsAdFreePageTitle => 'تجربة بدون إعلانات';
+
+  @override
+  String get rewardsAdFreeInactiveHeadline =>
+      'استمتع بتجربة خالية من الإعلانات';
+
+  @override
+  String rewardsAdFreeInactiveBody(String duration) {
+    return 'شاهد إعلانًا قصيرًا للاستمتاع بالتطبيق بدون انقطاع لمدة $duration.';
+  }
+
+  @override
+  String get rewardsAdFreeActiveHeadline => 'تجربة خالية من الإعلانات نشطة';
+
+  @override
+  String get rewardsAdFreeActiveBody => 'وصولك الخالي من الإعلانات ينتهي في:';
+
+  @override
   String get appTourStep1Title => 'أخبارك، مصممة خصيصًا لك';
 
   @override

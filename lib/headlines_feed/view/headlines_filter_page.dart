@@ -153,8 +153,8 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
           );
           // Add the new filter to the global AppBloc state.
           context.read<AppBloc>().add(
-                SavedHeadlineFilterAdded(filter: newFilter),
-              );
+            SavedHeadlineFilterAdded(filter: newFilter),
+          );
 
           // Apply the newly saved filter to the HeadlinesFeedBloc. The page
           // is not popped here; that action is deferred until after the
@@ -213,8 +213,8 @@ Future<void> _updateAndApplyFilter(
 
           // Dispatch an update event to the global AppBloc.
           context.read<AppBloc>().add(
-                SavedHeadlineFilterUpdated(filter: updatedFilter),
-              );
+            SavedHeadlineFilterUpdated(filter: updatedFilter),
+          );
 
           // Apply the updated filter to the feed.
           _applyFilter(context, savedFilter: updatedFilter);
@@ -290,12 +290,14 @@ class _HeadlinesFilterView extends StatelessWidget {
 
             // Determine if the reset button should be enabled. It's enabled only
             // if there are active selections to clear.
-            final isResetEnabled = filterState.selectedTopics.isNotEmpty ||
+            final isResetEnabled =
+                filterState.selectedTopics.isNotEmpty ||
                 filterState.selectedSources.isNotEmpty ||
                 filterState.selectedCountries.isNotEmpty;
 
             // Determine if the "Apply" button should be enabled.
-            final isFilterEmpty = filterState.selectedTopics.isEmpty &&
+            final isFilterEmpty =
+                filterState.selectedTopics.isEmpty &&
                 filterState.selectedSources.isEmpty &&
                 filterState.selectedCountries.isEmpty;
 
@@ -307,7 +309,8 @@ class _HeadlinesFilterView extends StatelessWidget {
 
             // Check if the current selection matches any existing saved filter.
             // This check is skipped if we are in edit mode.
-            final isDuplicate = !isEditing &&
+            final isDuplicate =
+                !isEditing &&
                 savedHeadlineFilters.any(
                   (savedHeadlineFilter) =>
                       setEquals(
@@ -345,8 +348,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                     // The button is disabled if there are no selections to clear.
                     onPressed: isResetEnabled
                         ? () => context.read<HeadlinesFilterBloc>().add(
-                              const FilterSelectionsCleared(),
-                            )
+                            const FilterSelectionsCleared(),
+                          )
                         : null,
                   ),
                   // Apply Filters Button
@@ -383,16 +386,17 @@ class _HeadlinesFilterView extends StatelessWidget {
 
     if (filterState.status == HeadlinesFilterStatus.failure) {
       return FailureStateWidget(
-        exception: filterState.error ??
+        exception:
+            filterState.error ??
             const UnknownException('Failed to load filter data.'),
         onRetry: () {
           context.read<HeadlinesFilterBloc>().add(
-                FilterDataLoaded(
-                  initialSelectedTopics: initialFilter.topics,
-                  initialSelectedSources: initialFilter.sources,
-                  initialSelectedCountries: initialFilter.countries,
-                ),
-              );
+            FilterDataLoaded(
+              initialSelectedTopics: initialFilter.topics,
+              initialSelectedSources: initialFilter.sources,
+              initialSelectedCountries: initialFilter.countries,
+            ),
+          );
         },
       );
     }
@@ -415,22 +419,23 @@ class _HeadlinesFilterView extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                final selectedItems =
-                    await Navigator.of(context).push<Set<Topic>>(
-                  MaterialPageRoute(
-                    builder: (_) => MultiSelectSearchPage<Topic>(
-                      title: l10n.headlinesFeedFilterTopicLabel,
-                      allItems: filterState.allTopics,
-                      initialSelectedItems: filterState.selectedTopics.toSet(),
-                      itemBuilder: (Topic item) => item.name,
-                    ),
-                  ),
-                );
+                final selectedItems = await Navigator.of(context)
+                    .push<Set<Topic>>(
+                      MaterialPageRoute(
+                        builder: (_) => MultiSelectSearchPage<Topic>(
+                          title: l10n.headlinesFeedFilterTopicLabel,
+                          allItems: filterState.allTopics,
+                          initialSelectedItems: filterState.selectedTopics
+                              .toSet(),
+                          itemBuilder: (Topic item) => item.name,
+                        ),
+                      ),
+                    );
 
                 if (selectedItems != null && context.mounted) {
                   context.read<HeadlinesFilterBloc>().add(
-                        FilterTopicsChanged(topics: selectedItems),
-                      );
+                    FilterTopicsChanged(topics: selectedItems),
+                  );
                 }
               },
             ),
@@ -446,22 +451,23 @@ class _HeadlinesFilterView extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                final selectedItems =
-                    await Navigator.of(context).push<Set<Source>>(
-                  MaterialPageRoute(
-                    builder: (_) => MultiSelectSearchPage<Source>(
-                      title: l10n.headlinesFeedFilterSourceLabel,
-                      allItems: filterState.allSources,
-                      initialSelectedItems: filterState.selectedSources.toSet(),
-                      itemBuilder: (Source item) => item.name,
-                    ),
-                  ),
-                );
+                final selectedItems = await Navigator.of(context)
+                    .push<Set<Source>>(
+                      MaterialPageRoute(
+                        builder: (_) => MultiSelectSearchPage<Source>(
+                          title: l10n.headlinesFeedFilterSourceLabel,
+                          allItems: filterState.allSources,
+                          initialSelectedItems: filterState.selectedSources
+                              .toSet(),
+                          itemBuilder: (Source item) => item.name,
+                        ),
+                      ),
+                    );
 
                 if (selectedItems != null && context.mounted) {
                   context.read<HeadlinesFilterBloc>().add(
-                        FilterSourcesChanged(sources: selectedItems),
-                      );
+                    FilterSourcesChanged(sources: selectedItems),
+                  );
                 }
               },
             ),
@@ -477,23 +483,23 @@ class _HeadlinesFilterView extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                final selectedItems =
-                    await Navigator.of(context).push<Set<Country>>(
-                  MaterialPageRoute(
-                    builder: (_) => MultiSelectSearchPage<Country>(
-                      title: l10n.headlinesFeedFilterEventCountryLabel,
-                      allItems: filterState.allCountries,
-                      initialSelectedItems:
-                          filterState.selectedCountries.toSet(),
-                      itemBuilder: (Country item) => item.name,
-                    ),
-                  ),
-                );
+                final selectedItems = await Navigator.of(context)
+                    .push<Set<Country>>(
+                      MaterialPageRoute(
+                        builder: (_) => MultiSelectSearchPage<Country>(
+                          title: l10n.headlinesFeedFilterEventCountryLabel,
+                          allItems: filterState.allCountries,
+                          initialSelectedItems: filterState.selectedCountries
+                              .toSet(),
+                          itemBuilder: (Country item) => item.name,
+                        ),
+                      ),
+                    );
 
                 if (selectedItems != null && context.mounted) {
                   context.read<HeadlinesFilterBloc>().add(
-                        FilterCountriesChanged(countries: selectedItems),
-                      );
+                    FilterCountriesChanged(countries: selectedItems),
+                  );
                 }
               },
             ),

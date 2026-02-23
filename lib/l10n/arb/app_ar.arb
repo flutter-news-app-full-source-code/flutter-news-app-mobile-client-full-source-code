@@ -2256,6 +2256,31 @@
     "@rewardsOfferActiveButton": {
         "description": "Button text for a reward that is currently active."
     },
+    "rewardsAdFreePageTitle": "تجربة بدون إعلانات",
+    "@rewardsAdFreePageTitle": {
+        "description": "Title for the dedicated Ad-Free reward page."
+    },
+    "rewardsAdFreeInactiveHeadline": "استمتع بتجربة خالية من الإعلانات",
+    "@rewardsAdFreeInactiveHeadline": {
+        "description": "Headline for the ad-free reward page when the reward is not active."
+    },
+    "rewardsAdFreeInactiveBody": "شاهد إعلانًا قصيرًا للاستمتاع بالتطبيق بدون انقطاع لمدة {duration}.",
+    "@rewardsAdFreeInactiveBody": {
+        "description": "Body text for the ad-free reward page when the reward is not active.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "تجربة خالية من الإعلانات نشطة",
+    "@rewardsAdFreeActiveHeadline": {
+        "description": "Headline for the ad-free reward page when the reward is active."
+    },
+    "rewardsAdFreeActiveBody": "وصولك الخالي من الإعلانات ينتهي في:",
+    "@rewardsAdFreeActiveBody": {
+        "description": "Body text for the ad-free reward page when the reward is active, preceding the countdown timer."
+    },
     "appTourStep1Title": "أخبارك، مصممة خصيصًا لك",
     "@appTourStep1Title": {
         "description": "Title for the first step of the app tour."

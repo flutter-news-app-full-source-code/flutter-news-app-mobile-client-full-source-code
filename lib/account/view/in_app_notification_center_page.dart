@@ -14,38 +14,9 @@ import 'package:ui_kit/ui_kit.dart';
 /// This page allows users to view their notification history, mark individual
 /// notifications as read, and mark all notifications as read.
 /// {@endtemplate}
-class InAppNotificationCenterPage extends StatefulWidget {
+class InAppNotificationCenterPage extends StatelessWidget {
   /// {@macro in_app_notification_center_page}
   const InAppNotificationCenterPage({super.key});
-
-  @override
-  State<InAppNotificationCenterPage> createState() =>
-      _InAppNotificationCenterPageState();
-}
-
-class _InAppNotificationCenterPageState
-    extends State<InAppNotificationCenterPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this)
-      ..addListener(() {
-        if (!_tabController.indexIsChanging) {
-          context.read<InAppNotificationCenterBloc>().add(
-            InAppNotificationCenterTabChanged(_tabController.index),
-          );
-        }
-      });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +54,7 @@ class _InAppNotificationCenterPageState
                     IconButton(
                       tooltip: l10n.deleteReadNotificationsButtonTooltip,
                       icon: const Icon(Icons.delete_sweep_outlined),
-                      onPressed: !isDeleting && state.hasReadItemsInCurrentTab
+                      onPressed: !isDeleting && state.hasReadItems
                           ? () async {
                               final confirmed = await showDialog<bool>(
                                 context: context,
@@ -117,13 +88,6 @@ class _InAppNotificationCenterPageState
                           : null,
                     ),
                   ],
-                  bottom: TabBar(
-                    controller: _tabController,
-                    tabs: [
-                      Tab(text: l10n.notificationCenterTabBreakingNews),
-                      Tab(text: l10n.notificationCenterTabDigests),
-                    ],
-                  ),
                 ),
                 body: Center(
                   child: ConstrainedBox(
@@ -154,8 +118,7 @@ class _InAppNotificationCenterPageState
                           builder: (context, state) {
                             if (state.status ==
                                     InAppNotificationCenterStatus.loading &&
-                                state.breakingNewsNotifications.isEmpty &&
-                                state.digestNotifications.isEmpty) {
+                                state.notifications.isEmpty) {
                               return LoadingStateWidget(
                                 icon: Icons.notifications_none_outlined,
                                 headline:
@@ -167,8 +130,7 @@ class _InAppNotificationCenterPageState
 
                             if (state.status ==
                                     InAppNotificationCenterStatus.failure &&
-                                state.breakingNewsNotifications.isEmpty &&
-                                state.digestNotifications.isEmpty) {
+                                state.notifications.isEmpty) {
                               return FailureStateWidget(
                                 exception:
                                     state.error ??
@@ -182,22 +144,10 @@ class _InAppNotificationCenterPageState
                                 },
                               );
                             }
-
-                            return TabBarView(
-                              controller: _tabController,
-                              children: [
-                                _NotificationList(
-                                  status: state.status,
-                                  notifications:
-                                      state.breakingNewsNotifications,
-                                  hasMore: state.breakingNewsHasMore,
-                                ),
-                                _NotificationList(
-                                  status: state.status,
-                                  notifications: state.digestNotifications,
-                                  hasMore: state.digestHasMore,
-                                ),
-                              ],
+                            return _NotificationList(
+                              status: state.status,
+                              notifications: state.notifications,
+                              hasMore: state.hasMore,
                             );
                           },
                         ),

@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -90,51 +91,53 @@ class FollowedContentPage extends StatelessWidget {
 
     if (preferences == null) return;
 
-    final Map<String, dynamic> pageArgs;
-    final Set<FeedItem> initialSelectedItems;
-    final void Function(Set<FeedItem> newItems) onSave;
+    final Widget page;
+    final void Function(Set<FeedItem>?) onSave;
 
     switch (tabIndex) {
       case 0:
-        pageArgs = {
-          'title': l10n.addTopicsPageTitle,
-          'repository': context.read<DataRepository<Topic>>(),
-          'itemBuilder': (FeedItem item) => (item as Topic).name,
-        };
-        initialSelectedItems = preferences.followedTopics.toSet();
+        page = MultiSelectSearchPage<Topic>(
+          title: l10n.addTopicsPageTitle,
+          repository: context.read<DataRepository<Topic>>(),
+          initialSelectedItems: preferences.followedTopics.toSet(),
+          itemBuilder: (Topic topic) => topic.name,
+        );
         onSave = (newItems) {
+          if (newItems == null) return;
           final updatedPreferences = preferences.copyWith(
-            followedTopics: newItems.cast<Topic>().toList(),
+            followedTopics: newItems.whereType<Topic>().toList(),
           );
           appBloc.add(
             AppUserContentPreferencesChanged(preferences: updatedPreferences),
           );
         };
       case 1:
-        pageArgs = {
-          'title': l10n.addSourcesPageTitle,
-          'repository': context.read<DataRepository<Source>>(),
-          'itemBuilder': (FeedItem item) => (item as Source).name,
-        };
-        initialSelectedItems = preferences.followedSources.toSet();
+        page = MultiSelectSearchPage<Source>(
+          title: l10n.addSourcesPageTitle,
+          repository: context.read<DataRepository<Source>>(),
+          initialSelectedItems: preferences.followedSources.toSet(),
+          itemBuilder: (Source source) => source.name,
+        );
         onSave = (newItems) {
+          if (newItems == null) return;
           final updatedPreferences = preferences.copyWith(
-            followedSources: newItems.cast<Source>().toList(),
+            followedSources: newItems.whereType<Source>().toList(),
           );
           appBloc.add(
             AppUserContentPreferencesChanged(preferences: updatedPreferences),
           );
         };
       case 2:
-        pageArgs = {
-          'title': l10n.addCountriesPageTitle,
-          'repository': context.read<DataRepository<Country>>(),
-          'itemBuilder': (FeedItem item) => (item as Country).name,
-        };
-        initialSelectedItems = preferences.followedCountries.toSet();
+        page = MultiSelectSearchPage<Country>(
+          title: l10n.addCountriesPageTitle,
+          repository: context.read<DataRepository<Country>>(),
+          initialSelectedItems: preferences.followedCountries.toSet(),
+          itemBuilder: (Country country) => country.name,
+        );
         onSave = (newItems) {
+          if (newItems == null) return;
           final updatedPreferences = preferences.copyWith(
-            followedCountries: newItems.cast<Country>().toList(),
+            followedCountries: newItems.whereType<Country>().toList(),
           );
           appBloc.add(
             AppUserContentPreferencesChanged(preferences: updatedPreferences),
@@ -144,10 +147,9 @@ class FollowedContentPage extends StatelessWidget {
         return;
     }
 
-    final selectedItems = await context.pushNamed<Set<FeedItem>>(
-      Routes.multiSelectSearchName,
-      extra: {...pageArgs, 'initialSelectedItems': initialSelectedItems},
-    );
+    final selectedItems = await Navigator.of(
+      context,
+    ).push<Set<FeedItem>>(MaterialPageRoute(builder: (_) => page));
 
     if (selectedItems != null) {
       onSave(selectedItems);

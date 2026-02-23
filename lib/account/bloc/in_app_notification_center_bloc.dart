@@ -37,7 +37,6 @@ class InAppNotificationCenterBloc
     );
     on<InAppNotificationCenterMarkedAsRead>(_onMarkedAsRead);
     on<InAppNotificationCenterMarkAllAsRead>(_onMarkAllAsRead);
-    on<InAppNotificationCenterTabChanged>(_onTabChanged);
     on<InAppNotificationCenterMarkOneAsRead>(_onMarkOneAsRead);
     on<InAppNotificationCenterFetchMoreRequested>(
       _onFetchMoreRequested,
@@ -70,25 +69,13 @@ class InAppNotificationCenterBloc
     }
 
     try {
-      // Fetch both tabs' initial data in parallel and wait for their results.
-      final results = await Future.wait([
-        _fetchNotifications(userId: userId, filter: _breakingNewsFilter),
-        _fetchNotifications(userId: userId, filter: _digestFilter),
-      ]);
-
-      final breakingNewsResponse = results[0];
-      final digestResponse = results[1];
-
-      // Perform a single, atomic state update with both results.
+      final response = await _fetchNotifications(userId: userId);
       emit(
         state.copyWith(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: breakingNewsResponse.items,
-          breakingNewsHasMore: breakingNewsResponse.hasMore,
-          breakingNewsCursor: breakingNewsResponse.cursor,
-          digestNotifications: digestResponse.items,
-          digestHasMore: digestResponse.hasMore,
-          digestCursor: digestResponse.cursor,
+          notifications: response.items,
+          hasMore: response.hasMore,
+          cursor: response.cursor,
         ),
       );
     } catch (error, stackTrace) {
@@ -101,12 +88,8 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterFetchMoreRequested event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
-    final isBreakingNewsTab = state.currentTabIndex == 0;
-    final hasMore = isBreakingNewsTab
-        ? state.breakingNewsHasMore
-        : state.digestHasMore;
-
-    if (state.status == InAppNotificationCenterStatus.loadingMore || !hasMore) {
+    if (state.status == InAppNotificationCenterStatus.loadingMore ||
+        !state.hasMore) {
       return;
     }
 
@@ -121,60 +104,23 @@ class InAppNotificationCenterBloc
       return;
     }
 
-    final filter = isBreakingNewsTab ? _breakingNewsFilter : _digestFilter;
-    final cursor = isBreakingNewsTab
-        ? state.breakingNewsCursor
-        : state.digestCursor;
-
     try {
       final response = await _fetchNotifications(
         userId: userId,
-        filter: filter,
-        cursor: cursor,
+        cursor: state.cursor,
       );
 
-      // Append the new items to the correct list.
-      if (isBreakingNewsTab) {
-        emit(
-          state.copyWith(
-            status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: [
-              ...state.breakingNewsNotifications,
-              ...response.items,
-            ],
-            breakingNewsHasMore: response.hasMore,
-            breakingNewsCursor: response.cursor,
-          ),
-        );
-      } else {
-        emit(
-          state.copyWith(
-            status: InAppNotificationCenterStatus.success,
-            digestNotifications: [
-              ...state.digestNotifications,
-              ...response.items,
-            ],
-            digestHasMore: response.hasMore,
-            digestCursor: response.cursor,
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          status: InAppNotificationCenterStatus.success,
+          notifications: [...state.notifications, ...response.items],
+          hasMore: response.hasMore,
+          cursor: response.cursor,
+        ),
+      );
     } catch (error, stackTrace) {
       _handleFetchError(emit, error, stackTrace);
     }
-  }
-
-  /// Handles the event to change the active tab.
-  Future<void> _onTabChanged(
-    InAppNotificationCenterTabChanged event,
-    Emitter<InAppNotificationCenterState> emit,
-  ) async {
-    // If the tab is changed, we don't need to re-fetch data as it was
-    _logger.info(
-      '[InAppNotificationCenterBloc] Tab changed to index: ${event.tabIndex}',
-    );
-    // already fetched on initial load. We just update the index.
-    emit(state.copyWith(currentTabIndex: event.tabIndex));
   }
 
   /// Handles marking a single notification as read.
@@ -243,20 +189,11 @@ class InAppNotificationCenterBloc
       );
 
       // Update the local state to reflect the change immediately.
-      final updatedBreakingNewsList = state.breakingNewsNotifications
+      final updatedNotifications = state.notifications
           .map((n) => n.id == notification.id ? updatedNotification : n)
           .toList();
 
-      final updatedDigestList = state.digestNotifications
-          .map((n) => n.id == notification.id ? updatedNotification : n)
-          .toList();
-
-      emit(
-        state.copyWith(
-          breakingNewsNotifications: updatedBreakingNewsList,
-          digestNotifications: updatedDigestList,
-        ),
-      );
+      emit(state.copyWith(notifications: updatedNotifications));
 
       // Notify the global AppBloc to re-check the unread count.
       _appBloc.add(const AppInAppNotificationMarkedAsRead());
@@ -320,19 +257,11 @@ class InAppNotificationCenterBloc
       );
 
       // Update local state with all notifications marked as read.
-      final fullyUpdatedBreakingNewsList = state.breakingNewsNotifications
+      final fullyUpdatedNotifications = state.notifications
           .map((n) => n.isRead ? n : n.copyWith(readAt: now))
           .toList();
 
-      final fullyUpdatedDigestList = state.digestNotifications
-          .map((n) => n.isRead ? n : n.copyWith(readAt: now))
-          .toList();
-      emit(
-        state.copyWith(
-          breakingNewsNotifications: fullyUpdatedBreakingNewsList,
-          digestNotifications: fullyUpdatedDigestList,
-        ),
-      );
+      emit(state.copyWith(notifications: fullyUpdatedNotifications));
 
       // Notify the global AppBloc to clear the unread indicator.
       _appBloc.add(const AppAllInAppNotificationsMarkedAsRead());
@@ -368,15 +297,11 @@ class InAppNotificationCenterBloc
     try {
       emit(state.copyWith(status: InAppNotificationCenterStatus.deleting));
 
-      final isBreakingNewsTab = state.currentTabIndex == 0;
-      final notificationsForTab = isBreakingNewsTab
-          ? state.breakingNewsNotifications
-          : state.digestNotifications;
-
-      final readNotifications = notificationsForTab
+      final readNotifications = state.notifications
           .where((n) => n.isRead)
           .toList();
 
+      // ignore: unnecessary_null_comparison
       if (readNotifications.isEmpty) {
         _logger.info('No read notifications to delete in the current tab.');
         emit(state.copyWith(status: InAppNotificationCenterStatus.success));
@@ -396,32 +321,17 @@ class InAppNotificationCenterBloc
       _logger.info('Deletion successful. Refreshing notification list.');
 
       // After deletion, re-fetch the current tab's data to ensure consistency.
-      final filter = isBreakingNewsTab ? _breakingNewsFilter : _digestFilter;
-      final response = await _fetchNotifications(
-        userId: userId,
-        filter: filter,
-      );
+      final response = await _fetchNotifications(userId: userId);
 
       // Update the state with the refreshed list.
-      if (isBreakingNewsTab) {
-        emit(
-          state.copyWith(
-            status: InAppNotificationCenterStatus.success,
-            breakingNewsNotifications: response.items,
-            breakingNewsHasMore: response.hasMore,
-            breakingNewsCursor: response.cursor,
-          ),
-        );
-      } else {
-        emit(
-          state.copyWith(
-            status: InAppNotificationCenterStatus.success,
-            digestNotifications: response.items,
-            digestHasMore: response.hasMore,
-            digestCursor: response.cursor,
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          status: InAppNotificationCenterStatus.success,
+          notifications: response.items,
+          hasMore: response.hasMore,
+          cursor: response.cursor,
+        ),
+      );
     } catch (error, stackTrace) {
       _handleFetchError(emit, error, stackTrace);
     }
@@ -430,14 +340,12 @@ class InAppNotificationCenterBloc
   /// A generic method to fetch notifications based on a filter.
   Future<PaginatedResponse<InAppNotification>> _fetchNotifications({
     required String userId,
-    required Map<String, dynamic> filter,
     String? cursor,
   }) async {
     // This method now simply fetches and returns the data, or throws on error.
     // The responsibility of emitting state is moved to the event handlers.
     return _inAppNotificationRepository.readAll(
       userId: userId,
-      filter: filter,
       pagination: PaginationOptions(
         limit: _notificationsFetchLimit,
         cursor: cursor,
@@ -445,27 +353,6 @@ class InAppNotificationCenterBloc
       sort: [const SortOption('createdAt', SortOrder.desc)],
     );
   }
-
-  /// Filter for "Breaking News" notifications.
-  ///
-  /// This filter uses the `$nin` (not in) operator to exclude notifications
-  /// that are explicitly typed as digests. All other notifications are
-  /// considered "breaking news" for the purpose of this tab.
-  Map<String, dynamic> get _breakingNewsFilter => {
-    'payload.data.notificationType': {
-      r'$nin': [PushNotificationSubscriptionDeliveryType.dailyDigest.name],
-    },
-  };
-
-  /// Filter for "Digests" notifications.
-  ///
-  /// This filter uses the `$in` operator to select notifications that are
-  /// explicitly typed as either a daily or weekly digest.
-  Map<String, dynamic> get _digestFilter => {
-    'payload.data.notificationType': {
-      r'$in': [PushNotificationSubscriptionDeliveryType.dailyDigest.name],
-    },
-  };
 
   /// Centralized error handler for fetch operations.
   void _handleFetchError(

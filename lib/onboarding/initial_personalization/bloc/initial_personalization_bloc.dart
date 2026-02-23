@@ -117,7 +117,6 @@ class InitialPersonalizationBloc
             followedTopics: const [],
             savedHeadlines: const [],
             savedHeadlineFilters: const [],
-            savedSourceFilters: const [],
           );
 
       final updatedPreferences = existingPreferences.copyWith(

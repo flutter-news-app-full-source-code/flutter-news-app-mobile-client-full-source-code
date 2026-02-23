@@ -2368,5 +2368,9 @@
     "accountPageSyncProgressButton": "Sync Progress",
     "@accountPageSyncProgressButton": {
         "description": "Button text for guest users on the account page to initiate account linking/syncing."
+    },
+    "applyButtonLabel": "Apply",
+    "@applyButtonLabel": {
+        "description": "Generic label for an apply button."
     }
 }

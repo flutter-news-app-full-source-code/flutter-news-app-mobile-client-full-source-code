@@ -40,7 +40,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/fe
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_and_font_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -440,30 +439,6 @@ GoRouter createRouter({
               ),
             ],
             child: EntityDetailsPage(args: args),
-          );
-        },
-      ),
-      GoRoute(
-        path: '/multi-select-search',
-        name: Routes.multiSelectSearchName,
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          final title = extra['title'] as String? ?? '';
-          final allItems = extra['allItems'] as List<dynamic>?;
-          final repository = extra['repository'] as DataRepository<dynamic>?;
-          final initialSelectedItems = extra['initialSelectedItems'] as Set?;
-          final itemBuilder = extra['itemBuilder'] as Function;
-          final maxSelectionCount = extra['maxSelectionCount'] as int?;
-
-          // Use dynamic type to accommodate various item types.
-          return MultiSelectSearchPage<dynamic>(
-            title: title,
-            allItems: allItems,
-            repository: repository,
-            initialSelectedItems: initialSelectedItems?.cast<dynamic>() ?? {},
-            // The itemBuilder is passed as a dynamic function.
-            itemBuilder: (item) => itemBuilder(item) as String,
-            maxSelectionCount: maxSelectionCount,
           );
         },
       ),

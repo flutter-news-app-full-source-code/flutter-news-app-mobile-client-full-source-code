@@ -137,6 +137,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
             );
 
             final isOwnComment = user != null && engagement.userId == user.id;
+            final isPending = comment.status == ModerationStatus.pendingReview;
 
             return ListTile(
               leading: UserAvatar(user: user),
@@ -156,7 +157,24 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (isOwnComment)
+                  if (isPending)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        l10n.commentStatusPending,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  if (isOwnComment && !isPending)
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 20),
                       onPressed: () {
@@ -164,20 +182,21 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                             ?.startEditing();
                       },
                     ),
-                  IconButton(
-                    icon: const Icon(Icons.flag_outlined, size: 20),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (_) => ReportContentBottomSheet(
-                          entityId: engagement.id,
-                          reportableEntity: ReportableEntity.comment,
-                        ),
-                      );
-                    },
-                  ),
+                  if (!isOwnComment)
+                    IconButton(
+                      icon: const Icon(Icons.flag_outlined, size: 20),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => ReportContentBottomSheet(
+                            entityId: engagement.id,
+                            reportableEntity: ReportableEntity.comment,
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
               subtitle: Text(comment.content),

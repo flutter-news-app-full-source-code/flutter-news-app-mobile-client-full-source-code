@@ -245,15 +245,6 @@ class _RewardOfferCard extends StatelessWidget {
           ),
         ],
         if (isActive) const SizedBox(height: AppSpacing.lg),
-        if (isActive)
-          Text(
-            l10n.rewardsOfferExpiresIn(''), // Placeholder for layout
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
       ],
     );
   }
@@ -278,9 +269,7 @@ class _CountdownTimerState extends State<_CountdownTimer> {
     _updateRemaining();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        setState(() {
-          _updateRemaining();
-        });
+        setState(_updateRemaining);
       }
     });
   }

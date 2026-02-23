@@ -1850,4 +1850,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountPageSyncProgressButton => 'مزامنة التقدم';
+
+  @override
+  String get applyButtonLabel => 'تطبيق';
 }

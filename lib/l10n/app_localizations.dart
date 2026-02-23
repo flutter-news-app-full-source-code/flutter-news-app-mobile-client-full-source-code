@@ -3409,6 +3409,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync Progress'**
   String get accountPageSyncProgressButton;
+
+  /// Generic label for an apply button.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyButtonLabel;
 }
 
 class _AppLocalizationsDelegate

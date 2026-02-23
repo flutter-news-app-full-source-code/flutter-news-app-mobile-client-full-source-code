@@ -1841,4 +1841,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountPageSyncProgressButton => 'Sync Progress';
+
+  @override
+  String get applyButtonLabel => 'Apply';
 }

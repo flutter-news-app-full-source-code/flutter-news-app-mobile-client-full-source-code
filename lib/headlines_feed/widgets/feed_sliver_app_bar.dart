@@ -100,12 +100,12 @@ class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
                     builder: (context, isAdFreeActive) {
                       return IconButton(
                         icon: Icon(
-                          isAdFreeActive
+                          !isAdFreeActive
                               ? Icons.card_giftcard
                               : Icons.card_giftcard_outlined,
-                          color: isAdFreeActive
+                          color: !isAdFreeActive
                               ? theme.colorScheme.primary
-                              : null,
+                              : theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         onPressed: () => context.pushNamed(Routes.rewardsName),
                       );

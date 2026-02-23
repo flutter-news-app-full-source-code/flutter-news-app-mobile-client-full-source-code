@@ -247,7 +247,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           return e.userId == currentUserId;
         }
         return true;
-      }).toList();
+      });
 
       // Group engagements by their entityId.
       return groupBy(visibleItems, (e) => e.entityId);
@@ -1195,12 +1195,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         // Update the state with the created engagement from the server.
         // This is crucial because the server generates the valid ObjectId,
         // whereas our optimistic update used a UUID.
-        final confirmedEngagementsMap =
-            Map<String, List<Engagement>>.from(state.engagementsMap)
-              ..[event.headlineId] =
-                  (List<Engagement>.from(newEngagementsForHeadline)
-                    ..removeLast() // Remove optimistic
-                    ..add(createdEngagement)); // Add confirmed
+        final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+          state.engagementsMap,
+        );
+        final engagementsForHeadline = List<Engagement>.from(
+          newEngagementsForHeadline,
+        );
+        engagementsForHeadline.removeLast(); // Remove optimistic
+        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
 
         emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
 
@@ -1334,12 +1337,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         // Update the state with the created engagement from the server.
         // This ensures we have the correct ID for future updates.
-        final confirmedEngagementsMap =
-            Map<String, List<Engagement>>.from(state.engagementsMap)
-              ..[event.headlineId] =
-                  (List<Engagement>.from(newEngagementsForHeadline)
-                    ..removeLast() // Remove optimistic
-                    ..add(createdEngagement)); // Add confirmed
+        final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
+          state.engagementsMap,
+        );
+        final engagementsForHeadline = List<Engagement>.from(
+          newEngagementsForHeadline,
+        );
+        engagementsForHeadline.removeLast(); // Remove optimistic
+        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
 
         emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
       }

@@ -134,11 +134,7 @@ class _NavigationSections extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final areRewardsEnabled = context.select(
-      (AppBloc bloc) =>
-          bloc.state.remoteConfig?.features.rewards.enabled ?? false,
-    );
-    // Using a simple Column instead of a Card with a Column.
+
     return Column(
       children: [
         ListTile(

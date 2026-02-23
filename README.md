@@ -46,7 +46,6 @@ Empower users to tailor the app to their exact preferences, creating a sticky an
 
 ### 🧭 Powerful Content Curation
 Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
-- **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
 - **Smart Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams directly from the feed.
 - **Multi-Dimensional Search:** Users can perform targeted searches across headlines, sources, and topics with advanced filtering options.
 > **Your Advantage:** A sophisticated discovery engine that encourages exploration and increases session depth.
@@ -57,7 +56,7 @@ Give users the tools to find exactly what they're looking for with a multi-facet
 Turn passive readers into active curators with advanced tools for managing information flow.
 - **Saved Filter Hub:** A dedicated hub allows users to construct, save, and manage highly specific news feeds (e.g., "Tech News from US & UK").
 - **One-Tap Pinning:** Users can pin their favorite custom filters to the main feed for instant access.
-- **Proactive Notification Subscriptions:** This is a standout feature. When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—specifically for content that matches their custom criteria.
+- **Proactive Notification Subscriptions:** This is a standout feature. When saving a filter, users can subscribe to receive push notifications specifically for content that matches their custom criteria.
 > **Your Advantage:** Deliver a "Bloomberg-terminal" style experience for power users, driving high retention through personalized alerts.
 
 </details>
@@ -126,7 +125,7 @@ A sophisticated, multi-stage onboarding process ensures users get immediate valu
 ### 🏆 Engagement-Driven Rewards
 A modern, time-based reward system that unlocks features through user engagement, moving away from traditional subscriptions.
 - **Pay-with-Time Model:** Users can "pay" for premium features (like removing ads or unlocking exclusive content) by engaging with high-value rewarded video ads, monetizing non-paying users without friction.
-- **Server-Verified Security:** Leverages AdMob's Server-Side Verification (SSV) to securely grant rewards like an ad-free experience or access to daily digests, ensuring a fraud-proof economy.
+- **Server-Verified Security:** Leverages AdMob's Server-Side Verification (SSV) to securely grant rewards like an ad-free experience ensuring a fraud-proof economy.
 - **Centralized Rewards Hub:** A dedicated "Rewards Center" allows users to see all available offers, track the countdown on active rewards, and initiate new reward actions.
 - **Configurable Offers:** All reward types and their durations (e.g., "Ad-Free for 24 hours") are controlled via remote configuration, allowing for dynamic adjustments without an app update.
 > **Your Advantage:** Launch with a flexible, engagement-focused monetization strategy. The complex logic for handling ad display, server-side verification, and state management for timed rewards is already built, tested, and ready for production.

@@ -301,8 +301,9 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.rewards,
             name: Routes.rewardsName,
-            builder: (context, state) {
-              return RepositoryProvider<RewardedAdManager>(
+            pageBuilder: (context, state) => MaterialPage(
+              fullscreenDialog: true,
+              child: RepositoryProvider<RewardedAdManager>(
                 create: (context) => RewardedAdManager(
                   appBloc: context.read<AppBloc>(),
                   adService: context.read<AdService>(),
@@ -310,8 +311,8 @@ GoRouter createRouter({
                   logger: context.read<Logger>(),
                 ),
                 child: const RewardsPage(),
-              );
-            },
+              ),
+            ),
           ),
           GoRoute(
             path: Routes.editProfile,

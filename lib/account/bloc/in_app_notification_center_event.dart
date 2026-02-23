@@ -32,17 +32,6 @@ class InAppNotificationCenterMarkAllAsRead
   const InAppNotificationCenterMarkAllAsRead();
 }
 
-/// Dispatched when the user changes the selected tab in the notification center.
-class InAppNotificationCenterTabChanged extends InAppNotificationCenterEvent {
-  const InAppNotificationCenterTabChanged(this.tabIndex);
-
-  /// The index of the newly selected tab. 0: Breaking News, 1: Digests.
-  final int tabIndex;
-
-  @override
-  List<Object> get props => [tabIndex];
-}
-
 /// Dispatched when a single in-app notification is marked as read by its ID,
 /// typically from a deep-link without navigating from the notification center.
 class InAppNotificationCenterMarkOneAsRead

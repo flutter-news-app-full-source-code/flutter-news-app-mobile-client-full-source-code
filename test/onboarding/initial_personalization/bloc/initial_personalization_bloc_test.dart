@@ -113,6 +113,7 @@ void main() {
           user: user,
           userContext: userContext,
           remoteConfig: remoteConfig,
+          userContentPreferences: userContentPreferences,
         ),
       );
 
@@ -176,9 +177,6 @@ void main() {
         'saves preferences and completes onboarding',
         setUp: () {
           when(
-            () => userContentPreferencesRepository.read(id: userId),
-          ).thenAnswer((_) async => userContentPreferences);
-          when(
             () => userContentPreferencesRepository.update(
               id: userId,
               item: userContentPreferences,
@@ -196,9 +194,6 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(
-            () => userContentPreferencesRepository.read(id: userId),
-          ).called(1);
           verify(
             () => userContentPreferencesRepository.update(
               id: userId,

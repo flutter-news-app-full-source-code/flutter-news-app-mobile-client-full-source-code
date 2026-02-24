@@ -1,3 +1,5 @@
+// test/headlines-feed/view/headlines_filter_page_test.dart
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -10,8 +12,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
@@ -186,15 +188,15 @@ void main() {
 
       expect(find.text('Filter Headlines'), findsOneWidget);
       expect(
-        find.byKey(const Key(Routes.feedFilterTopicsName)),
+        find.byKey(const Key('filter_topics_tile')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key(Routes.feedFilterSourcesName)),
+        find.byKey(const Key('filter_sources_tile')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key(Routes.feedFilterEventCountriesName)),
+        find.byKey(const Key('filter_countries_tile')),
         findsOneWidget,
       );
     });
@@ -222,10 +224,6 @@ void main() {
         initialState: successState,
       );
 
-      when(
-        () => mockGoRouter.pushNamed(any(), extra: any(named: 'extra')),
-      ).thenAnswer((_) async => null);
-
       await tester.pumpWidget(
         buildWidget(
           headlinesFilterBloc: headlinesFilterBloc,
@@ -234,15 +232,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key(Routes.feedFilterTopicsName)));
+      await tester.tap(find.byKey(const Key('filter_topics_tile')));
       await tester.pumpAndSettle();
 
-      verify(
-        () => mockGoRouter.pushNamed(
-          Routes.feedFilterTopicsName,
-          extra: any(named: 'extra'),
-        ),
-      ).called(1);
+      expect(find.byType(MultiSelectSearchPage<Topic>), findsOneWidget);
     });
 
     testWidgets('tapping Sources navigates to SourceFilterPage', (
@@ -260,10 +253,6 @@ void main() {
         initialState: successState,
       );
 
-      when(
-        () => mockGoRouter.pushNamed(any(), extra: any(named: 'extra')),
-      ).thenAnswer((_) async => null);
-
       await tester.pumpWidget(
         buildWidget(
           headlinesFilterBloc: headlinesFilterBloc,
@@ -272,15 +261,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key(Routes.feedFilterSourcesName)));
+      await tester.tap(find.byKey(const Key('filter_sources_tile')));
       await tester.pumpAndSettle();
 
-      verify(
-        () => mockGoRouter.pushNamed(
-          Routes.feedFilterSourcesName,
-          extra: any(named: 'extra'),
-        ),
-      ).called(1);
+      expect(find.byType(MultiSelectSearchPage<Source>), findsOneWidget);
     });
 
     testWidgets('tapping Countries navigates to CountryFilterPage', (
@@ -298,10 +282,6 @@ void main() {
         initialState: successState,
       );
 
-      when(
-        () => mockGoRouter.pushNamed(any(), extra: any(named: 'extra')),
-      ).thenAnswer((_) async => null);
-
       await tester.pumpWidget(
         buildWidget(
           headlinesFilterBloc: headlinesFilterBloc,
@@ -311,16 +291,11 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(
-        find.byKey(const Key(Routes.feedFilterEventCountriesName)),
+        find.byKey(const Key('filter_countries_tile')),
       );
       await tester.pumpAndSettle();
 
-      verify(
-        () => mockGoRouter.pushNamed(
-          Routes.feedFilterEventCountriesName,
-          extra: any(named: 'extra'),
-        ),
-      ).called(1);
+      expect(find.byType(MultiSelectSearchPage<Country>), findsOneWidget);
     });
 
     testWidgets(

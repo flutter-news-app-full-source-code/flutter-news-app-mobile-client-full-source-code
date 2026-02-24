@@ -51,7 +51,6 @@ void main() {
       followedCountries: const [],
       savedHeadlines: const [],
       savedHeadlineFilters: const [filter1],
-      savedSourceFilters: const [],
     );
 
     setUpAll(() {
@@ -147,7 +146,6 @@ void main() {
             followedCountries: [],
             savedHeadlines: [],
             savedHeadlineFilters: [],
-            savedSourceFilters: [],
           ),
         ),
       );

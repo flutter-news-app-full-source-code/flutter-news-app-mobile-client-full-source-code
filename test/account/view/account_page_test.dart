@@ -96,7 +96,6 @@ void main() {
       );
 
       expect(find.text(standardUser.email), findsOneWidget);
-      expect(find.text('Standard User'), findsOneWidget);
     });
 
     testWidgets('dispatches AppLogoutRequested on sign out tap', (

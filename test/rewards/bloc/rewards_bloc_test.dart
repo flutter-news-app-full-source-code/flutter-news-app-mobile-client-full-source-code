@@ -21,6 +21,8 @@ class MockFeaturesConfig extends Mock implements FeaturesConfig {}
 
 class MockRewardsConfig extends Mock implements RewardsConfig {}
 
+class MockUser extends Mock implements User {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeAppEvent());
@@ -34,6 +36,7 @@ void main() {
     late RemoteConfig remoteConfig;
     late FeaturesConfig featuresConfig;
     late RewardsConfig rewardsConfig;
+    late User user;
 
     setUp(() {
       appBloc = MockAppBloc();
@@ -42,6 +45,9 @@ void main() {
       remoteConfig = MockRemoteConfig();
       featuresConfig = MockFeaturesConfig();
       rewardsConfig = MockRewardsConfig();
+      user = MockUser();
+
+      when(() => user.id).thenReturn('test-user-id');
 
       when(() => remoteConfig.features).thenReturn(featuresConfig);
       when(() => featuresConfig.rewards).thenReturn(rewardsConfig);
@@ -53,6 +59,7 @@ void main() {
         AppState(
           status: AppLifeCycleStatus.authenticated,
           remoteConfig: remoteConfig,
+          user: user,
         ),
       );
       when(
@@ -86,11 +93,8 @@ void main() {
       'emits [RewardsLoadingAd] when RewardsAdRequested is added',
       build: () =>
           RewardsBloc(appBloc: appBloc, analyticsService: analyticsService),
-      act: (bloc) =>
-          bloc.add(const RewardsAdRequested(type: RewardType.adFree)),
-      expect: () => [
-        const RewardsLoadingAd(activeRewardType: RewardType.adFree),
-      ],
+      act: (bloc) => bloc.add(RewardsAdRequested()),
+      expect: () => [const RewardsLoadingAd()],
     );
 
     blocTest<RewardsBloc, RewardsState>(
@@ -126,18 +130,16 @@ void main() {
       'emits [RewardsVerifying] and starts timer on RewardsAdWatched',
       build: () =>
           RewardsBloc(appBloc: appBloc, analyticsService: analyticsService),
-      seed: () => const RewardsLoadingAd(activeRewardType: RewardType.adFree),
+      seed: () => const RewardsLoadingAd(),
       act: (bloc) => bloc.add(RewardsAdWatched()),
-      expect: () => [
-        const RewardsVerifying(activeRewardType: RewardType.adFree),
-      ],
+      expect: () => [const RewardsVerifying()],
     );
 
     blocTest<RewardsBloc, RewardsState>(
       'dispatches UserRewardsRefreshed when timer ticks',
       build: () =>
           RewardsBloc(appBloc: appBloc, analyticsService: analyticsService),
-      seed: () => const RewardsVerifying(activeRewardType: RewardType.adFree),
+      seed: () => const RewardsVerifying(),
       act: (bloc) => bloc.add(RewardsTimerTicked()),
       verify: (_) {
         verify(
@@ -164,10 +166,10 @@ void main() {
           analyticsService: analyticsService,
         );
       },
-      seed: () => const RewardsVerifying(activeRewardType: RewardType.adFree),
+      seed: () => const RewardsVerifying(),
       act: (bloc) => bloc.add(RewardsTimerTicked()),
       wait: const Duration(milliseconds: 100), // Allow future to complete
-      expect: () => [const RewardsSuccess(activeRewardType: RewardType.adFree)],
+      expect: () => [const RewardsSuccess()],
       verify: (_) {
         verify(
           () => analyticsService.logEvent(
@@ -196,7 +198,7 @@ void main() {
           analyticsService: analyticsService,
         );
       },
-      seed: () => const RewardsVerifying(activeRewardType: RewardType.adFree),
+      seed: () => const RewardsVerifying(),
       act: (bloc) => bloc.add(RewardsTimerTicked()),
       wait: const Duration(milliseconds: 100),
       expect: () => <RewardsState>[],

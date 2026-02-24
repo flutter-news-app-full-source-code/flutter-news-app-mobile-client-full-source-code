@@ -615,6 +615,11 @@ void main() {
           'reactionType',
           ReactionType.like,
         ),
+        isA<HeadlinesFeedState>().having(
+          (s) => s.engagementsMap['h1']?.first.reaction?.reactionType,
+          'reactionType',
+          ReactionType.like,
+        ),
       ],
       verify: (_) {
         verify(

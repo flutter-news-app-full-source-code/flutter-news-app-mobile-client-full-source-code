@@ -23,19 +23,20 @@ class AppTourPage extends StatelessWidget {
         analyticsService: context.read<AnalyticsService>(),
         logger: context.read<Logger>(),
       ),
-      child: const _AppTourView(),
+      child: const AppTourView(),
     );
   }
 }
 
-class _AppTourView extends StatefulWidget {
-  const _AppTourView();
+@visibleForTesting
+class AppTourView extends StatefulWidget {
+  const AppTourView({super.key});
 
   @override
-  State<_AppTourView> createState() => _AppTourViewState();
+  State<AppTourView> createState() => _AppTourViewState();
 }
 
-class _AppTourViewState extends State<_AppTourView> {
+class _AppTourViewState extends State<AppTourView> {
   final _pageController = PageController();
 
   @override

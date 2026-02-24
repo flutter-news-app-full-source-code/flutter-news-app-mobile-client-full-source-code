@@ -29,14 +29,14 @@ class SavedHeadlinesFiltersPage extends StatelessWidget {
         // saved filters and to dispatch update events.
         appBloc: context.read<AppBloc>(),
       )..add(const SavedHeadlinesFiltersDataLoaded()),
-      child: const _SavedHeadlinesFiltersView(),
+      child: const SavedHeadlinesFiltersView(),
     );
   }
 }
 
 /// The main view for the SavedHeadlinesFiltersPage.
-class _SavedHeadlinesFiltersView extends StatelessWidget {
-  const _SavedHeadlinesFiltersView();
+class SavedHeadlinesFiltersView extends StatelessWidget {
+  const SavedHeadlinesFiltersView({super.key});
 
   @override
   Widget build(BuildContext context) {

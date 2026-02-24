@@ -87,7 +87,6 @@ void main() {
           primaryProvider: PushNotificationProviders.firebase,
           deliveryConfigs: {
             PushNotificationSubscriptionDeliveryType.breakingOnly: true,
-            PushNotificationSubscriptionDeliveryType.dailyDigest: true,
           },
         ),
         feed: FeedConfig(
@@ -122,7 +121,6 @@ void main() {
           followedItems: {},
           savedHeadlines: {},
           savedHeadlineFilters: {},
-          savedSourceFilters: {},
           commentsPerDay: {},
           reactionsPerDay: {},
           reportsPerDay: {},

@@ -9,6 +9,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
     as app_bloc;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/saved_headlines_filters_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/saved_headlines_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -25,16 +26,22 @@ class MockHeadlinesFeedBloc
     extends MockBloc<HeadlinesFeedEvent, HeadlinesFeedState>
     implements HeadlinesFeedBloc {}
 
+class MockSavedHeadlinesFiltersBloc
+    extends MockBloc<SavedHeadlinesFiltersEvent, SavedHeadlinesFiltersState>
+    implements SavedHeadlinesFiltersBloc {}
+
 class FakeAppEvent extends Fake implements app_bloc.AppEvent {}
 
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeAppEvent());
+    registerFallbackValue(const SavedHeadlinesFiltersDataLoaded());
   });
 
   group('SavedHeadlinesFiltersPage', () {
     late MockAppBloc appBloc;
     late MockHeadlinesFeedBloc headlinesFeedBloc;
+    late MockSavedHeadlinesFiltersBloc savedHeadlinesFiltersBloc;
     late StreamController<app_bloc.AppState> appStateController;
 
     const filter1 = SavedHeadlineFilter(
@@ -57,6 +64,7 @@ void main() {
     setUp(() {
       appBloc = MockAppBloc();
       headlinesFeedBloc = MockHeadlinesFeedBloc();
+      savedHeadlinesFiltersBloc = MockSavedHeadlinesFiltersBloc();
       appStateController = StreamController<app_bloc.AppState>.broadcast();
 
       when(() => appBloc.stream).thenAnswer((_) => appStateController.stream);
@@ -69,7 +77,7 @@ void main() {
       appStateController.close();
     });
 
-    Widget buildWidget() {
+    Widget buildWidget({SavedHeadlinesFiltersBloc? bloc}) {
       return MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -79,26 +87,20 @@ void main() {
             BlocProvider<HeadlinesFeedBloc>(
               create: (context) => headlinesFeedBloc,
             ),
+            BlocProvider<SavedHeadlinesFiltersBloc>(
+              create: (context) => bloc ?? savedHeadlinesFiltersBloc,
+            ),
           ],
-          child: const SavedHeadlinesFiltersPage(),
+          child: const SavedHeadlinesFiltersView(),
         ),
       );
     }
 
     testWidgets('renders correctly with a list of filters', (tester) async {
-      const userContentPreferences = UserContentPreferences(
-        id: 'user1',
-        followedCountries: [],
-        followedSources: [],
-        followedTopics: [],
-        savedHeadlines: [],
-        savedHeadlineFilters: [filter1, filter2],
-        savedSourceFilters: [],
-      );
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: userContentPreferences,
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [filter1, filter2],
         ),
       );
       await tester.pumpWidget(buildWidget());
@@ -110,10 +112,9 @@ void main() {
     });
 
     testWidgets('shows loading state', (tester) async {
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: null,
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.loading,
         ),
       );
       await tester.pumpWidget(buildWidget());
@@ -124,19 +125,10 @@ void main() {
     testWidgets('shows empty state when no filters are available', (
       tester,
     ) async {
-      const userContentPreferences = UserContentPreferences(
-        id: 'user1',
-        followedCountries: [],
-        followedSources: [],
-        followedTopics: [],
-        savedHeadlines: [],
-        savedHeadlineFilters: [],
-        savedSourceFilters: [],
-      );
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: userContentPreferences,
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [],
         ),
       );
       await tester.pumpWidget(buildWidget());
@@ -150,18 +142,10 @@ void main() {
       tester,
     ) async {
       final mockGoRouter = MockGoRouter();
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: UserContentPreferences(
-            id: 'user1',
-            followedCountries: [],
-            followedSources: [],
-            followedTopics: [],
-            savedHeadlines: [],
-            savedHeadlineFilters: [filter1, filter2],
-            savedSourceFilters: [],
-          ),
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [filter1, filter2],
         ),
       );
       when(
@@ -184,7 +168,7 @@ void main() {
           SavedFilterSelected(
             filter: filter1,
             adThemeStyle: AdThemeStyle.fromTheme(
-              Theme.of(tester.element(find.byType(SavedHeadlinesFiltersPage))),
+              Theme.of(tester.element(find.byType(SavedHeadlinesFiltersView))),
             ),
           ),
         ),
@@ -196,18 +180,10 @@ void main() {
       tester,
     ) async {
       final mockGoRouter = MockGoRouter();
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: UserContentPreferences(
-            id: 'user1',
-            followedCountries: [],
-            followedSources: [],
-            followedTopics: [],
-            savedHeadlines: [],
-            savedHeadlineFilters: [],
-            savedSourceFilters: [],
-          ),
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [],
         ),
       );
       when(
@@ -234,7 +210,6 @@ void main() {
               sources: [],
               countries: [],
             ),
-            'filterToEdit': null,
           },
         ),
       ).called(1);
@@ -244,18 +219,10 @@ void main() {
       tester,
     ) async {
       final mockGoRouter = MockGoRouter();
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: UserContentPreferences(
-            id: 'user1',
-            followedCountries: [],
-            followedSources: [],
-            followedTopics: [],
-            savedHeadlines: [],
-            savedHeadlineFilters: [filter1, filter2],
-            savedSourceFilters: [],
-          ),
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [filter1, filter2],
         ),
       );
       when(
@@ -286,21 +253,13 @@ void main() {
     testWidgets('tapping delete option shows confirmation dialog and deletes', (
       tester,
     ) async {
-      when(() => appBloc.state).thenReturn(
-        const app_bloc.AppState(
-          status: AppLifeCycleStatus.authenticated,
-          userContentPreferences: UserContentPreferences(
-            id: 'user1',
-            followedCountries: [],
-            followedSources: [],
-            followedTopics: [],
-            savedHeadlines: [],
-            savedHeadlineFilters: [filter1, filter2],
-            savedSourceFilters: [],
-          ),
+      when(() => savedHeadlinesFiltersBloc.state).thenReturn(
+        const SavedHeadlinesFiltersState(
+          status: SavedHeadlinesFiltersStatus.success,
+          filters: [filter1, filter2],
         ),
       );
-      when(() => appBloc.add(any())).thenAnswer((_) async {});
+      when(() => savedHeadlinesFiltersBloc.add(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
@@ -315,8 +274,8 @@ void main() {
       await tester.pumpAndSettle();
 
       verify(
-        () => appBloc.add(
-          const app_bloc.SavedHeadlineFilterDeleted(filterId: '1'),
+        () => savedHeadlinesFiltersBloc.add(
+          const SavedHeadlinesFiltersDeleted(filterId: '1'),
         ),
       ).called(1);
     });

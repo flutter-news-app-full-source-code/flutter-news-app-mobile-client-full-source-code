@@ -92,7 +92,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: AppTourPage(),
+            home: AppTourView(),
           ),
         ),
       );
@@ -100,7 +100,7 @@ void main() {
 
     testWidgets('renders correctly', (tester) async {
       await tester.pumpWidget(buildSubject());
-      expect(find.byType(AppTourPage), findsOneWidget);
+      expect(find.byType(AppTourView), findsOneWidget);
       expect(find.byType(PageView), findsOneWidget);
       expect(find.byType(SmoothPageIndicator), findsOneWidget);
       expect(find.byType(ElevatedButton), findsOneWidget);

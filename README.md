@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
-  <img src="https://img.shields.io/badge/coverage-43%25-green?style=for-the-badge" alt="coverage: _%">
+  <img src="https://img.shields.io/badge/coverage-40%25-green?style=for-the-badge" alt="coverage: _%">
   <a href="LICENSE"><img src="https://img.shields.io/badge/TRIAL_LICENSE-VIEW_TERMS-blue?style=for-the-badge" alt="Trial License: View Terms"></a>
   <a href="https://github.com/sponsors/flutter-news-app-full-source-code"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
 </p>

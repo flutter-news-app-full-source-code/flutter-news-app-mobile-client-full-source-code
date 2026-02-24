@@ -160,7 +160,7 @@ void main() {
           'notificationId': 'payload-notif-id-2',
           'contentType': 'headline',
           'contentId': 'headline-456',
-          'notificationType': 'dailyDigest',
+          'notificationType': 'breakingOnly',
         });
 
         // Assert

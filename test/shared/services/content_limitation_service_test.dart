@@ -109,7 +109,6 @@ void main() {
       followedTopics: [],
       savedHeadlines: [],
       savedHeadlineFilters: [],
-      savedSourceFilters: [],
     );
 
     final mockRemoteConfig = RemoteConfig(
@@ -197,9 +196,7 @@ void main() {
           savedHeadlineFilters: {
             AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
           },
-          savedSourceFilters: {
-            AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
-          },
+
           commentsPerDay: {AccessTier.guest: 0, AccessTier.standard: 3},
           reactionsPerDay: {AccessTier.guest: 2, AccessTier.standard: 10},
           reportsPerDay: {AccessTier.guest: 1, AccessTier.standard: 5},

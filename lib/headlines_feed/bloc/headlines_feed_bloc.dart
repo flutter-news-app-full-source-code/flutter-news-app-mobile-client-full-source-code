@@ -1198,11 +1198,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
           state.engagementsMap,
         );
-        final engagementsForHeadline = List<Engagement>.from(
-          newEngagementsForHeadline,
-        );
-        engagementsForHeadline.removeLast(); // Remove optimistic
-        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        final engagementsForHeadline =
+            List<Engagement>.from(newEngagementsForHeadline)
+              ..removeLast() // Remove optimistic
+              ..add(createdEngagement); // Add confirmed
         confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
 
         emit(state.copyWith(engagementsMap: confirmedEngagementsMap));
@@ -1340,11 +1339,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         final confirmedEngagementsMap = Map<String, List<Engagement>>.from(
           state.engagementsMap,
         );
-        final engagementsForHeadline = List<Engagement>.from(
-          newEngagementsForHeadline,
-        );
-        engagementsForHeadline.removeLast(); // Remove optimistic
-        engagementsForHeadline.add(createdEngagement); // Add confirmed
+        final engagementsForHeadline =
+            List<Engagement>.from(newEngagementsForHeadline)
+              ..removeLast() // Remove optimistic
+              ..add(createdEngagement); // Add confirmed
         confirmedEngagementsMap[event.headlineId] = engagementsForHeadline;
 
         emit(state.copyWith(engagementsMap: confirmedEngagementsMap));

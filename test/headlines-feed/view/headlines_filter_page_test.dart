@@ -187,18 +187,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Filter Headlines'), findsOneWidget);
-      expect(
-        find.byKey(const Key('filter_topics_tile')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const Key('filter_sources_tile')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const Key('filter_countries_tile')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('filter_topics_tile')), findsOneWidget);
+      expect(find.byKey(const Key('filter_sources_tile')), findsOneWidget);
+      expect(find.byKey(const Key('filter_countries_tile')), findsOneWidget);
     });
 
     testWidgets('shows loading state correctly', (tester) async {
@@ -290,9 +281,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('filter_countries_tile')),
-      );
+      await tester.tap(find.byKey(const Key('filter_countries_tile')));
       await tester.pumpAndSettle();
 
       expect(find.byType(MultiSelectSearchPage<Country>), findsOneWidget);

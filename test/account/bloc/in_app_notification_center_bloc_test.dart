@@ -173,6 +173,7 @@ void main() {
         build: () => bloc,
         act: (bloc) =>
             bloc.add(const InAppNotificationCenterFetchMoreRequested()),
+        // ignore: inference_failure_on_collection_literal
         expect: () => [],
       );
 

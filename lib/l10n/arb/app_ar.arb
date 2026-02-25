@@ -1,92 +1,28 @@
 {
     "@@locale": "ar",
     "accountLinkingPageTitle": "مزامنة تقدمك",
-    "@accountLinkingPageTitle": {
-        "description": "Title for the account linking page"
-    },
     "accountLinkingGenericError": "حدث خطأ",
-    "@accountLinkingGenericError": {
-        "description": "Generic error message shown during account linking"
-    },
     "accountLinkingEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول!",
-    "@accountLinkingEmailSentSuccess": {
-        "description": "Success message shown after sending an email sign-in link"
-    },
     "accountLinkingHeadline": "احفظ تقدمك",
-    "@accountLinkingHeadline": {
-        "description": "Headline text on the account linking page"
-    },
     "accountLinkingBody": "أنشئ حسابًا لمزامنة العناصر التي تتابعها وتفضيلاتك عبر جميع أجهزتك.",
-    "@accountLinkingBody": {
-        "description": "Body text explaining the benefits of linking an account"
-    },
     "accountLinkingContinueWithGoogleButton": "المتابعة باستخدام جوجل",
-    "@accountLinkingContinueWithGoogleButton": {
-        "description": "Text for the Google sign-in button"
-    },
     "accountLinkingEmailInputLabel": "أدخل بريدك الإلكتروني",
-    "@accountLinkingEmailInputLabel": {
-        "description": "Label for the email input field"
-    },
     "accountLinkingEmailInputHint": "you@example.com",
-    "@accountLinkingEmailInputHint": {
-        "description": "Hint text for the email input field"
-    },
     "accountLinkingEmailValidationError": "الرجاء إدخال عنوان بريد إلكتروني صالح",
-    "@accountLinkingEmailValidationError": {
-        "description": "Validation error message for the email input field"
-    },
     "accountLinkingSendLinkButton": "مزامنة مع البريد الإلكتروني",
-    "@accountLinkingSendLinkButton": {
-        "description": "Text for the button that sends an email sign-in link"
-    },
     "accountPageTitle": "الحساب",
-    "@accountPageTitle": {
-        "description": "Title for the account page"
-    },
     "accountAnonymousUser": "(مجهول)",
-    "@accountAnonymousUser": {
-        "description": "Display name shown for an anonymous user"
-    },
     "accountNoNameUser": "لا يوجد اسم",
-    "@accountNoNameUser": {
-        "description": "Default display name shown when user has no name set"
-    },
     "accountStatusAuthenticated": "مصادق عليه",
-    "@accountStatusAuthenticated": {
-        "description": "Text indicating the user is fully authenticated"
-    },
     "accountStatusAnonymous": "جلسة مجهولة",
-    "@accountStatusAnonymous": {
-        "description": "Text indicating the user is in an anonymous session"
-    },
     "accountStatusUnauthenticated": "لم يتم تسجيل الدخول",
-    "@accountStatusUnauthenticated": {
-        "description": "Text indicating the user is not signed in"
-    },
     "accountSettingsTile": "الإعدادات",
-    "@accountSettingsTile": {
-        "description": "Title for the settings navigation tile"
-    },
     "accountSignOutTile": "تسجيل الخروج",
-    "@accountSignOutTile": {
-        "description": "Title for the sign out action tile"
-    },
     "accountBackupTile": "أنشئ حسابًا لحفظ البيانات",
-    "@accountBackupTile": {
-        "description": "Title for the tile prompting anonymous users to create an account"
-    },
     "accountContentPreferencesTile": "المتابعات",
-    "@accountContentPreferencesTile": {
-        "description": "Title for the content preferences navigation tile in the account page"
-    },
     "accountSavedHeadlinesTile": "المحفوظات",
-    "@accountSavedHeadlinesTile": {
-        "description": "Title for the saved headlines navigation tile in the account page"
-    },
     "accountRoleLabel": "الدور: {role}",
     "@accountRoleLabel": {
-        "description": "Label displaying the user's role in the account header",
         "placeholders": {
             "role": {
                 "type": "String",
@@ -95,308 +31,82 @@
         }
     },
     "accountMyContentSectionTitle": "المحتوى الخاص بي",
-    "@accountMyContentSectionTitle": {
-        "description": "Title for the 'My Content' section on the account page."
-    },
     "accountActivityAndRewardsSectionTitle": "النشاط والمكافآت",
-    "@accountActivityAndRewardsSectionTitle": {
-        "description": "Title for the 'Activity & Rewards' section on the account page."
-    },
     "accountGeneralSectionTitle": "عام",
-    "@accountGeneralSectionTitle": {
-        "description": "Title for the 'General' section on the account page."
-    },
     "accountEditProfileButton": "تعديل الملف الشخصي",
-    "@accountEditProfileButton": {
-        "description": "Button text to navigate to the edit profile page."
-    },
     "editProfilePageTitle": "تعديل الملف الشخصي",
-    "@editProfilePageTitle": {
-        "description": "Title for the Edit Profile page."
-    },
     "editProfileNameInputLabel": "الاسم",
-    "@editProfileNameInputLabel": {
-        "description": "Label for the name input field on the Edit Profile page."
-    },
     "editProfileEmailInputLabel": "البريد الإلكتروني",
-    "@editProfileEmailInputLabel": {
-        "description": "Label for the email input field on the Edit Profile page."
-    },
     "editProfileUpdateSuccessSnackbar": "تم تحديث الملف الشخصي بنجاح.",
-    "@editProfileUpdateSuccessSnackbar": {
-        "description": "Snackbar message shown when the user's profile is updated successfully."
-    },
     "editProfileUpdateFailureSnackbar": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
-    "@editProfileUpdateFailureSnackbar": {
-        "description": "Snackbar message shown when updating the user's profile fails."
-    },
     "followedContentPageTitle": "العناصر المتابعة",
-    "@followedContentPageTitle": {
-        "description": "Title for the new unified page that shows all followed content."
-    },
     "followedContentTopicsTab": "المواضيع",
-    "@followedContentTopicsTab": {
-        "description": "Label for the 'Topics' tab on the followed content page."
-    },
     "followedContentSourcesTab": "المصادر",
-    "@followedContentSourcesTab": {
-        "description": "Label for the 'Sources' tab on the followed content page."
-    },
     "authenticationEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول.",
-    "@authenticationEmailSentSuccess": {
-        "description": "Success message shown after sending an email sign-in link on the authentication page"
-    },
     "authenticationPageTitle": "تسجيل الدخول / التسجيل",
-    "@authenticationPageTitle": {
-        "description": "Title for the main authentication page"
-    },
     "authenticationEmailLabel": "البريد الإلكتروني",
-    "@authenticationEmailLabel": {
-        "description": "Label for the email input field on the authentication page"
-    },
     "authenticationSendLinkButton": "إرسال رابط تسجيل الدخول",
-    "@authenticationSendLinkButton": {
-        "description": "Text for the button that sends an email sign-in link on the authentication page"
-    },
     "authenticationOrDivider": "أو",
-    "@authenticationOrDivider": {
-        "description": "Text used as a separator between sign-in methods"
-    },
     "authenticationGoogleSignInButton": "تسجيل الدخول باستخدام جوجل",
-    "@authenticationGoogleSignInButton": {
-        "description": "Text for the Google sign-in button on the authentication page"
-    },
     "authenticationAnonymousSignInButton": "المتابعة كمجهول",
-    "@authenticationAnonymousSignInButton": {
-        "description": "Text for the button to continue without signing in"
-    },
     "headlineDetailsInitialHeadline": "في انتظار التفاصيل",
-    "@headlineDetailsInitialHeadline": {
-        "description": "Headline text shown in the initial state widget on the details page"
-    },
     "headlineDetailsInitialSubheadline": "يرجى الانتظار...",
-    "@headlineDetailsInitialSubheadline": {
-        "description": "Subheadline text shown in the initial state widget on the details page"
-    },
     "headlineDetailsLoadingHeadline": "جارٍ تحميل العنوان",
-    "@headlineDetailsLoadingHeadline": {
-        "description": "Headline text shown in the loading state widget on the details page"
-    },
     "headlineDetailsLoadingSubheadline": "جارٍ جلب البيانات...",
-    "@headlineDetailsLoadingSubheadline": {
-        "description": "Subheadline text shown in the loading state widget on the details page"
-    },
     "headlineDetailsContinueReadingButton": "متابعة القراءة",
-    "@headlineDetailsContinueReadingButton": {
-        "description": "Text for the button to open the full article"
-    },
     "headlinesFeedLoadingHeadline": "جارٍ التحميل...",
-    "@headlinesFeedLoadingHeadline": {
-        "description": "Headline text shown in the loading state widget on the feed page"
-    },
     "headlinesFeedLoadingSubheadline": "جارٍ جلب العناوين",
-    "@headlinesFeedLoadingSubheadline": {
-        "description": "Subheadline text shown in the loading state widget on the feed page"
-    },
     "headlinesFeedFilterTitle": "تصفية العناوين",
-    "@headlinesFeedFilterTitle": {
-        "description": "Title for the filter bottom sheet"
-    },
     "headlinesFeedFilterCategoryLabel": "الفئة",
-    "@headlinesFeedFilterCategoryLabel": {
-        "description": "Label for the category filter dropdown"
-    },
     "headlinesFeedFilterAllOption": "الكل",
-    "@headlinesFeedFilterAllOption": {
-        "description": "Text for the 'All' option in filter dropdowns"
-    },
     "headlinesFeedFilterCategoryTechnology": "تكنولوجيا",
-    "@headlinesFeedFilterCategoryTechnology": {
-        "description": "Filter option for Technology category"
-    },
     "headlinesFeedFilterCategoryBusiness": "أعمال",
-    "@headlinesFeedFilterCategoryBusiness": {
-        "description": "Filter option for Business category"
-    },
     "headlinesFeedFilterCategorySports": "رياضة",
-    "@headlinesFeedFilterCategorySports": {
-        "description": "Filter option for Sports category"
-    },
     "headlinesFeedFilterSourceLabel": "المصادر",
-    "@headlinesFeedFilterSourceLabel": {
-        "description": "Label for the source filter dropdown"
-    },
     "headlinesFeedFilterSourceCNN": "CNN",
-    "@headlinesFeedFilterSourceCNN": {
-        "description": "Filter option for CNN source"
-    },
     "headlinesFeedFilterSourceReuters": "Reuters",
-    "@headlinesFeedFilterSourceReuters": {
-        "description": "Filter option for Reuters source"
-    },
     "headlinesFeedFilterEventCountryLabel": "الدول",
-    "@headlinesFeedFilterEventCountryLabel": {
-        "description": "Filter page label indication where the hadline event has took place"
-    },
     "headlinesFeedFilterSourceCountryLabel": "مقر المصدر",
-    "@headlinesFeedFilterSourceCountryLabel": {
-        "description": "Filter page label indication where the headline source is located"
-    },
     "headlinesFeedFilterCountryUS": "الولايات المتحدة",
-    "@headlinesFeedFilterCountryUS": {
-        "description": "Filter option for United States"
-    },
     "headlinesFeedFilterCountryUK": "المملكة المتحدة",
-    "@headlinesFeedFilterCountryUK": {
-        "description": "Filter option for United Kingdom"
-    },
     "headlinesFeedFilterCountryCA": "كندا",
-    "@headlinesFeedFilterCountryCA": {
-        "description": "Filter option for Canada"
-    },
     "headlinesFeedFilterApplyButton": "تطبيق الفلاتر",
-    "@headlinesFeedFilterApplyButton": {
-        "description": "Text for the button to apply selected filters"
-    },
     "headlinesFeedFilterResetButton": "إعادة تعيين الفلاتر",
-    "@headlinesFeedFilterResetButton": {
-        "description": "Text for the button to reset all filters"
-    },
     "headlinesSearchHintText": "ابحث في العناوين...",
-    "@headlinesSearchHintText": {
-        "description": "Hint text for the search input field"
-    },
     "headlinesSearchInitialHeadline": "اعثر على العناوين فوراً",
-    "@headlinesSearchInitialHeadline": {
-        "description": "Headline text shown in the initial state widget on the search page"
-    },
     "headlinesSearchInitialSubheadline": "اكتب كلمات رئيسية أعلاه لاكتشاف المقالات الإخبارية.",
-    "@headlinesSearchInitialSubheadline": {
-        "description": "Subheadline text shown in the initial state widget on the search page"
-    },
     "headlinesSearchNoResultsHeadline": "لا توجد نتائج",
-    "@headlinesSearchNoResultsHeadline": {
-        "description": "Headline text shown when a search yields no results"
-    },
     "headlinesSearchNoResultsSubheadline": "جرب مصطلح بحث مختلف",
-    "@headlinesSearchNoResultsSubheadline": {
-        "description": "Subheadline text shown when a search yields no results"
-    },
     "authenticationEmailSignInButton": "متابعة بالبريد الإلكتروني",
-    "@authenticationEmailSignInButton": {
-        "description": "نص زر بدء تدفق تسجيل الدخول بالبريد الإلكتروني"
-    },
     "authenticationLinkingHeadline": "زامن تقدمك",
-    "@authenticationLinkingHeadline": {
-        "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
-    },
     "authenticationLinkingSubheadline": "أنشئ حسابًا لحفظ إعداداتك وتفضيلات المحتوى والمزيد عبر الأجهزة.",
-    "@authenticationLinkingSubheadline": {
-        "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
-    },
     "authenticationSignInHeadline": "فيريتاس",
-    "@authenticationSignInHeadline": {
-        "description": "عنوان صفحة المصادقة أثناء تسجيل الدخول القياسي"
-    },
     "authenticationSignInSubheadline": "أخبار غير مصفاة من مصادر موثوقة حول العالم.",
-    "@authenticationSignInSubheadline": {
-        "description": "عنوان فرعي لصفحة المصادقة أثناء تسجيل الدخول القياسي"
-    },
     "emailSignInPageTitle": "تسجيل الدخول بالبريد الإلكتروني",
-    "@emailSignInPageTitle": {
-        "description": "عنوان شريط التطبيق لصفحة تسجيل الدخول بالبريد الإلكتروني"
-    },
     "emailSignInExplanation": "أدخل بريدك الإلكتروني أدناه. سنرسل لك رابطًا آمنًا لتسجيل الدخول فورًا. لا حاجة لكلمة مرور!",
-    "@emailSignInExplanation": {
-        "description": "نص توضيحي في صفحة تسجيل الدخول بالبريد الإلكتروني"
-    },
     "emailLinkSentPageTitle": "تحقق من بريدك الإلكتروني",
-    "@emailLinkSentPageTitle": {
-        "description": "عنوان شريط التطبيق لصفحة تأكيد إرسال رابط البريد الإلكتروني"
-    },
     "emailLinkSentConfirmation": "تم إرسال الرابط! تحقق من صندوق الوارد في بريدك الإلكتروني (ومجلد الرسائل غير المرغوب فيها) بحثًا عن رسالة منا. انقر على الرابط الموجود بالداخل لإكمال تسجيل الدخول.",
-    "@emailLinkSentConfirmation": {
-        "description": "رسالة تأكيد تظهر بعد إرسال رابط البريد الإلكتروني"
-    },
     "accountConnectPrompt": "ربط الحساب",
-    "@accountConnectPrompt": {
-        "description": "عنوان المربع الذي يطالب المستخدمين المجهولين بتسجيل الدخول/الربط"
-    },
     "accountConnectBenefit": "لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
-    "@accountConnectBenefit": {
-        "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
-    },
     "bottomNavFeedLabel": "الموجز",
-    "@bottomNavFeedLabel": {
-        "description": "Label for the Feed item in the bottom navigation bar"
-    },
     "bottomNavSearchLabel": "بحث",
-    "@bottomNavSearchLabel": {
-        "description": "Label for the Search item in the bottom navigation bar"
-    },
     "bottomNavAccountLabel": "الحساب",
-    "@bottomNavAccountLabel": {
-        "description": "Label for the Account item in the bottom navigation bar"
-    },
     "accountNotificationsTile": "الإشعارات",
-    "@accountNotificationsTile": {
-        "description": "Title for the notifications navigation tile in the account page"
-    },
     "headlinesSearchActionTooltip": "بحث",
-    "@headlinesSearchActionTooltip": {
-        "description": "Tooltip text for the search icon button in the search page AppBar"
-    },
     "notificationsTooltip": "عرض الإشعارات",
-    "@notificationsTooltip": {
-        "description": "Tooltip text for the notifications icon button in the feed page AppBar"
-    },
     "categoryFilterLoadingHeadline": "جارٍ تحميل الفئات...",
-    "@categoryFilterLoadingHeadline": {
-        "description": "Headline for loading state on category filter page"
-    },
     "categoryFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب الفئات المتاحة.",
-    "@categoryFilterLoadingSubheadline": {
-        "description": "Subheadline for loading state on category filter page"
-    },
     "categoryFilterEmptyHeadline": "لم يتم العثور على فئات",
-    "@categoryFilterEmptyHeadline": {
-        "description": "Headline for empty state on category filter page"
-    },
     "categoryFilterEmptySubheadline": "لا توجد فئات متاحة في الوقت الحالي.",
-    "@categoryFilterEmptySubheadline": {
-        "description": "Subheadline for empty state on category filter page"
-    },
     "countryFilterLoadingHeadline": "جارٍ تحميل البلدان...",
-    "@countryFilterLoadingHeadline": {
-        "description": "Headline for loading state on country filter page"
-    },
     "countryFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب البلدان المتاحة.",
-    "@countryFilterLoadingSubheadline": {
-        "description": "Subheadline for loading state on country filter page"
-    },
     "countryFilterEmptyHeadline": "لم يتم العثور على بلدان",
-    "@countryFilterEmptyHeadline": {
-        "description": "Headline for empty state on country filter page"
-    },
     "countryFilterEmptySubheadline": "لا توجد بلدان متاحة في الوقت الحالي.",
-    "@countryFilterEmptySubheadline": {
-        "description": "Subheadline for empty state on country filter page"
-    },
     "headlinesFeedAppBarTitle": "HT",
-    "@headlinesFeedAppBarTitle": {
-        "description": "Title displayed in the AppBar of the main headlines feed"
-    },
     "headlinesFeedFilterTooltip": "تصفية العناوين",
-    "@headlinesFeedFilterTooltip": {
-        "description": "Tooltip for the filter icon button in the feed AppBar"
-    },
     "headlinesFeedFilterAllLabel": "الكل",
-    "@headlinesFeedFilterAllLabel": {
-        "description": "Label indicating 'All' items are selected in a filter tile"
-    },
     "headlinesFeedFilterSelectedCountLabel": "تم تحديد {count}",
     "@headlinesFeedFilterSelectedCountLabel": {
-        "description": "Label showing the number of selected filters (e.g., \"5 selected\")",
         "placeholders": {
             "count": {
                 "type": "int",
@@ -405,224 +115,61 @@
         }
     },
     "sourceFilterLoadingHeadline": "جارٍ تحميل المصادر...",
-    "@sourceFilterLoadingHeadline": {
-        "description": "Headline for loading state on source filter page"
-    },
     "sourceFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب المصادر المتاحة.",
-    "@sourceFilterLoadingSubheadline": {
-        "description": "Subheadline for loading state on source filter page"
-    },
     "sourceFilterEmptyHeadline": "لم يتم العثور على مصادر",
-    "@sourceFilterEmptyHeadline": {
-        "description": "Headline for empty state on source filter page"
-    },
     "sourceFilterEmptySubheadline": "لا توجد مصادر متاحة في الوقت الحالي.",
-    "@sourceFilterEmptySubheadline": {
-        "description": "Subheadline for empty state on source filter page"
-    },
     "accountSignInPromptButton": "تسجيل / تسجيل الدخول",
-    "@accountSignInPromptButton": {
-        "description": "Button text shown in the user header for anonymous users to initiate sign-in/sign-up"
-    },
     "settingsTitle": "الإعدادات",
-    "@settingsTitle": {
-        "description": "Title for the main settings page"
-    },
     "settingsLoadingHeadline": "جارٍ تحميل الإعدادات...",
-    "@settingsLoadingHeadline": {
-        "description": "Headline shown while settings are loading"
-    },
     "settingsLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب تفضيلاتك.",
-    "@settingsLoadingSubheadline": {
-        "description": "Subheadline shown while settings are loading"
-    },
     "settingsErrorDefault": "تعذر تحميل الإعدادات.",
-    "@settingsErrorDefault": {
-        "description": "Default error message when settings fail to load"
-    },
     "settingsAppearanceTitle": "المظهر",
-    "@settingsAppearanceTitle": {
-        "description": "Title for the appearance settings section/page"
-    },
     "settingsFeedDisplayTitle": "الموجز",
-    "@settingsFeedDisplayTitle": {
-        "description": "Title for the feed display settings section/page"
-    },
     "settingsArticleDisplayTitle": "عرض المقال",
-    "@settingsArticleDisplayTitle": {
-        "description": "Title for the article display settings section/page"
-    },
     "settingsNotificationsTitle": "الإشعارات",
-    "@settingsNotificationsTitle": {
-        "description": "Title for the notification settings section/page"
-    },
     "settingsAppearanceThemeModeLight": "فاتح",
-    "@settingsAppearanceThemeModeLight": {
-        "description": "Label for the light theme mode option"
-    },
     "settingsAppearanceThemeModeDark": "داكن",
-    "@settingsAppearanceThemeModeDark": {
-        "description": "Label for the dark theme mode option"
-    },
     "settingsAppearanceThemeModeSystem": "النظام",
-    "@settingsAppearanceThemeModeSystem": {
-        "description": "Label for the system theme mode option"
-    },
     "settingsAppearanceThemeNameRed": "أحمر",
-    "@settingsAppearanceThemeNameRed": {
-        "description": "Label for the red color scheme option"
-    },
     "settingsAppearanceThemeNameBlue": "أزرق",
-    "@settingsAppearanceThemeNameBlue": {
-        "description": "Label for the blue color scheme option"
-    },
     "settingsAppearanceThemeNameGrey": "رمادي",
-    "@settingsAppearanceThemeNameGrey": {
-        "description": "Label for the grey color scheme option"
-    },
     "settingsAppearanceFontSizeSmall": "صغير",
-    "@settingsAppearanceFontSizeSmall": {
-        "description": "Label for the small font size option"
-    },
     "settingsAppearanceFontSizeLarge": "كبير",
-    "@settingsAppearanceFontSizeLarge": {
-        "description": "Label for the large font size option"
-    },
     "settingsAppearanceFontSizeMedium": "متوسط",
-    "@settingsAppearanceFontSizeMedium": {
-        "description": "Label for the medium font size option"
-    },
     "settingsAppearanceThemeModeLabel": "وضع المظهر",
-    "@settingsAppearanceThemeModeLabel": {
-        "description": "Label for the theme mode selection dropdown"
-    },
     "settingsAppearanceThemeNameLabel": "نظام الألوان",
-    "@settingsAppearanceThemeNameLabel": {
-        "description": "Label for the color scheme selection dropdown"
-    },
     "settingsAppearanceAppFontSizeLabel": "حجم خط التطبيق",
-    "@settingsAppearanceAppFontSizeLabel": {
-        "description": "Label for the app font size selection dropdown"
-    },
     "settingsAppearanceAppFontTypeLabel": "خط التطبيق",
-    "@settingsAppearanceAppFontTypeLabel": {
-        "description": "Label for the app font selection dropdown"
-    },
     "settingsAppearanceFontWeightLabel": "وزن الخط",
-    "@settingsAppearanceFontWeightLabel": {
-        "description": "Label for the font weight setting."
-    },
     "settingsFeedTileTypeImageTop": "صورة في الأعلى",
-    "@settingsFeedTileTypeImageTop": {
-        "description": "Label for the feed tile type with image on top"
-    },
     "settingsFeedTileTypeImageStart": "صورة في البداية",
-    "@settingsFeedTileTypeImageStart": {
-        "description": "Label for the feed tile type with image at the start"
-    },
     "settingsFeedTileTypeTextOnly": "نص فقط",
-    "@settingsFeedTileTypeTextOnly": {
-        "description": "Label for the feed tile type with text only"
-    },
     "settingsFeedTileTypeLabel": "تخطيط عنصر الموجز",
-    "@settingsFeedTileTypeLabel": {
-        "description": "Label for the feed tile layout selection dropdown"
-    },
     "settingsArticleFontSizeLabel": "حجم خط المقال",
-    "@settingsArticleFontSizeLabel": {
-        "description": "Label for the article font size selection dropdown"
-    },
     "settingsNotificationsEnableLabel": "تفعيل الإشعارات",
-    "@settingsNotificationsEnableLabel": {
-        "description": "Label for the switch to enable/disable notifications"
-    },
     "settingsNotificationsCategoriesLabel": "الفئات المتابعة",
-    "@settingsNotificationsCategoriesLabel": {
-        "description": "Label for the section to select notification categories"
-    },
     "settingsNotificationsSourcesLabel": "المصادر المتابعة",
-    "@settingsNotificationsSourcesLabel": {
-        "description": "Label for the section to select notification sources"
-    },
     "settingsNotificationsCountriesLabel": "البلدان المتابعة",
-    "@settingsNotificationsCountriesLabel": {
-        "description": "Label for the section to select notification countries"
-    },
     "settingsAppearanceSectionTitle": "المظهر",
-    "@settingsAppearanceSectionTitle": {
-        "description": "Section title for appearance settings."
-    },
     "settingsFeedSectionTitle": "الموجز",
-    "@settingsFeedSectionTitle": {
-        "description": "Section title for feed settings."
-    },
     "settingsGeneralSectionTitle": "عام",
-    "@settingsGeneralSectionTitle": {
-        "description": "Section title for general settings."
-    },
     "settingsAccentColorAndFontsTitle": "لون التمييز والخطوط",
-    "@settingsAccentColorAndFontsTitle": {
-        "description": "Title for the consolidated theme and font settings page."
-    },
     "settingsAccentColorLabel": "لون التمييز",
-    "@settingsAccentColorLabel": {
-        "description": "Label for the accent color selection."
-    },
     "settingsFontFamilyLabel": "عائلة الخط",
-    "@settingsFontFamilyLabel": {
-        "description": "Label for the font family selection."
-    },
     "settingsLayoutAndReadingTitle": "التخطيط والقراءة",
-    "@settingsLayoutAndReadingTitle": {
-        "description": "Title for the feed layout and reading settings page."
-    },
     "appName": "Headlines Toolkit",
-    "@appName": {
-        "description": "The name of the application."
-    },
     "unknownError": "حدث خطأ غير معروف.",
-    "@unknownError": {
-        "description": "Generic error message shown when an operation fails unexpectedly"
-    },
     "loadMoreError": "فشل تحميل المزيد من العناصر.",
-    "@loadMoreError": {
-        "description": "Error message shown when pagination fails to load the next set of items"
-    },
     "settingsAppearanceFontSizeExtraLarge": "كبير جداً",
-    "@settingsAppearanceFontSizeExtraLarge": {
-        "description": "Label for the extra large font size option"
-    },
     "settingsAppearanceFontFamilySystemDefault": "افتراضي النظام",
-    "@settingsAppearanceFontFamilySystemDefault": {
-        "description": "Label for the system default font family option"
-    },
     "settingsAppearanceFontFamilyRoboto": "روبوتو",
-    "@settingsAppearanceFontFamilyRoboto": {
-        "description": "Label for the Roboto font family option"
-    },
     "settingsAppearanceFontFamilyOpenSans": "أوبن سانس",
-    "@settingsAppearanceFontFamilyOpenSans": {
-        "description": "Label for the Open Sans font family option"
-    },
     "settingsAppearanceThemeSubPageTitle": "إعدادات المظهر",
-    "@settingsAppearanceThemeSubPageTitle": {
-        "description": "Title for the theme settings sub-page under appearance"
-    },
     "settingsAppearanceFontSubPageTitle": "إعدادات الخط",
-    "@settingsAppearanceFontSubPageTitle": {
-        "description": "Title for the font settings sub-page under appearance"
-    },
     "settingsLanguageTitle": "اللغة",
-    "@settingsLanguageTitle": {
-        "description": "Title for the language settings page/section"
-    },
     "emailCodeSentPageTitle": "أدخل الرمز",
-    "@emailCodeSentPageTitle": {
-        "description": "AppBar title for the email code verification page"
-    },
     "emailCodeSentConfirmation": "تم إرسال رمز التحقق إلى {email}. يرجى إدخاله أدناه.",
     "@emailCodeSentConfirmation": {
-        "description": "Confirmation message shown after the email code has been sent",
         "placeholders": {
             "email": {
                 "type": "String",
@@ -631,128 +178,37 @@
         }
     },
     "emailCodeSentInstructions": "أدخل الرمز المكون من 6 أرقام الذي تلقيته.",
-    "@emailCodeSentInstructions": {
-        "description": "Instructions for the user to enter the verification code"
-    },
     "emailCodeVerificationHint": "رمز مكون من 6 أرقام",
-    "@emailCodeVerificationHint": {
-        "description": "Hint text for the email code input field"
-    },
     "emailCodeVerificationButtonLabel": "تحقق من الرمز",
-    "@emailCodeVerificationButtonLabel": {
-        "description": "Label for the button to verify the email code"
-    },
     "emailCodeValidationEmptyError": "الرجاء إدخال الرمز المكون من 6 أرقام.",
-    "@emailCodeValidationEmptyError": {
-        "description": "Validation error when the email verification code is empty."
-    },
     "emailCodeValidationLengthError": "يجب أن يتكون الرمز من 6 أرقام.",
-    "@emailCodeValidationLengthError": {
-        "description": "Validation error when the email verification code is not 6 digits."
-    },
     "headlinesFeedEmptyFilteredHeadline": "لا توجد عناوين تطابق فلاترك",
-    "@headlinesFeedEmptyFilteredHeadline": {
-        "description": "Headline text shown when headline filters result in an empty list"
-    },
     "headlinesFeedEmptyFilteredSubheadline": "حاول تعديل معايير الفلترة أو مسحها لرؤية جميع العناوين.",
-    "@headlinesFeedEmptyFilteredSubheadline": {
-        "description": "Subheadline text shown when headline filters result in an empty list"
-    },
     "headlinesFeedClearFiltersButton": "مسح الفلاتر",
-    "@headlinesFeedClearFiltersButton": {
-        "description": "Button text to clear applied headline filters"
-    },
     "headlinesFeedFilterLoadingCriteria": "جارٍ تحميل خيارات التصفية...",
-    "@headlinesFeedFilterLoadingCriteria": {
-        "description": "Text shown when filter options are loading"
-    },
     "pleaseWait": "يرجى الانتظار...",
-    "@pleaseWait": {
-        "description": "Generic wait message"
-    },
     "headlinesFeedFilterErrorCriteria": "تعذر تحميل خيارات التصفية.",
-    "@headlinesFeedFilterErrorCriteria": {
-        "description": "Error message when filter options fail to load"
-    },
     "headlinesFeedFilterCountryLabel": "الدول",
-    "@headlinesFeedFilterCountryLabel": {
-        "description": "Label for the country filter selection"
-    },
     "headlinesFeedFilterSourceTypeLabel": "الأنواع",
-    "@headlinesFeedFilterSourceTypeLabel": {
-        "description": "Label for the source type filter selection"
-    },
     "headlinesFeedFilterErrorSources": "تعذر تحميل المصادر.",
-    "@headlinesFeedFilterErrorSources": {
-        "description": "Error message when sources fail to load for filtering"
-    },
     "headlinesFeedFilterNoSourcesMatch": "لا توجد مصادر تطابق الفلاتر المحددة.",
-    "@headlinesFeedFilterNoSourcesMatch": {
-        "description": "Message shown when no sources match the selected filters"
-    },
     "searchModelTypeHeadline": "العناوين الرئيسية",
-    "@searchModelTypeHeadline": {
-        "description": "Dropdown display name for Headline search type"
-    },
     "searchModelTypeCategory": "الفئات",
-    "@searchModelTypeCategory": {
-        "description": "Dropdown display name for Category search type"
-    },
     "searchModelTypeSource": "المصادر",
-    "@searchModelTypeSource": {
-        "description": "Dropdown display name for Source search type"
-    },
     "searchModelTypeCountry": "الدول",
-    "@searchModelTypeCountry": {
-        "description": "Dropdown display name for Country search type"
-    },
     "searchHintTextHeadline": "مثال: تطورات الذكاء الاصطناعي, مركبة المريخ...",
-    "@searchHintTextHeadline": {
-        "description": "Hint text for searching headlines"
-    },
     "searchHintTextGeneric": "بحث...",
-    "@searchHintTextGeneric": {
-        "description": "Generic hint text for search input fields"
-    },
     "searchHintTextCategory": "مثال: تكنولوجيا, رياضة, مالية...",
-    "@searchHintTextCategory": {
-        "description": "Hint text for searching categories"
-    },
     "searchHintTextSource": "مثال: بي بي سي نيوز, تك كرانش, رويترز...",
-    "@searchHintTextSource": {
-        "description": "Hint text for searching sources"
-    },
     "searchHintTextCountry": "مثال: الولايات المتحدة, اليابان, البرازيل...",
-    "@searchHintTextCountry": {
-        "description": "Hint text for searching countries"
-    },
     "searchPageInitialHeadline": "ابدأ بحثك",
-    "@searchPageInitialHeadline": {
-        "description": "Generic headline for the initial state of the search page"
-    },
     "searchPageInitialSubheadline": "اختر نوعًا وأدخل كلمات رئيسية للبدء.",
-    "@searchPageInitialSubheadline": {
-        "description": "Generic subheadline for the initial state of the search page"
-    },
     "followedCategoriesPageTitle": "الفئات المتابَعة",
-    "@followedCategoriesPageTitle": {
-        "description": "عنوان صفحة عرض الفئات المتابعة"
-    },
     "addCategoriesTooltip": "إضافة فئات",
-    "@addCategoriesTooltip": {
-        "description": "تلميح زر إضافة فئات جديدة للمتابعة"
-    },
     "noFollowedCategoriesMessage": "أنت لا تتابع أي فئات حتى الآن.",
-    "@noFollowedCategoriesMessage": {
-        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي فئات"
-    },
     "addCategoriesButtonLabel": "البحث عن فئات لمتابعتها",
-    "@addCategoriesButtonLabel": {
-        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة الفئات"
-    },
     "unfollowCategoryTooltip": "إلغاء متابعة {categoryName}",
     "@unfollowCategoryTooltip": {
-        "description": "تلميح زر إلغاء متابعة فئة معينة",
         "placeholders": {
             "categoryName": {
                 "type": "String",
@@ -761,28 +217,12 @@
         }
     },
     "addTopicsPageTitle": "متابعة المواضيع",
-    "@addTopicsPageTitle": {
-        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة مواضيع لمتابعتها"
-    },
     "topicFilterLoadingHeadline": "جارٍ تحميل المواضيع...",
-    "@topicFilterLoadingHeadline": {
-        "description": "عنوان لحالة التحميل في صفحة تصفية المواضيع"
-    },
     "topicFilterError": "تعذر تحميل المواضيع. يرجى المحاولة مرة أخرى.",
-    "@topicFilterError": {
-        "description": "رسالة خطأ عند فشل تحميل المواضيع في صفحة التصفية/الإضافة"
-    },
     "topicFilterEmptyHeadline": "لم يتم العثور على مواضيع",
-    "@topicFilterEmptyHeadline": {
-        "description": "عنوان للحالة الفارغة في صفحة تصفية المواضيع"
-    },
     "topicFilterEmptySubheadline": "لا توجد مواضيع متاحة في الوقت الحالي.",
-    "@topicFilterEmptySubheadline": {
-        "description": "عنوان فرعي للحالة الفارغة في صفحة تصفية المواضيع"
-    },
     "unfollowTopicTooltip": "إلغاء متابعة {topicName}",
     "@unfollowTopicTooltip": {
-        "description": "تلميح زر إلغاء متابعة موضوع معين",
         "placeholders": {
             "topicName": {
                 "type": "String",
@@ -792,7 +232,6 @@
     },
     "followTopicTooltip": "متابعة {topicName}",
     "@followTopicTooltip": {
-        "description": "تلميح زر متابعة موضوع معين",
         "placeholders": {
             "topicName": {
                 "type": "String",
@@ -801,68 +240,22 @@
         }
     },
     "followedSourcesLoadingHeadline": "جارٍ تحميل المصادر المتابَعة...",
-    "@followedSourcesLoadingHeadline": {
-        "description": "عنوان لحالة التحميل في صفحة المصادر المتابعة"
-    },
     "followedSourcesErrorHeadline": "تعذر تحميل المصادر المتابَعة",
-    "@followedSourcesErrorHeadline": {
-        "description": "رسالة خطأ عند فشل تحميل المصادر المتابعة"
-    },
     "followedSourcesEmptyHeadline": "لا توجد مصادر متابَعة",
-    "@followedSourcesEmptyHeadline": {
-        "description": "عنوان للحالة الفارغة في صفحة المصادر المتابعة"
-    },
     "followedSourcesEmptySubheadline": "ابدأ بمتابعة المصادر لكي تظهر هنا.",
-    "@followedSourcesEmptySubheadline": {
-        "description": "عنوان فرعي للحالة الفارغة في صفحة المصادر المتابعة"
-    },
     "headlinesFeedFilterTopicLabel": "الموضوع",
-    "@headlinesFeedFilterTopicLabel": {
-        "description": "Label for the topic filter dropdown"
-    },
     "followedTopicsPageTitle": "المواضيع المتابَعة",
-    "@followedTopicsPageTitle": {
-        "description": "عنوان صفحة عرض المواضيع المتابعة"
-    },
     "addTopicsTooltip": "إضافة مواضيع",
-    "@addTopicsTooltip": {
-        "description": "تلميح زر إضافة مواضيع جديدة للمتابعة"
-    },
     "followedTopicsLoadingHeadline": "جارٍ تحميل المواضيع المتابَعة...",
-    "@followedTopicsLoadingHeadline": {
-        "description": "عنوان لحالة التحميل في صفحة المواضيع المتابعة"
-    },
     "followedTopicsErrorHeadline": "تعذر تحميل المواضيع المتابَعة",
-    "@followedTopicsErrorHeadline": {
-        "description": "رسالة خطأ عند فشل تحميل المواضيع المتابعة"
-    },
     "followedTopicsEmptyHeadline": "لا توجد مواضيع متابَعة",
-    "@followedTopicsEmptyHeadline": {
-        "description": "عنوان للحالة الفارغة في صفحة المواضيع المتابعة"
-    },
     "followedTopicsEmptySubheadline": "ابدأ بمتابعة المواضيع لكي تظهر هنا.",
-    "@followedTopicsEmptySubheadline": {
-        "description": "عنوان فرعي للحالة الفارغة في صفحة المواضيع المتابعة"
-    },
     "followedSourcesPageTitle": "المصادر المتابَعة",
-    "@followedSourcesPageTitle": {
-        "description": "عنوان صفحة عرض المصادر المتابعة"
-    },
     "addSourcesTooltip": "إضافة مصادر",
-    "@addSourcesTooltip": {
-        "description": "تلميح زر إضافة مصادر جديدة للمتابعة"
-    },
     "noFollowedSourcesMessage": "أنت لا تتابع أي مصادر حتى الآن.",
-    "@noFollowedSourcesMessage": {
-        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي مصادر"
-    },
     "addSourcesButtonLabel": "البحث عن مصادر لمتابعتها",
-    "@addSourcesButtonLabel": {
-        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة المصادر"
-    },
     "unfollowSourceTooltip": "إلغاء متابعة {sourceName}",
     "@unfollowSourceTooltip": {
-        "description": "تلميح زر إلغاء متابعة مصدر معين",
         "placeholders": {
             "sourceName": {
                 "type": "String",
@@ -871,24 +264,11 @@
         }
     },
     "followedCountriesPageTitle": "الدول المتابَعة",
-    "@followedCountriesPageTitle": {
-        "description": "عنوان صفحة عرض الدول المتابعة"
-    },
     "addCountriesTooltip": "إضافة دول",
-    "@addCountriesTooltip": {
-        "description": "تلميح زر إضافة دول جديدة للمتابعة"
-    },
     "noFollowedCountriesMessage": "أنت لا تتابع أي دول حتى الآن.",
-    "@noFollowedCountriesMessage": {
-        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي دول"
-    },
     "addCountriesButtonLabel": "البحث عن دول لمتابعتها",
-    "@addCountriesButtonLabel": {
-        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة الدول"
-    },
     "unfollowCountryTooltip": "إلغاء متابعة {countryName}",
     "@unfollowCountryTooltip": {
-        "description": "تلميح زر إلغاء متابعة دولة معينة",
         "placeholders": {
             "countryName": {
                 "type": "String",
@@ -897,16 +277,9 @@
         }
     },
     "addCategoriesPageTitle": "إضافة فئات للمتابعة",
-    "@addCategoriesPageTitle": {
-        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة فئات لمتابعتها"
-    },
     "categoryFilterError": "تعذر تحميل الفئات. يرجى المحاولة مرة أخرى.",
-    "@categoryFilterError": {
-        "description": "رسالة خطأ عند فشل تحميل الفئات في صفحة التصفية/الإضافة"
-    },
     "followCategoryTooltip": "متابعة {categoryName}",
     "@followCategoryTooltip": {
-        "description": "تلميح زر متابعة فئة معينة",
         "placeholders": {
             "categoryName": {
                 "type": "String",
@@ -915,16 +288,9 @@
         }
     },
     "addSourcesPageTitle": "إضافة مصادر للمتابعة",
-    "@addSourcesPageTitle": {
-        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة مصادر لمتابعتها"
-    },
     "sourceFilterError": "تعذر تحميل المصادر. يرجى المحاولة مرة أخرى.",
-    "@sourceFilterError": {
-        "description": "رسالة خطأ عند فشل تحميل المصادر في صفحة التصفية/الإضافة"
-    },
     "followSourceTooltip": "متابعة {sourceName}",
     "@followSourceTooltip": {
-        "description": "تلميح زر متابعة مصدر معين",
         "placeholders": {
             "sourceName": {
                 "type": "String",
@@ -933,12 +299,8 @@
         }
     },
     "addCountriesPageTitle": "إضافة دول للمتابعة",
-    "@addCountriesPageTitle": {
-        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة دول لمتابعتها"
-    },
     "followCountryTooltip": "متابعة {countryName}",
     "@followCountryTooltip": {
-        "description": "تلميح زر متابعة دولة معينة",
         "placeholders": {
             "countryName": {
                 "type": "String",
@@ -947,100 +309,30 @@
         }
     },
     "headlineDetailsSaveTooltip": "حفظ العنوان",
-    "@headlineDetailsSaveTooltip": {
-        "description": "Tooltip for the button to save a headline"
-    },
     "headlineDetailsRemoveFromSavedTooltip": "إزالة من المحفوظات",
-    "@headlineDetailsRemoveFromSavedTooltip": {
-        "description": "Tooltip for the button to remove a headline from saved list"
-    },
     "headlineSavedSuccessSnackbar": "تم حفظ العنوان!",
-    "@headlineSavedSuccessSnackbar": {
-        "description": "Snackbar message shown when a headline is successfully saved"
-    },
     "headlineUnsavedSuccessSnackbar": "تمت إزالة العنوان من المحفوظات.",
-    "@headlineUnsavedSuccessSnackbar": {
-        "description": "Snackbar message shown when a headline is successfully unsaved"
-    },
     "headlineSaveErrorSnackbar": "تعذر تحديث حالة الحفظ. يرجى المحاولة مرة أخرى.",
-    "@headlineSaveErrorSnackbar": {
-        "description": "Snackbar message shown when saving/unsaving a headline fails"
-    },
     "shareActionTooltip": "مشاركة العنوان",
-    "@shareActionTooltip": {
-        "description": "Tooltip for the share button on the headline details page"
-    },
     "sharingUnavailableSnackbar": "المشاركة غير متاحة على هذا الجهاز أو المنصة.",
-    "@sharingUnavailableSnackbar": {
-        "description": "Snackbar message shown when sharing is unavailable"
-    },
     "similarHeadlinesSectionTitle": "قد يعجبك ايضا",
-    "@similarHeadlinesSectionTitle": {
-        "description": "Title for the similar headlines section on the details page"
-    },
     "similarHeadlinesEmpty": "لم يتم العثور على عناوين مشابهة.",
-    "@similarHeadlinesEmpty": {
-        "description": "Message shown when no similar headlines are found"
-    },
     "detailsPageTitle": "التفاصيل",
-    "@detailsPageTitle": {
-        "description": "Title for the category/source details page"
-    },
     "followButtonLabel": "متابعة",
-    "@followButtonLabel": {
-        "description": "Label for the follow button"
-    },
     "unfollowButtonLabel": "إلغاء المتابعة",
-    "@unfollowButtonLabel": {
-        "description": "Label for the unfollow button"
-    },
     "noHeadlinesFoundMessage": "لم يتم العثور على عناوين لهذا العنصر.",
-    "@noHeadlinesFoundMessage": {
-        "description": "Message displayed when no headlines are available for a category/source"
-    },
     "failedToLoadMoreHeadlines": "فشل تحميل المزيد من العناوين.",
-    "@failedToLoadMoreHeadlines": {
-        "description": "Error message when loading more headlines fails on details page"
-    },
     "headlinesSectionTitle": "العناوين الرئيسية",
-    "@headlinesSectionTitle": {
-        "description": "Title for the headlines section on details page"
-    },
     "headlinesFeedFilterApplyFollowedLabel": "تطبيق العناصر التي أتابعها كمرشحات.",
-    "@headlinesFeedFilterApplyFollowedLabel": {
-        "description": "Label for the checkbox to apply followed items as filters"
-    },
     "mustBeLoggedInToUseFeatureError": "يجب عليك تسجيل الدخول لاستخدام هذه الميزة.",
-    "@mustBeLoggedInToUseFeatureError": {
-        "description": "Error message shown when a logged-in user is required for a feature"
-    },
     "noFollowedItemsForFilterSnackbar": "أنت لا تتبع أي عناصر لتطبيقها كفلتر.",
-    "@noFollowedItemsForFilterSnackbar": {
-        "description": "Snackbar message shown when user tries to apply followed filters but has none."
-    },
     "requestCodePageHeadline": "أدخل بريدك الإلكتروني",
-    "@requestCodePageHeadline": {
-        "description": "Headline for the request code page"
-    },
     "requestCodePageSubheadline": "سنرسل رمزًا آمنًا إلى بريدك الإلكتروني للتحقق من هويتك.",
-    "@requestCodePageSubheadline": {
-        "description": "Subheadline for the request code page"
-    },
     "requestCodeEmailLabel": "عنوان البريد الإلكتروني",
-    "@requestCodeEmailLabel": {
-        "description": "Label for the email input on the request code page"
-    },
     "requestCodeEmailHint": "you@example.com",
-    "@requestCodeEmailHint": {
-        "description": "Hint text for the email input on the request code page"
-    },
     "requestCodeSendCodeButton": "إرسال الرمز",
-    "@requestCodeSendCodeButton": {
-        "description": "Button text to send the verification code"
-    },
     "requestCodeResendButtonCooldown": "إعادة الإرسال في {seconds} ثانية",
     "@requestCodeResendButtonCooldown": {
-        "description": "Button text shown during the cooldown period for resending a code",
         "placeholders": {
             "seconds": {
                 "type": "int",
@@ -1049,100 +341,30 @@
         }
     },
     "entityDetailsCategoryTitle": "الفئة",
-    "@entityDetailsCategoryTitle": {
-        "description": "Title for category entity type"
-    },
     "entityDetailsSourceTitle": "المصدر",
-    "@entityDetailsSourceTitle": {
-        "description": "Title for source entity type"
-    },
     "entityDetailsTopicTitle": "الموضوع",
-    "@entityDetailsTopicTitle": {
-        "description": "Title for topic entity type"
-    },
     "entityDetailsCountryTitle": "الدولة",
-    "@entityDetailsCountryTitle": {
-        "description": "Title for country entity type"
-    },
     "savedHeadlinesLoadingHeadline": "جارٍ تحميل العناوين المحفوظة...",
-    "@savedHeadlinesLoadingHeadline": {
-        "description": "Headline for loading state on saved headlines page"
-    },
     "savedHeadlinesLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب مقالاتك المحفوظة.",
-    "@savedHeadlinesLoadingSubheadline": {
-        "description": "Subheadline for loading state on saved headlines page"
-    },
     "savedHeadlinesErrorHeadline": "تعذر تحميل العناوين المحفوظة",
-    "@savedHeadlinesErrorHeadline": {
-        "description": "Error message when saved headlines fail to load"
-    },
     "savedHeadlinesEmptyHeadline": "لا توجد عناوين محفوظة",
-    "@savedHeadlinesEmptyHeadline": {
-        "description": "Headline for empty state on saved headlines page"
-    },
     "savedHeadlinesEmptySubheadline": "لم تقم بحفظ أي مقالات بعد. ابدأ الاستكشاف!",
-    "@savedHeadlinesEmptySubheadline": {
-        "description": "Subheadline for empty state on saved headlines page"
-    },
     "followedCategoriesLoadingHeadline": "جارٍ تحميل الفئات المتابَعة...",
-    "@followedCategoriesLoadingHeadline": {
-        "description": "Headline for loading state on followed categories page"
-    },
     "followedCategoriesErrorHeadline": "تعذر تحميل الفئات المتابَعة",
-    "@followedCategoriesErrorHeadline": {
-        "description": "Error message when followed categories fail to load"
-    },
     "followedCategoriesEmptyHeadline": "لا توجد فئات متابَعة",
-    "@followedCategoriesEmptyHeadline": {
-        "description": "Headline for empty state on followed categories page"
-    },
     "followedCategoriesEmptySubheadline": "ابدأ بمتابعة الفئات لكي تظهر هنا.",
-    "@followedCategoriesEmptySubheadline": {
-        "description": "Subheadline for empty state on followed categories page"
-    },
     "accountFollowedCountriesTile": "الدول المتابَعة",
-    "@accountFollowedCountriesTile": {
-        "description": "Title for the followed countries navigation tile in the account page"
-    },
     "followedCountriesLoadingHeadline": "جارٍ تحميل الدول المتابَعة...",
-    "@followedCountriesLoadingHeadline": {
-        "description": "Headline for loading state on followed countries page"
-    },
     "followedCountriesErrorHeadline": "تعذر تحميل الدول المتابَعة",
-    "@followedCountriesErrorHeadline": {
-        "description": "Error message when followed countries fail to load"
-    },
     "followedCountriesEmptyHeadline": "لا توجد دول متابَعة",
-    "@followedCountriesEmptyHeadline": {
-        "description": "Headline for empty state on followed countries page"
-    },
     "followedCountriesEmptySubheadline": "ابدأ بمتابعة الدول لكي تظهر هنا.",
-    "@followedCountriesEmptySubheadline": {
-        "description": "Subheadline for empty state on followed countries page"
-    },
     "countryFilterError": "تعذر تحميل الدول. يرجى المحاولة مرة أخرى.",
-    "@countryFilterError": {
-        "description": "Error message when countries fail to load on the filter/add page"
-    },
     "contentTypeHeadline": "العناوين الرئيسية",
-    "@contentTypeHeadline": {
-        "description": "Label for Headline content type"
-    },
     "contentTypeTopic": "المواضيع",
-    "@contentTypeTopic": {
-        "description": "Label for Topic content type"
-    },
     "contentTypeSource": "المصادر",
-    "@contentTypeSource": {
-        "description": "Label for Source content type"
-    },
     "contentTypeCountry": "الدول",
-    "@contentTypeCountry": {
-        "description": "Label for Country content type"
-    },
     "searchingFor": "جار البحث عن {contentType}...",
     "@searchingFor": {
-        "description": "Subheadline for loading state on search page",
         "placeholders": {
             "contentType": {
                 "type": "String"
@@ -1150,72 +372,23 @@
         }
     },
     "settingsAppearanceFontWeightLight": "صغير",
-    "@settingsAppearanceFontWeightLight": {
-        "description": "Label for the light font weight option"
-    },
     "settingsAppearanceFontWeightRegular": "عادي",
-    "@settingsAppearanceFontWeightRegular": {
-        "description": "Label for the regular font weight option"
-    },
     "settingsAppearanceFontWeightBold": "عريض",
-    "@settingsAppearanceFontWeightBold": {
-        "description": "Label for the bold font weight option"
-    },
     "maintenanceHeadline": "تحت الصيانة",
-    "@maintenanceHeadline": {
-        "description": "Headline for the maintenance page"
-    },
     "maintenanceSubheadline": "نقوم حاليًا بإجراء صيانة. يرجى التحقق مرة أخرى لاحقًا.",
-    "@maintenanceSubheadline": {
-        "description": "Subheadline for the maintenance page"
-    },
     "updateRequiredHeadline": "التحديث مطلوب",
-    "@updateRequiredHeadline": {
-        "description": "Headline for the force update page"
-    },
     "updateRequiredSubheadline": "يتوفر إصدار جديد من التطبيق. يرجى التحديث لمتابعة استخدام التطبيق.",
-    "@updateRequiredSubheadline": {
-        "description": "Subheadline for the force update page"
-    },
     "updateRequiredButton": "التحديث الآن",
-    "@updateRequiredButton": {
-        "description": "Button text for the force update page"
-    },
     "neverShowAgain": "لا تظهر هذا مرة أخرى",
-    "@neverShowAgain": {
-        "description": "Option to dismiss a feed decorator permanently"
-    },
     "followButtonText": "متابعة",
-    "@followButtonText": {
-        "description": "Text for the follow button on suggestion items"
-    },
     "unfollowButtonText": "إلغاء المتابعة",
-    "@unfollowButtonText": {
-        "description": "Text for the unfollow button on suggestion items"
-    },
     "adInfoPlaceholderText": "الإعلانات تساعد في إبقاء هذا التطبيق مجانيًا.",
-    "@adInfoPlaceholderText": {
-        "description": "رسالة معروضة في خانات الإعلانات عند تحميل الإعلانات أو فشلها، تشرح الغرض منها."
-    },
     "retryButtonText": "إعادة المحاولة",
-    "@retryButtonText": {
-        "description": "Text for a button that allows the user to retry a failed operation."
-    },
     "headlinesFeedFilterLoadingHeadline": "جاري تحميل الفلاتر",
-    "@headlinesFeedFilterLoadingHeadline": {
-        "description": "Headline for the loading state when fetching filter options on the headlines filter page."
-    },
     "suggestedTopicsTitle": "مواضيع مقترحة",
-    "@suggestedTopicsTitle": {
-        "description": "عنوان لمجموعة المواضيع المقترحة."
-    },
     "suggestedSourcesTitle": "مصادر مقترحة",
-    "@suggestedSourcesTitle": {
-        "description": "عنوان لمجموعة المصادر المقترحة."
-    },
     "couldNotOpenUpdateUrl": "تعذر فتح رابط التحديث: {url}",
     "@couldNotOpenUpdateUrl": {
-        "description": "رسالة تظهر في شريط الإشعارات عندما يتعذر فتح رابط التحديث.",
         "placeholders": {
             "url": {
                 "type": "String"
@@ -1224,7 +397,6 @@
     },
     "currentAppVersionLabel": "إصدارك الحالي: {version}",
     "@currentAppVersionLabel": {
-        "description": "تسمية لعرض إصدار التطبيق الحالي.",
         "placeholders": {
             "version": {
                 "type": "String",
@@ -1234,7 +406,6 @@
     },
     "latestRequiredVersionLabel": "الإصدار المطلوب: {version}",
     "@latestRequiredVersionLabel": {
-        "description": "تسمية لعرض أحدث إصدار مطلوب للتطبيق.",
         "placeholders": {
             "version": {
                 "type": "String",
@@ -1243,804 +414,206 @@
         }
     },
     "anonymousLimitTitle": "تسجيل الدخول للقيام بالمزيد",
-    "@anonymousLimitTitle": {
-        "description": "Title for the bottom sheet when an anonymous user hits a content limit."
-    },
     "anonymousLimitBody": "قم بإنشاء حساب مجاني لإضافة المزيد ومتابعة المزيد.",
-    "@anonymousLimitBody": {
-        "description": "Body text for the bottom sheet when an anonymous user hits a content limit."
-    },
     "anonymousLimitButton": "تسجيل الدخول",
-    "@anonymousLimitButton": {
-        "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
-    },
     "standardLimitBody": "لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.",
-    "@standardLimitBody": {
-        "description": "Body text for the bottom sheet when a standard user hits a content limit."
-    },
     "standardLimitButton": "الترقية إلى بريميوم",
-    "@standardLimitButton": {
-        "description": "Button text for the bottom sheet when a standard user hits a content limit."
-    },
     "premiumLimitTitle": "لقد وصلت إلى الحد الأقصى",
-    "@premiumLimitTitle": {
-        "description": "Title for the bottom sheet when a premium user hits a content limit."
-    },
     "premiumLimitBody": "لإضافة عناصر جديدة، يرجى مراجعة وإدارة المحتوى المحفوظ والمتابع الحالي.",
-    "@premiumLimitBody": {
-        "description": "Body text for the bottom sheet when a premium user hits a content limit."
-    },
     "premiumLimitButton": "إدارة المحتوى الخاص بي",
-    "@premiumLimitButton": {
-        "description": "Button text for the bottom sheet when a premium user hits a content limit."
-    },
     "saveButtonLabel": "حفظ",
-    "@saveButtonLabel": {
-        "description": "Generic label for a save button."
-    },
     "cancelButtonLabel": "إلغاء",
-    "@cancelButtonLabel": {
-        "description": "Generic label for a cancel button."
-    },
     "manageFiltersPageTitle": "إدارة الفلاتر",
-    "@manageFiltersPageTitle": {
-        "description": "Title for the page where users manage their saved filters."
-    },
     "manageFiltersEmptyHeadline": "لا توجد فلاتر محفوظة",
-    "@manageFiltersEmptyHeadline": {
-        "description": "Headline for the empty state on the manage saved filters page."
-    },
     "manageFiltersEmptySubheadline": "يمكنك حفظ الفلاتر من صفحة التصفية.",
-    "@manageFiltersEmptySubheadline": {
-        "description": "Subheadline for the empty state on the manage saved filters page."
-    },
     "manageFiltersRenameTooltip": "إعادة تسمية الفلتر",
-    "@manageFiltersRenameTooltip": {
-        "description": "Tooltip for the button to rename a saved filter."
-    },
     "manageFiltersDeleteTooltip": "حذف الفلتر",
-    "@manageFiltersDeleteTooltip": {
-        "description": "Tooltip for the button to delete a saved filter."
-    },
     "saveFilterDialogTitleSave": "حفظ الفلتر",
-    "@saveFilterDialogTitleSave": {
-        "description": "Title for the dialog when saving a new filter."
-    },
     "saveFilterDialogTitleRename": "إعادة تسمية الفلتر",
-    "@saveFilterDialogTitleRename": {
-        "description": "Title for the dialog when renaming an existing filter."
-    },
     "saveFilterDialogInputLabel": "اسم الفلتر",
-    "@saveFilterDialogInputLabel": {
-        "description": "Label for the text input field where the user names a filter."
-    },
     "saveFilterDialogValidationEmpty": "لا يمكن أن يكون الاسم فارغًا",
-    "@saveFilterDialogValidationEmpty": {
-        "description": "Validation error message when the filter name is empty."
-    },
     "saveFilterDialogValidationTooLong": "الاسم طويل جدًا",
-    "@saveFilterDialogValidationTooLong": {
-        "description": "Validation error message when the filter name is too long."
-    },
     "saveFilterDialogGenericError": "حدث خطأ غير متوقع أثناء حفظ الفلتر.",
-    "@saveFilterDialogGenericError": {
-        "description": "Generic error message shown in a snackbar if saving a filter fails for an unknown reason."
-    },
     "headlinesFilterSaveTooltip": "حفظ الفلتر",
-    "@headlinesFilterSaveTooltip": {
-        "description": "Tooltip for the save icon on the main filter page."
-    },
     "headlinesFilterManageTooltip": "إدارة الفلاتر",
-    "@headlinesFilterManageTooltip": {
-        "description": "Tooltip for the manage icon on the main filter page."
-    },
     "savedFiltersBarOpenTooltip": "فتح الفلاتر",
-    "@savedFiltersBarOpenTooltip": {
-        "description": "Tooltip for the icon button on the filters bar that opens the filter page."
-    },
     "savedFiltersBarAllLabel": "الكل",
-    "@savedFiltersBarAllLabel": {
-        "description": "Label for the 'All' chip in the saved filters bar."
-    },
     "savedFiltersBarCustomLabel": "مخصص",
-    "@savedFiltersBarCustomLabel": {
-        "description": "Label for the 'Custom' chip in the saved filters bar, indicating an unsaved filter is active."
-    },
     "applyFilterDialogTitle": "تطبيق الفلتر",
-    "@applyFilterDialogTitle": {
-        "description": "Title for the dialog that asks the user how to apply a filter."
-    },
     "applyFilterDialogContent": "هل تريد تطبيق إعدادات الفلترة هذه لهذه الجلسة فقط، أم حفظها للاستخدام المستقبلي؟",
-    "@applyFilterDialogContent": {
-        "description": "Content for the dialog that asks the user how to apply a filter."
-    },
     "applyFilterDialogApplyOnlyButton": "تطبيق فقط",
-    "@applyFilterDialogApplyOnlyButton": {
-        "description": "Button text to apply the filter for the current session only."
-    },
     "applyFilterDialogApplyAndSaveButton": "تطبيق وحفظ",
-    "@applyFilterDialogApplyAndSaveButton": {
-        "description": "Button text to apply and save the filter for future use."
-    },
     "savedFiltersBarFollowedLabel": "المتابَعات",
-    "@savedFiltersBarFollowedLabel": {
-        "description": "Label for the 'Followed' chip in the saved filters bar."
-    },
     "sourceListFilterPageTitle": "تصفية المصادر",
-    "@sourceListFilterPageTitle": {
-        "description": "Title for the page where users can filter the list of sources."
-    },
     "sourceListFilterPageFilterButtonTooltip": "تصفية قائمة المصادر",
-    "@sourceListFilterPageFilterButtonTooltip": {
-        "description": "Tooltip for the button that opens the source list filter page."
-    },
     "savedFiltersPageTitle": "الفلاتر المحفوظة",
-    "@savedFiltersPageTitle": {
-        "description": "The title for the app bar on the saved filters management page."
-    },
     "savedFiltersEmptyHeadline": "لا توجد فلاتر محفوظة",
-    "@savedFiltersEmptyHeadline": {
-        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
-    },
     "savedFiltersEmptySubheadline": "الفلاتر التي تحفظها من الموجز ستظهر هنا.",
-    "@savedFiltersEmptySubheadline": {
-        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
-    },
     "savedFiltersMenuRename": "إعادة تسمية",
-    "@savedFiltersMenuRename": {
-        "description": "The text for the 'Rename' option in the popup menu on a saved filter item."
-    },
     "savedFiltersMenuDelete": "حذف",
-    "@savedFiltersMenuDelete": {
-        "description": "The text for the 'Delete' option in the popup menu on a saved filter item."
-    },
     "discoverPageTitle": "اكتشف",
-    "@discoverPageTitle": {
-        "description": "عنوان صفحة الاكتشاف"
-    },
     "bottomNavDiscoverLabel": "اكتشف",
-    "@bottomNavDiscoverLabel": {
-        "description": "تسمية عنصر الاكتشاف في شريط التنقل السفلي"
-    },
     "feedSearchHint": "ابحث في العناوين...",
-    "@feedSearchHint": {
-        "description": "نص تلميحي لشريط البحث في صفحة الأخبار"
-    },
     "headlineSearchEnterQuery": "ابحث عن عناوين من آلاف المصادر.",
-    "@headlineSearchEnterQuery": {
-        "description": "عنوان للحالة الأولية لصفحة بحث العناوين"
-    },
     "headlineSearchEnterQuerySubheadline": "ابحث بالكلمة المفتاحية للعثور على مقالات من آلاف المصادر.",
-    "@headlineSearchEnterQuerySubheadline": {
-        "description": "عنوان فرعي للحالة الأولية لصفحة بحث العناوين"
-    },
     "headlineSearchNoResults": "لم يتم العثور على عناوين.",
-    "@headlineSearchNoResults": {
-        "description": "عنوان عندما لا يُرجع بحث العناوين أي نتائج"
-    },
     "headlineSearchNoResultsSubheadline": "لم نتمكن من العثور على أي عناوين تطابق بحثك. يرجى تجربة كلمات مفتاحية مختلفة.",
-    "@headlineSearchNoResultsSubheadline": {
-        "description": "عنوان فرعي عندما لا يُرجع بحث العناوين أي نتائج"
-    },
     "accountGuestAccount": "حساب زائر",
-    "@accountGuestAccount": {
-        "description": "تسمية تشير إلى أن المستخدم زائر."
-    },
     "accountRoleStandard": "مستخدم عادي",
-    "@accountRoleStandard": {
-        "description": "تسمية لدور المستخدم العادي."
-    },
     "accountRolePremium": "مستخدم مميز",
-    "@accountRolePremium": {
-        "description": "تسمية لدور المستخدم المميز."
-    },
     "deleteConfirmationDialogTitle": "تأكيد الحذف",
-    "@deleteConfirmationDialogTitle": {
-        "description": "عنوان الحوار الذي يطلب من المستخدم تأكيد عملية الحذف."
-    },
     "deleteConfirmationDialogContent": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
-    "@deleteConfirmationDialogContent": {
-        "description": "النص الرئيسي في حوار تأكيد الحذف."
-    },
     "deleteConfirmationDialogConfirmButton": "حذف",
-    "@deleteConfirmationDialogConfirmButton": {
-        "description": "النص الموجود على زر التأكيد في حوار تأكيد الحذف."
-    },
     "headlineSearchInitialHeadline": "ابحث عن العناوين",
-    "@headlineSearchInitialHeadline": {
-        "description": "نص العنوان المعروض في حالة البحث الأولية"
-    },
     "headlineSearchInitialSubheadline": "أدخل كلمات رئيسية للعثور على المقالات.",
-    "@headlineSearchInitialSubheadline": {
-        "description": "نص العنوان الفرعي المعروض في حالة البحث الأولية"
-    },
     "accountGuestUserHeadline": "حساب زائر",
-    "@accountGuestUserHeadline": {
-        "description": "عنوان رأس المستخدم عندما يكون المستخدم ضيفًا."
-    },
     "accountGuestUserSubheadline": "سجل الدخول لمزامنة بياناتك",
-    "@accountGuestUserSubheadline": {
-        "description": "عنوان فرعي لرأس المستخدم يطالب المستخدمين الضيوف بتسجيل الدخول."
-    },
     "discoverSearchHint": "ابحث في المصادر...",
-    "@discoverSearchHint": {
-        "description": "نص تلميحي لشريط البحث في صفحة الاكتشاف"
-    },
     "seeAllButtonLabel": "عرض الكل",
-    "@seeAllButtonLabel": {
-        "description": "تسمية الزر لرؤية جميع العناصر في فئة"
-    },
     "failedToLoadMoreSources": "فشل تحميل المزيد من المصادر.",
-    "@failedToLoadMoreSources": {
-        "description": "رسالة خطأ عند فشل تحميل المزيد من المصادر في صفحة التفاصيل"
-    },
     "sourceListFilterByHeadquartersPageTitle": "مكان المقر",
-    "@sourceListFilterByHeadquartersPageTitle": {
-        "description": "عنوان الصفحة التي يقوم فيها المستخدمون بتصفية المصادر حسب بلد المقر."
-    },
     "sourceTypeNewsAgency": "وكالة أنباء",
-    "@sourceTypeNewsAgency": {
-        "description": "نوع المصدر لوكالة أنباء"
-    },
     "sourceTypeLocalNewsOutlet": "منفذ إخباري محلي",
-    "@sourceTypeLocalNewsOutlet": {
-        "description": "نوع المصدر لمنفذ إخباري محلي"
-    },
     "sourceTypeNationalNewsOutlet": "منفذ إخباري وطني",
-    "@sourceTypeNationalNewsOutlet": {
-        "description": "نوع المصدر لمنفذ إخباري وطني"
-    },
     "sourceTypeInternationalNewsOutlet": "منفذ إخباري دولي",
-    "@sourceTypeInternationalNewsOutlet": {
-        "description": "نوع المصدر لمنفذ إخباري دولي"
-    },
     "sourceTypeSpecializedPublisher": "ناشر متخصص",
-    "@sourceTypeSpecializedPublisher": {
-        "description": "نوع المصدر لناشر متخصص"
-    },
     "sourceTypeBlog": "مدونة",
-    "@sourceTypeBlog": {
-        "description": "نوع المصدر لمدونة"
-    },
     "sourceTypeGovernmentSource": "مصدر حكومي",
-    "@sourceTypeGovernmentSource": {
-        "description": "نوع المصدر لمصدر حكومي"
-    },
     "sourceTypeAggregator": "مجمع أخبار",
-    "@sourceTypeAggregator": {
-        "description": "نوع المصدر لمجمع أخبار"
-    },
     "sourceTypeOther": "أخرى",
-    "@sourceTypeOther": {
-        "description": "نوع المصدر لأخرى"
-    },
     "sourceTypeNewsAgencies": "وكالات الأنباء",
-    "@sourceTypeNewsAgencies": {
-        "description": "نوع المصدر بصيغة الجمع لوكالة أنباء"
-    },
     "sourceTypeLocalNewsOutlets": "منافذ إخبارية محلية",
-    "@sourceTypeLocalNewsOutlets": {
-        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري محلي"
-    },
     "sourceTypeNationalNewsOutlets": "منافذ إخبارية وطنية",
-    "@sourceTypeNationalNewsOutlets": {
-        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري وطني"
-    },
     "sourceTypeInternationalNewsOutlets": "منافذ إخبارية دولية",
-    "@sourceTypeInternationalNewsOutlets": {
-        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري دولي"
-    },
     "sourceTypeSpecializedPublishers": "ناشرون متخصصون",
-    "@sourceTypeSpecializedPublishers": {
-        "description": "نوع المصدر بصيغة الجمع لناشر متخصص"
-    },
     "sourceTypeBlogs": "مدونات",
-    "@sourceTypeBlogs": {
-        "description": "نوع المصدر بصيغة الجمع لمدونة"
-    },
     "sourceTypeGovernmentSources": "مصادر حكومية",
-    "@sourceTypeGovernmentSources": {
-        "description": "نوع المصدر بصيغة الجمع لمصدر حكومي"
-    },
     "sourceTypeAggregators": "مجمعات أخبار",
-    "@sourceTypeAggregators": {
-        "description": "نوع المصدر بصيغة الجمع لمجمع أخبار"
-    },
     "sourceTypeOthers": "أخرى",
-    "@sourceTypeOthers": {
-        "description": "نوع المصدر بصيغة الجمع لأخرى"
-    },
     "sourceTypeFilterEmptyHeadline": "لم يتم العثور على أنواع مصادر",
-    "@sourceTypeFilterEmptyHeadline": {
-        "description": "Headline for empty state on source type filter page"
-    },
     "sourceTypeFilterEmptySubheadline": "لا توجد أنواع مصادر متاحة للتصفية في الوقت الحالي.",
-    "@sourceTypeFilterEmptySubheadline": {
-        "description": "Subheadline for empty state on source type filter page"
-    },
     "decoratorDismissedConfirmation": "تم إخفاء الاقتراح.",
-    "@decoratorDismissedConfirmation": {
-        "description": "رسالة تأكيد سهلة الاستخدام تظهر بدلاً من مزين الخلاصة بعد أن يتجاهله المستخدم."
-    },
     "decoratorDismissAction": "إخفاء الاقتراح",
-    "@decoratorDismissAction": {
-        "description": "النص الخاص بعنصر القائمة الذي يسمح للمستخدم بإخفاء أو تجاهل مزين الخلاصة."
-    },
     "decoratorLinkAccountTitle_1": "احفظ مقالاتك وتفضيلاتك",
-    "@decoratorLinkAccountTitle_1": {
-        "description": "First variation of the title for the 'Link Account' decorator, focusing on the benefit of saving content."
-    },
     "decoratorLinkAccountTitle_2": "لا تفقد تفضيلاتك و متابعاتك",
-    "@decoratorLinkAccountTitle_2": {
-        "description": "Second variation of the title for the 'Link Account' decorator, highlighting the benefit of persistence."
-    },
     "decoratorLinkAccountDescription_1": "أنشئ حسابًا مجانيًا لحفظ المزيد من المقالات، ومتابعة المزيد من المواضيع، ومزامنة تفضيلاتك عبر الأجهزة.",
-    "@decoratorLinkAccountDescription_1": {
-        "description": "First variation of the description for the 'Link Account' decorator, hinting at increased limits and syncing."
-    },
     "decoratorLinkAccountDescription_2": "سجل لفتح المزيد من الحفظ، وتوسيع المحتوى الذي تتابعه، والحفاظ على موجز أخبارك متسقًا في كل مكان.",
-    "@decoratorLinkAccountDescription_2": {
-        "description": "Second variation of the description for the 'Link Account' decorator, hinting at increased limits and consistency."
-    },
     "decoratorLinkAccountCta_1": "سجل الآن",
-    "@decoratorLinkAccountCta_1": {
-        "description": "First variation of the call-to-action text for the 'Link Account' decorator."
-    },
     "decoratorLinkAccountCta_2": "إنشاء حساب مجاني",
-    "@decoratorLinkAccountCta_2": {
-        "description": "Second variation of the call-to-action text for the 'Link Account' decorator."
-    },
     "decoratorUpgradeTitle_1": "تجربة أخبار بلا انقطاع",
-    "@decoratorUpgradeTitle_1": {
-        "description": "First variation of the title for the 'Upgrade' decorator, focusing on an uninterrupted, ad-free experience."
-    },
     "decoratorUpgradeTitle_2": "افتح وصولك المميز",
-    "@decoratorUpgradeTitle_2": {
-        "description": "Second variation of the title for the 'Upgrade' decorator, highlighting premium access."
-    },
     "decoratorUpgradeDescription_1": "تخلص من الإعلانات ووسع حدودك بشكل كبير للمقالات المحفوظة والمحتوى المتابع.",
-    "@decoratorUpgradeDescription_1": {
-        "description": "First variation of the description for the 'Upgrade' decorator, highlighting ad-free and increased limits."
-    },
     "decoratorUpgradeDescription_2": "قم بالترقية إلى بريميوم لتجربة خالية من الإعلانات والقدرة على حفظ ومتابعة المزيد من المحتوى الذي تحبه.",
-    "@decoratorUpgradeDescription_2": {
-        "description": "Second variation of the description for the 'Upgrade' decorator, emphasizing ad-free and the ability to save/follow more."
-    },
     "decoratorUpgradeCta_1": "الترقية إلى بريميوم",
-    "@decoratorUpgradeCta_1": {
-        "description": "First variation of the call-to-action text for the 'Upgrade' decorator."
-    },
     "decoratorUpgradeCta_2": "اعرف المزيد",
-    "@decoratorUpgradeCta_2": {
-        "description": "Second variation of the call-to-action text for the 'Upgrade' decorator."
-    },
     "decoratorRateAppTitle_1": "تستمتع بالتطبيق؟",
-    "@decoratorRateAppTitle_1": {
-        "description": "First variation of the title for the 'Rate App' decorator, engaging the user positively."
-    },
     "decoratorRateAppTitle_2": "شاركنا رأيك",
-    "@decoratorRateAppTitle_2": {
-        "description": "Second variation of the title for the 'Rate App' decorator, asking for feedback."
-    },
     "decoratorRateAppDescription_1": "تقييمك يساعدنا على تحسين تجربة الأخبار للجميع. رأيك يهمنا!",
-    "@decoratorRateAppDescription_1": {
-        "description": "First variation of the description for the 'Rate App' decorator, explaining the impact of their rating."
-    },
     "decoratorRateAppDescription_2": "ملاحظاتك تساعدنا في تقديم أخبار أفضل. خذ لحظة لتقييمنا الآن!",
-    "@decoratorRateAppDescription_2": {
-        "description": "Second variation of the description for the 'Rate App' decorator, emphasizing the value of their feedback."
-    },
     "decoratorRateAppCta_1": "قيم الآن",
-    "@decoratorRateAppCta_1": {
-        "description": "First variation of the call-to-action text for the 'Rate App' decorator."
-    },
     "decoratorRateAppCta_2": "أعط تقييمك",
-    "@decoratorRateAppCta_2": {
-        "description": "Second variation of the call-to-action text for the 'Rate App' decorator."
-    },
     "decoratorEnableNotificationsTitle_1": "لا تفوت الأخبار العاجلة",
-    "@decoratorEnableNotificationsTitle_1": {
-        "description": "First variation of the title for the 'Enable Notifications' decorator, focusing on breaking news."
-    },
     "decoratorEnableNotificationsTitle_2": "ابق على اطلاع، فورًا",
-    "@decoratorEnableNotificationsTitle_2": {
-        "description": "Second variation of the title for the 'Enable Notifications' decorator, emphasizing instant updates."
-    },
     "decoratorEnableNotificationsDescription_1": "احصل على تنبيهات فورية للأخبار العاجلة والتحديثات من مواضيعك ومصادرك المتابعة.",
-    "@decoratorEnableNotificationsDescription_1": {
-        "description": "First variation of the description for the 'Enable Notifications' decorator, detailing types of alerts."
-    },
     "decoratorEnableNotificationsDescription_2": "قم بتمكين الإشعارات لتلقي تحديثات الأخبار المخصصة مباشرة على جهازك.",
-    "@decoratorEnableNotificationsDescription_2": {
-        "description": "Second variation of the description for the 'Enable Notifications' decorator, highlighting personalized updates."
-    },
     "decoratorEnableNotificationsCta_1": "تفعيل التنبيهات",
-    "@decoratorEnableNotificationsCta_1": {
-        "description": "First variation of the call-to-action text for the 'Enable Notifications' decorator."
-    },
     "decoratorEnableNotificationsCta_2": "تشغيل الإشعارات",
-    "@decoratorEnableNotificationsCta_2": {
-        "description": "Second variation of the call-to-action text for the 'Enable Notifications' decorator."
-    },
     "decoratorSuggestedTopicsTitle_1": "اكتشف اهتمامات جديدة",
-    "@decoratorSuggestedTopicsTitle_1": {
-        "description": "First variation of the title for the 'Suggested Topics' decorator, encouraging exploration."
-    },
     "decoratorSuggestedTopicsTitle_2": "وسع آفاق معرفتك",
-    "@decoratorSuggestedTopicsTitle_2": {
-        "description": "Second variation of the title for the 'Suggested Topics' decorator, focusing on discovery."
-    },
     "decoratorSuggestedSourcesTitle_1": "ابحث عن وجهات نظر جديدة",
-    "@decoratorSuggestedSourcesTitle_1": {
-        "description": "First variation of the title for the 'Suggested Sources' decorator, encouraging discovery of new sources."
-    },
     "decoratorSuggestedSourcesTitle_2": "اكتشف مصادر موثوقة",
-    "@decoratorSuggestedSourcesTitle_2": {
-        "description": "Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading."
-    },
     "savedHeadlineFiltersPageTitle": "الفلاتر المحفوظة",
-    "@savedHeadlineFiltersPageTitle": {
-        "description": "The title for the app bar on the saved filters management page."
-    },
     "savedHeadlineFiltersCreateNewButton": "إنشاء فلتر",
-    "@savedHeadlineFiltersCreateNewButton": {
-        "description": "The text for the floating action button to create a new filter."
-    },
     "savedHeadlineFiltersLoadingHeadline": "جارٍ تحميل فلاترك...",
-    "@savedHeadlineFiltersLoadingHeadline": {
-        "description": "The main headline text displayed while the saved filters are loading."
-    },
     "savedHeadlineFiltersEmptyHeadline": "لا توجد فلاتر محفوظة بعد",
-    "@savedHeadlineFiltersEmptyHeadline": {
-        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
-    },
     "savedHeadlineFiltersEmptySubheadline": "الفلاتر التي تنشئها وتحفظها ستظهر هنا. اضغط على الزر أدناه للبدء.",
-    "@savedHeadlineFiltersEmptySubheadline": {
-        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
-    },
     "savedFiltersMenuEdit": "تعديل",
-    "@savedFiltersMenuEdit": {
-        "description": "The text for the 'Edit' option in the popup menu on a saved filter item."
-    },
     "saveFilterDialogPinToFeedLabel": "تثبيت في شريط الفلاتر",
-    "@saveFilterDialogPinToFeedLabel": {
-        "description": "Label for the switch that allows a user to pin a saved filter to their feed."
-    },
     "saveFilterDialogNotificationsLabel": "تفضيلات الإشعارات",
-    "@saveFilterDialogNotificationsLabel": {
-        "description": "The title for the section in the save filter dialog where users configure notification settings."
-    },
     "notificationDeliveryTypeBreakingOnly": "الأخبار العاجلة",
-    "@notificationDeliveryTypeBreakingOnly": {
-        "description": "The user-facing name for the 'breakingOnly' notification delivery type."
-    },
     "notificationDeliveryTypeDailyDigest": "الملخص اليومي",
-    "@notificationDeliveryTypeDailyDigest": {
-        "description": "The user-facing name for the 'dailyDigest' notification delivery type."
-    },
     "notificationDeliveryTypeWeeklyRoundup": "الحصاد الأسبوعي",
-    "@notificationDeliveryTypeWeeklyRoundup": {
-        "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
-    },
     "prePermissionDialogTitle": "تفعيل الإشعارات؟",
-    "@prePermissionDialogTitle": {
-        "description": "Title for the pre-permission dialog asking the user to enable notifications."
-    },
     "prePermissionDialogBody": "لإرسال تنبيهات الأخبار العاجلة والملخصات لهذا الفلتر، يرجى السماح بالإشعارات.",
-    "@prePermissionDialogBody": {
-        "description": "Body text for the pre-permission dialog explaining why notifications are needed for saved filters."
-    },
     "prePermissionDialogDenyButton": "ليس الآن",
-    "@prePermissionDialogDenyButton": {
-        "description": "Text for the button to deny notification permission in the pre-permission dialog."
-    },
     "prePermissionDialogAllowButton": "السماح",
-    "@prePermissionDialogAllowButton": {
-        "description": "Text for the button to allow notification permission in the pre-permission dialog."
-    },
     "notificationPermissionDeniedError": "تم رفض إذن الإشعارات. يمكنك تمكينه في إعدادات جهازك.",
-    "@notificationPermissionDeniedError": {
-        "description": "Error message shown when the user denies notification permissions at the OS level."
-    },
     "notificationCenterPageTitle": "الإشعارات",
-    "@notificationCenterPageTitle": {
-        "description": "Title for the in-app notification center page."
-    },
     "notificationCenterMarkAllAsReadButton": "وضع علامة على الكل كمقروء",
-    "@notificationCenterMarkAllAsReadButton": {
-        "description": "Text for the button to mark all notifications as read."
-    },
     "notificationCenterLoadingHeadline": "جارٍ تحميل الإشعارات...",
-    "@notificationCenterLoadingHeadline": {
-        "description": "Headline for the loading state on the notification center page."
-    },
     "notificationCenterLoadingSubheadline": "يرجى الانتظار...",
-    "@notificationCenterLoadingSubheadline": {
-        "description": "Subheadline for the loading state on the notification center page."
-    },
     "notificationCenterFailureHeadline": "فشل تحميل الإشعارات",
-    "@notificationCenterFailureHeadline": {
-        "description": "Headline for the failure state on the notification center page."
-    },
     "notificationCenterFailureSubheadline": "تعذر استرداد إشعاراتك. يرجى المحاولة مرة أخرى.",
-    "@notificationCenterFailureSubheadline": {
-        "description": "Subheadline for the failure state on the notification center page."
-    },
     "notificationCenterEmptyHeadline": "لا توجد إشعارات",
-    "@notificationCenterEmptyHeadline": {
-        "description": "Headline for the empty state on the notification center page."
-    },
     "notificationCenterEmptySubheadline": "ليس لديك إشعارات جديدة.",
-    "@notificationCenterEmptySubheadline": {
-        "description": "Subheadline for the empty state on the notification center page."
-    },
     "notificationCenterTabBreakingNews": "العواجل",
-    "@notificationCenterTabBreakingNews": {
-        "description": "Label for the 'Breaking News' tab in the notification center."
-    },
     "notificationCenterTabDigests": "الملخصات",
-    "@notificationCenterTabDigests": {
-        "description": "Label for the 'Digests' tab in the notification center."
-    },
     "deleteReadNotificationsButtonTooltip": "حذف جميع الإشعارات المقروءة",
-    "@deleteReadNotificationsButtonTooltip": {
-        "description": "Tooltip for the button to delete all read notifications in the current tab."
-    },
     "deleteReadNotificationsDialogContent": "هل أنت متأكد أنك تريد حذف جميع الإشعارات المقروءة في علامة التبويب هذه؟ لا يمكن التراجع عن هذا الإجراء.",
-    "@deleteReadNotificationsDialogContent": {
-        "description": "The main text in the dialog confirming the deletion of read notifications."
-    },
     "deleteButtonLabel": "حذف",
-    "@deleteButtonLabel": {
-        "description": "Generic label for a delete button."
-    },
     "breakingNewsPrefix": "خبر عاجل",
-    "@breakingNewsPrefix": {
-        "description": "Prefix text shown for breaking news headlines."
-    },
     "settingsFeedClickBehaviorLabel": "فتح الروابط باستخدام",
-    "@settingsFeedClickBehaviorLabel": {
-        "description": "Label for the setting that controls how article links are opened."
-    },
     "settingsFeedClickBehaviorDefault": "إفتراضي",
-    "@settingsFeedClickBehaviorDefault": {
-        "description": "Option to use the app's default link-opening behavior."
-    },
     "settingsFeedClickBehaviorInApp": "متصفح داخل التطبيق",
-    "@settingsFeedClickBehaviorInApp": {
-        "description": "Option to open links in a browser within the app."
-    },
     "settingsFeedClickBehaviorSystem": "متصفح النظام",
-    "@settingsFeedClickBehaviorSystem": {
-        "description": "Option to open links in the device's default system browser."
-    },
     "continueToArticleButtonLabel": "متابعة إلى المقال",
-    "@continueToArticleButtonLabel": {
-        "description": "Button text on an interstitial ad to proceed to the article."
-    },
     "headlineActionsModalTitle": "إجراءات",
-    "@headlineActionsModalTitle": {
-        "description": "Title for the modal bottom sheet that shows headline actions like share and bookmark."
-    },
     "shareActionLabel": "مشاركة",
-    "@shareActionLabel": {
-        "description": "Label for the share action."
-    },
     "bookmarkActionLabel": "حفظ",
-    "@bookmarkActionLabel": {
-        "description": "Label for the action to add a headline to bookmarks."
-    },
     "removeBookmarkActionLabel": "إزالة من المحفوظات",
-    "@removeBookmarkActionLabel": {
-        "description": "Label for the action to remove a headline from bookmarks."
-    },
     "reportActionLabel": "إبلاغ",
-    "@reportActionLabel": {
-        "description": "تسمية لإجراء الإبلاغ عن محتوى."
-    },
     "reportContentTitle": "الإبلاغ عن محتوى",
-    "@reportContentTitle": {
-        "description": "عنوان نافذة الإبلاغ عن محتوى."
-    },
     "reportReasonSelectionPrompt": "الرجاء تحديد سبب الإبلاغ:",
-    "@reportReasonSelectionPrompt": {
-        "description": "نص يطلب من المستخدم تحديد سبب الإبلاغ."
-    },
     "reportAdditionalCommentsLabel": "تعليقات إضافية (اختياري)",
-    "@reportAdditionalCommentsLabel": {
-        "description": "تسمية حقل التعليقات الإضافية الاختياري في نموذج الإبلاغ."
-    },
     "reportSubmitButtonLabel": "إرسال البلاغ",
-    "@reportSubmitButtonLabel": {
-        "description": "تسمية زر إرسال بلاغ المحتوى."
-    },
     "reportSuccessSnackbar": "تم إرسال البلاغ. شكراً لملاحظاتك.",
-    "@reportSuccessSnackbar": {
-        "description": "رسالة تظهر بعد إرسال البلاغ بنجاح."
-    },
     "reportFailureSnackbar": "فشل إرسال البلاغ. الرجاء المحاولة مرة أخرى.",
-    "@reportFailureSnackbar": {
-        "description": "رسالة تظهر عند فشل إرسال البلاغ."
-    },
     "commentsTitle": "التعليقات",
-    "@commentsTitle": {
-        "description": "عنوان قسم أو نافذة التعليقات."
-    },
     "commentPostButtonLabel": "نشر",
-    "@commentPostButtonLabel": {
-        "description": "تسمية زر نشر تعليق جديد."
-    },
     "commentInputHint": "أضف تعليقاً...",
-    "@commentInputHint": {
-        "description": "نص تلميحي لحقل إدخال التعليق."
-    },
     "commentRequiresReactionError": "الرجاء تحديد تفاعل لنشر تعليق.",
-    "@commentRequiresReactionError": {
-        "description": "رسالة خطأ تظهر عندما يحاول المستخدم التعليق بدون تحديد تفاعل."
-    },
     "likeActionLabel": "إعجاب",
-    "@likeActionLabel": {
-        "description": "تلميح أو تسمية لإجراء 'الإعجاب'."
-    },
     "dislikeActionLabel": "عدم إعجاب",
-    "@dislikeActionLabel": {
-        "description": "تلميح أو تسمية لإجراء 'عدم الإعجاب'."
-    },
     "commentActionLabel": "تعليق",
-    "@commentActionLabel": {
-        "description": "تلميح أو تسمية لإجراء 'التعليق'."
-    },
     "moreActionLabel": "المزيد",
-    "@moreActionLabel": {
-        "description": "تلميح أو تسمية أيقونة 'المزيد' من الإجراءات."
-    },
     "rateAppPromptTitle": "هل تستمتع بالتطبيق؟",
-    "@rateAppPromptTitle": {
-        "description": "عنوان النافذة التي تطلب من المستخدم تقييم التطبيق."
-    },
     "rateAppPromptBody": "تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟",
-    "@rateAppPromptBody": {
-        "description": "نص النافذة التي تطلب من المستخدم تقييم التطبيق."
-    },
     "rateAppPromptYesButton": "التطبيق رائع!",
-    "@rateAppPromptYesButton": {
-        "description": "نص زر الاستجابة الإيجابية لطلب التقييم."
-    },
     "rateAppPromptNoButton": "يحتاج لتحسين",
-    "@rateAppPromptNoButton": {
-        "description": "نص زر الاستجابة السلبية لطلب التقييم."
-    },
     "feedbackPromptTitle": "كيف يمكننا التحسين؟",
-    "@feedbackPromptTitle": {
-        "description": "عنوان النافذة التي تطلب ملاحظات تفصيلية بعد استجابة سلبية لطلب التقييم."
-    },
     "feedbackPromptReasonUI": "واجهة المستخدم / التصميم",
-    "@feedbackPromptReasonUI": {
-        "description": "سبب الملاحظات المتعلق بواجهة المستخدم والتصميم."
-    },
     "feedbackPromptReasonPerformance": "الأداء / السرعة",
-    "@feedbackPromptReasonPerformance": {
-        "description": "سبب الملاحظات المتعلق بأداء التطبيق."
-    },
     "feedbackPromptReasonContent": "جودة المحتوى",
-    "@feedbackPromptReasonContent": {
-        "description": "سبب الملاحظات المتعلق بجودة محتوى الأخبار."
-    },
     "feedbackPromptReasonOther": "أخرى",
-    "@feedbackPromptReasonOther": {
-        "description": "سبب الملاحظات للمشكلات غير المدرجة."
-    },
     "feedbackPromptSubmitButton": "إرسال الملاحظات",
-    "@feedbackPromptSubmitButton": {
-        "description": "نص زر إرسال الملاحظات التفصيلية."
-    },
     "rateAppNegativeFollowUpTitle_1": "كيف حالنا الآن؟",
-    "@rateAppNegativeFollowUpTitle_1": {
-        "description": "الصيغة الأولى لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
-    },
     "rateAppNegativeFollowUpTitle_2": "هل تحسن الأداء؟",
-    "@rateAppNegativeFollowUpTitle_2": {
-        "description": "الصيغة الثانية لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
-    },
     "rateAppNegativeFollowUpBody_1": "لقد عملنا على ملاحظاتك. هل تعيد النظر في تقييمك؟",
-    "@rateAppNegativeFollowUpBody_1": {
-        "description": "الصيغة الأولى لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
-    },
     "rateAppNegativeFollowUpBody_2": "نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.",
-    "@rateAppNegativeFollowUpBody_2": {
-        "description": "الصيغة الثانية لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
-    },
     "noCommentsYet": "لا توجد تعليقات حتى الآن.",
-    "@noCommentsYet": {
-        "description": "Message displayed when there are no comments on a headline."
-    },
     "commentInputNoReactionHint": "تفاعل لإضافة تعليق",
-    "@commentInputNoReactionHint": {
-        "description": "Hint text for the comment input field when the user has not yet reacted."
-    },
     "headlineReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
-    "@headlineReportReasonMisinformation": {
-        "description": "Report reason for factually incorrect content."
-    },
     "headlineReportReasonClickbait": "عنوان مضلل أو طعم نقر",
-    "@headlineReportReasonClickbait": {
-        "description": "Report reason for a clickbait headline."
-    },
     "headlineReportReasonOffensive": "محتوى مسيء أو خطاب كراهية",
-    "@headlineReportReasonOffensive": {
-        "description": "Report reason for offensive content."
-    },
     "headlineReportReasonSpam": "بريد عشوائي أو احتيال",
-    "@headlineReportReasonSpam": {
-        "description": "Report reason for spam or fraudulent content."
-    },
     "headlineReportReasonBrokenLink": "رابط معطل",
-    "@headlineReportReasonBrokenLink": {
-        "description": "Report reason for a non-working article URL."
-    },
     "headlineReportReasonPaywalled": "محتوى مدفوع",
-    "@headlineReportReasonPaywalled": {
-        "description": "Report reason for content that requires a subscription."
-    },
     "sourceReportReasonLowQuality": "صحافة منخفضة الجودة",
-    "@sourceReportReasonLowQuality": {
-        "description": "Report reason for a source with poor content."
-    },
     "sourceReportReasonHighAdDensity": "إعلانات أو نوافذ منبثقة مفرطة",
-    "@sourceReportReasonHighAdDensity": {
-        "description": "Report reason for a source with a bad user experience due to ads."
-    },
     "sourceReportReasonFrequentPaywalls": "جدران دفع متكررة",
-    "@sourceReportReasonFrequentPaywalls": {
-        "description": "Report reason for a source that often requires a subscription."
-    },
     "sourceReportReasonImpersonation": "انتحال شخصية",
-    "@sourceReportReasonImpersonation": {
-        "description": "Report reason for a source pretending to be another entity."
-    },
     "sourceReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
-    "@sourceReportReasonMisinformation": {
-        "description": "Report reason for a source pretending to be another entity."
-    },
     "commentReportReasonSpam": "إعلانات",
-    "@commentReportReasonSpam": {
-        "description": "Report reason for a comment that is spam."
-    },
     "commentReportReasonHarassment": "تحرش أو تنمر",
-    "@commentReportReasonHarassment": {
-        "description": "Report reason for a comment that is abusive."
-    },
     "commentReportReasonHateSpeech": "خطاب كراهية",
-    "@commentReportReasonHateSpeech": {
-        "description": "Report reason for a comment containing hate speech."
-    },
     "limitReachedTitle": "تم الوصول إلى الحد الأقصى",
-    "@limitReachedTitle": {
-        "description": "Generic title for when a user hits a content limit."
-    },
     "manageMyContentButton": "إدارة المحتوى الخاص بي",
-    "@manageMyContentButton": {
-        "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
-    },
     "upgradeButton": "ترقية",
-    "@upgradeButton": {
-        "description": "Button text prompting the user to upgrade their subscription plan."
-    },
     "createAccountButton": "إنشاء حساب",
-    "@createAccountButton": {
-        "description": "Button text prompting an anonymous user to create an account."
-    },
     "gotItButton": "حسنًا",
-    "@gotItButton": {
-        "description": "A simple acknowledgement button."
-    },
     "commentsPageTitle": "التعليقات",
-    "@commentsPageTitle": {
-        "description": "عنوان الصفحة أو الورقة السفلية التي تعرض التعليقات على عنوان رئيسي."
-    },
     "commentsCount": "{count,plural, zero{0 تعليقات} one{تعليق واحد} two{تعليقان} few{{count} تعليقات} many{{count} تعليقًا} other{{count} تعليق}}",
     "@commentsCount": {
-        "description": "تسمية زر يعرض عدد التعليقات ويفتح عرض التعليقات.",
         "placeholders": {
             "count": {
                 "type": "int"
@@ -2048,68 +621,22 @@
         }
     },
     "limitReachedGuestUserTitle": "الحساب مطلوب",
-    "@limitReachedGuestUserTitle": {
-        "description": "عنوان للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم (مثل التعليق، التفاعل)."
-    },
     "limitReachedGuestUserBody": "يرجى إنشاء حساب مجاني أو تسجيل الدخول للتفاعل مع المجتمع واستخدام هذه الميزة.",
-    "@limitReachedGuestUserBody": {
-        "description": "نص للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم."
-    },
     "limitReachedBodyFollow": "لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.",
-    "@limitReachedBodyFollow": {
-        "description": "نص يظهر عندما يحاول المستخدم متابعة عناصر (مواضيع، مصادر، دول) أكثر مما تسمح به خطته."
-    },
     "limitReachedBodySave": "لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.",
-    "@limitReachedBodySave": {
-        "description": "نص يظهر عندما يحاول المستخدم حفظ مقالات أكثر مما تسمح به خطته."
-    },
     "limitReachedBodySaveFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.",
-    "@limitReachedBodySaveFilters": {
-        "description": "نص يظهر عندما يحاول المستخدم حفظ فلاتر أكثر مما تسمح به خطته."
-    },
     "limitReachedBodyPinFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.",
-    "@limitReachedBodyPinFilters": {
-        "description": "نص يظهر عندما يحاول المستخدم تثبيت فلاتر أكثر مما تسمح به خطته."
-    },
     "limitReachedBodySubscribeToNotifications": "لقد وصلت إلى الحد الأقصى لاشتراكات الإشعارات. للاشتراك في تنبيهات جديدة، يرجى مراجعة اشتراكاتك الحالية.",
-    "@limitReachedBodySubscribeToNotifications": {
-        "description": "نص يظهر عندما يحاول المستخدم الاشتراك في إشعارات أكثر مما تسمح به خطته."
-    },
     "limitReachedBodyComments": "لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyComments": {
-        "description": "نص يظهر عندما يحاول المستخدم نشر تعليقات أكثر من حده اليومي."
-    },
     "limitReachedBodyReactions": "لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyReactions": {
-        "description": "نص يظهر عندما يحاول المستخدم التفاعل أكثر من حده اليومي."
-    },
     "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyReports": {
-        "description": "نص يظهر عندما يحاول المستخدم تقديم بلاغات أكثر من حده اليومي."
-    },
     "commentEditButtonLabel": "تحديث",
-    "@commentEditButtonLabel": {
-        "description": "Label for the button to update an existing comment."
-    },
     "commentPostFailureSnackbar": "فشل نشر التعليق. يرجى المحاولة مرة أخرى.",
-    "@commentPostFailureSnackbar": {
-        "description": "Snackbar message shown when posting a comment fails."
-    },
     "commentUpdateFailureSnackbar": "فشل تحديث التعليق. يرجى المحاولة مرة أخرى.",
-    "@commentUpdateFailureSnackbar": {
-        "description": "Snackbar message shown when updating a comment fails."
-    },
     "commentInputDisabledHint": "سجل الدخول للانضمام إلى المحادثة",
-    "@commentInputDisabledHint": {
-        "description": "Hint text for the comment input field when the user is a guest."
-    },
     "commentInputExistingHint": "لقد علقت بالفعل على هذا العنوان.",
-    "@commentInputExistingHint": {
-        "description": "Hint text for the comment input field when the user has already posted a comment."
-    },
     "commenterName": "مستخدم {id}",
     "@commenterName": {
-        "description": "Display name for a commenter when their full user object is not available, showing a partial ID.",
         "placeholders": {
             "id": {
                 "type": "String",
@@ -2118,16 +645,9 @@
         }
     },
     "accountRewardsTile": "المكافآت والعروض",
-    "@accountRewardsTile": {
-        "description": "Title for the rewards navigation tile in the account page."
-    },
     "rewardsPageTitle": "المكافآت",
-    "@rewardsPageTitle": {
-        "description": "Title for the rewards page."
-    },
     "rewardsOfferTitle": "احصل على {rewardName} لمدة {duration}",
     "@rewardsOfferTitle": {
-        "description": "Title for a reward offer card, indicating the reward and its duration.",
         "placeholders": {
             "rewardName": {
                 "type": "String"
@@ -2139,7 +659,6 @@
     },
     "rewardsOfferActiveTitle": "{rewardName} مفعل",
     "@rewardsOfferActiveTitle": {
-        "description": "Title for an active reward offer card.",
         "placeholders": {
             "rewardName": {
                 "type": "String"
@@ -2148,7 +667,6 @@
     },
     "rewardsOfferExpiresIn": "ينتهي في: {countdown}",
     "@rewardsOfferExpiresIn": {
-        "description": "Text showing the remaining time for an active reward.",
         "placeholders": {
             "countdown": {
                 "type": "String"
@@ -2156,20 +674,10 @@
         }
     },
     "rewardsOfferWatchButton": "شاهد الفيديو",
-    "@rewardsOfferWatchButton": {
-        "description": "Button text to watch a video to earn a reward."
-    },
     "rewardsOfferVerifyingButton": "جارٍ التحقق...",
-    "@rewardsOfferVerifyingButton": {
-        "description": "Button text shown while a reward is being verified."
-    },
     "rewardsOfferLoadingButton": "جارٍ تحميل الإعلان...",
-    "@rewardsOfferLoadingButton": {
-        "description": "Button text shown while the ad is being prepared to show."
-    },
     "rewardsSnackbarSuccess": "تم فتح المكافأة: {rewardName} الآن نشط.",
     "@rewardsSnackbarSuccess": {
-        "description": "Snackbar message shown when a reward is successfully unlocked.",
         "placeholders": {
             "rewardName": {
                 "type": "String"
@@ -2177,20 +685,10 @@
         }
     },
     "rewardsSnackbarFailure": "فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.",
-    "@rewardsSnackbarFailure": {
-        "description": "Snackbar message shown when reward verification fails."
-    },
     "rewardsAdDismissedSnackbar": "تم إغلاق الإعلان. يرجى مشاهدة الإعلان بالكامل للحصول على المكافأة.",
-    "@rewardsAdDismissedSnackbar": {
-        "description": "Snackbar message shown when the user dismisses a rewarded ad before completion."
-    },
     "decoratorUnlockRewardsTitle": "استمتع بتجربة خالية من الإعلانات",
-    "@decoratorUnlockRewardsTitle": {
-        "description": "Title for the 'Unlock Rewards' decorator."
-    },
     "decoratorUnlockRewardsDescription": "شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة {duration}.",
     "@decoratorUnlockRewardsDescription": {
-        "description": "Description for the 'Unlock Rewards' decorator.",
         "placeholders": {
             "duration": {
                 "type": "String"
@@ -2198,12 +696,8 @@
         }
     },
     "decoratorUnlockRewardsCta": "شاهد الآن",
-    "@decoratorUnlockRewardsCta": {
-        "description": "Call-to-action text for the 'Unlock Rewards' decorator."
-    },
     "rewardsDurationDays": "{count, plural, zero{0 يوم} one{يوم واحد} two{يومان} few{{count} أيام} many{{count} يومًا} other{{count} يوم}}",
     "@rewardsDurationDays": {
-        "description": "Pluralized string for reward duration in days.",
         "placeholders": {
             "count": {
                 "type": "int"
@@ -2211,28 +705,12 @@
         }
     },
     "rewardTypeAdFree": "بدون إعلانات",
-    "@rewardTypeAdFree": {
-        "description": "The name for the 'Ad-Free' reward type."
-    },
     "rewardTypeDailyDigest": "ملخص يومي",
-    "@rewardTypeDailyDigest": {
-        "description": "The name for the 'Daily Digest' reward type."
-    },
     "unlockMoreButton": "افتح المزيد",
-    "@unlockMoreButton": {
-        "description": "Button text to unlock more features or content limits."
-    },
     "requiresActiveReward": "يتطلب مكافأة نشطة. يمكنك فتح المكافآت من صفحة الحساب.",
-    "@requiresActiveReward": {
-        "description": "Label indicating a feature requires an active reward."
-    },
     "rewardsAdFreeTitle": "استمتع بتجربة خالية من الإعلانات",
-    "@rewardsAdFreeTitle": {
-        "description": "Title for the Ad-Free reward offer."
-    },
     "rewardsAdFreeDescription": "شاهد مقطع فيديو قصيرًا لإزالة جميع الإعلانات من التطبيق لمدة {duration}.",
     "@rewardsAdFreeDescription": {
-        "description": "Description for the Ad-Free reward offer.",
         "placeholders": {
             "duration": {
                 "type": "String"
@@ -2240,12 +718,8 @@
         }
     },
     "rewardsDailyDigestTitle": "افتح ملخصات الأخبار اليومية",
-    "@rewardsDailyDigestTitle": {
-        "description": "Title for the Daily Digest reward offer."
-    },
     "rewardsDailyDigestDescription": "احصل على إشعار دفع يومي يلخص أبرز العناوين من الفلاتر المحفوظة التي تم تمكين خيار 'الملخص اليومي' لها. نشط لمدة {duration}.",
     "@rewardsDailyDigestDescription": {
-        "description": "Description for the Daily Digest reward offer.",
         "placeholders": {
             "duration": {
                 "type": "String"
@@ -2253,20 +727,10 @@
         }
     },
     "rewardsOfferActiveButton": "نشط",
-    "@rewardsOfferActiveButton": {
-        "description": "Button text for a reward that is currently active."
-    },
     "rewardsAdFreePageTitle": "تجربة بدون إعلانات",
-    "@rewardsAdFreePageTitle": {
-        "description": "Title for the dedicated Ad-Free reward page."
-    },
     "rewardsAdFreeInactiveHeadline": "استمتع بتجربة خالية من الإعلانات",
-    "@rewardsAdFreeInactiveHeadline": {
-        "description": "Headline for the ad-free reward page when the reward is not active."
-    },
     "rewardsAdFreeInactiveBody": "شاهد إعلانًا قصيرًا للاستمتاع بالتطبيق بدون انقطاع لمدة {duration}.",
     "@rewardsAdFreeInactiveBody": {
-        "description": "Body text for the ad-free reward page when the reward is not active.",
         "placeholders": {
             "duration": {
                 "type": "String"
@@ -2274,72 +738,23 @@
         }
     },
     "rewardsAdFreeActiveHeadline": "تجربة خالية من الإعلانات نشطة",
-    "@rewardsAdFreeActiveHeadline": {
-        "description": "Headline for the ad-free reward page when the reward is active."
-    },
     "rewardsAdFreeActiveBody": "وصولك الخالي من الإعلانات ينتهي في:",
-    "@rewardsAdFreeActiveBody": {
-        "description": "Body text for the ad-free reward page when the reward is active, preceding the countdown timer."
-    },
     "appTourStep1Title": "أخبارك، مصممة خصيصًا لك",
-    "@appTourStep1Title": {
-        "description": "Title for the first step of the app tour."
-    },
     "appTourStep1Body": "احصل على موجز إخباري مصمم لك. تابع المواضيع والمصادر والدول التي تهمك أكثر وسنتولى الباقي.",
-    "@appTourStep1Body": {
-        "description": "Body text for the first step of the app tour."
-    },
     "appTourStep2Title": "نظم واحصل على إشعارات",
-    "@appTourStep2Title": {
-        "description": "Title for the second step of the app tour."
-    },
     "appTourStep2Body": "أنشئ واحفظ موجزات إخبارية مخصصة لأي مجال. اشترك للحصول على تنبيهات الأخبار العاجلة أو الملخصات اليومية للقصص التي لا يمكنك تفويتها.",
-    "@appTourStep2Body": {
-        "description": "Body text for the second step of the app tour."
-    },
     "appTourStep3Title": "شارك بوجهة نظرك",
-    "@appTourStep3Title": {
-        "description": "Title for the third step of the app tour."
-    },
     "appTourStep3Body": "تفاعل وعلق على المقالات للتواصل مع مجتمع عالمي. صوتك يساعد في تشكيل المحادثة.",
-    "@appTourStep3Body": {
-        "description": "Body text for the third step of the app tour."
-    },
     "appTourSkipButton": "تخطى",
-    "@appTourSkipButton": {
-        "description": "Button text to skip the app tour."
-    },
     "appTourNextButton": "التالي",
-    "@appTourNextButton": {
-        "description": "Button text to go to the next step of the app tour."
-    },
     "appTourGetStartedButton": "ابدأ الآن",
-    "@appTourGetStartedButton": {
-        "description": "Button text to finish the app tour."
-    },
     "initialPersonalizationTitle": "خصص موجزك الإخباري",
-    "@initialPersonalizationTitle": {
-        "description": "Title for the initial personalization page."
-    },
     "initialPersonalizationSubtitle": "تابع بعض المواضيع أو المصادر أو الدول للبدء. يمكنك دائمًا تغييرها لاحقًا.",
-    "@initialPersonalizationSubtitle": {
-        "description": "Subtitle for the initial personalization page."
-    },
     "initialPersonalizationStepTopicsTitle": "اختر المواضيع",
-    "@initialPersonalizationStepTopicsTitle": {
-        "description": "Title for the topic selection step in initial personalization."
-    },
     "initialPersonalizationStepSourcesTitle": "اختر المصادر",
-    "@initialPersonalizationStepSourcesTitle": {
-        "description": "Title for the source selection step in initial personalization."
-    },
     "initialPersonalizationStepCountriesTitle": "اختر الدول",
-    "@initialPersonalizationStepCountriesTitle": {
-        "description": "Title for the country selection step in initial personalization."
-    },
     "initialPersonalizationTotalSelectionCountLabel": "{count,plural, zero{0 محدد} one{1 محدد} two{2 محدد} few{{count} محددات} many{{count} محدد} other{{count} محدد}}",
     "@initialPersonalizationTotalSelectionCountLabel": {
-        "description": "Label showing the total number of selected items.",
         "placeholders": {
             "count": {
                 "type": "int"
@@ -2347,36 +762,14 @@
         }
     },
     "initialPersonalizationFinishButton": "إنهاء",
-    "@initialPersonalizationFinishButton": {
-        "description": "Button text to complete the initial personalization."
-    },
     "deleteAccountDialogTitle": "حذف الحساب",
-    "@deleteAccountDialogTitle": {
-        "description": "Title for the dialog asking to confirm account deletion."
-    },
     "deleteAccountDialogContent": "هل أنت متأكد أنك تريد حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
-    "@deleteAccountDialogContent": {
-        "description": "Content for the account deletion confirmation dialog."
-    },
     "deleteAccountDialogConfirm": "حذف الحساب",
-    "@deleteAccountDialogConfirm": {
-        "description": "Confirmation button text for account deletion."
-    },
     "deleteAccountButton": "حذف الحساب",
-    "@deleteAccountButton": {
-        "description": "Button text to initiate account deletion."
-    },
     "followedContentEmpty": "أنت لا تتابع أي عناصر في هذه الفئة حتى الآن.",
-    "@followedContentEmpty": {
-        "description": "Message shown when a list of followed items is empty."
-    },
     "followedContentEmptySubheadline": "العناصر التي تتابعها ستظهر هنا. استخدم زر '+' لإضافة المزيد.",
-    "@followedContentEmptySubheadline": {
-        "description": "Subheadline for the empty state on the followed content page."
-    },
     "multiSelectSearchPageSelectionCount": "{count}/{total}",
     "@multiSelectSearchPageSelectionCount": {
-        "description": "Label showing the number of selected items out of the total allowed.",
         "placeholders": {
             "count": {
                 "type": "int"
@@ -2387,19 +780,7 @@
         }
     },
     "guestUserDisplayName": "زائر",
-    "@guestUserDisplayName": {
-        "description": "The display name for a guest user."
-    },
     "accountPageSyncProgressButton": "مزامنة التقدم",
-    "@accountPageSyncProgressButton": {
-        "description": "Button text for guest users on the account page to initiate account linking/syncing."
-    },
     "applyButtonLabel": "تطبيق",
-    "@applyButtonLabel": {
-        "description": "Generic label for an apply button."
-    },
-    "commentStatusPending": "قيد المراجعة",
-    "@commentStatusPending": {
-        "description": "Status label for a comment that is pending moderation."
-    }
+    "commentStatusPending": "قيد المراجعة"
 }

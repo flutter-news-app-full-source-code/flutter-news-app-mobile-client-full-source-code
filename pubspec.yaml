@@ -27,15 +27,15 @@ dependencies:
   auth_api:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-api.git
-      ref: 599438a8320b2fad2be43686f9dd65b762f34b0b
+      ref: a70bf9d188eb0913bbde0995356c575a8ec33513
   auth_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-client.git
-      ref: 58cc4201ceb52f74e0b639106276e396e4ff03a6
+      ref: bc60915ae1d6a0f464eb3be00bccf7e420ec4146
   auth_repository:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
-      ref: 598998586fd4170ee673b74abf0df112218d0e07
+      ref: e43b19e00e4b9a117b3ebad509a856277ef31652
   bloc: ^9.0.1
   bloc_concurrency: ^0.3.0
   collection: ^1.19.1

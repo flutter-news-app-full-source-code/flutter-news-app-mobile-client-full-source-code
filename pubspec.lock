@@ -61,8 +61,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "599438a8320b2fad2be43686f9dd65b762f34b0b"
-      resolved-ref: "599438a8320b2fad2be43686f9dd65b762f34b0b"
+      ref: a70bf9d188eb0913bbde0995356c575a8ec33513
+      resolved-ref: a70bf9d188eb0913bbde0995356c575a8ec33513
       url: "https://github.com/flutter-news-app-full-source-code/auth-api.git"
     source: git
     version: "1.0.1"
@@ -70,8 +70,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "58cc4201ceb52f74e0b639106276e396e4ff03a6"
-      resolved-ref: "58cc4201ceb52f74e0b639106276e396e4ff03a6"
+      ref: bc60915ae1d6a0f464eb3be00bccf7e420ec4146
+      resolved-ref: bc60915ae1d6a0f464eb3be00bccf7e420ec4146
       url: "https://github.com/flutter-news-app-full-source-code/auth-client.git"
     source: git
     version: "1.0.1"
@@ -79,8 +79,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "598998586fd4170ee673b74abf0df112218d0e07"
-      resolved-ref: "598998586fd4170ee673b74abf0df112218d0e07"
+      ref: e43b19e00e4b9a117b3ebad509a856277ef31652
+      resolved-ref: e43b19e00e4b9a117b3ebad509a856277ef31652
       url: "https://github.com/flutter-news-app-full-source-code/auth-repository.git"
     source: git
     version: "1.0.1"

@@ -1,0 +1,786 @@
+{
+    "@@locale": "zh",
+    "accountLinkingPageTitle": "同步进度",
+    "accountLinkingGenericError": "发生错误",
+    "accountLinkingEmailSentSuccess": "请检查您的电子邮件以获取登录链接！",
+    "accountLinkingHeadline": "保存您的进度",
+    "accountLinkingBody": "创建一个账户，以便在您的所有设备上同步关注的项目和偏好设置。",
+    "accountLinkingContinueWithGoogleButton": "使用 Google 继续",
+    "accountLinkingEmailInputLabel": "输入您的电子邮件",
+    "accountLinkingEmailInputHint": "you@example.com",
+    "accountLinkingEmailValidationError": "请输入有效的电子邮件地址",
+    "accountLinkingSendLinkButton": "使用电子邮件同步",
+    "accountPageTitle": "账户",
+    "accountAnonymousUser": "（匿名）",
+    "accountNoNameUser": "无姓名",
+    "accountStatusAuthenticated": "已认证",
+    "accountStatusAnonymous": "匿名会话",
+    "accountStatusUnauthenticated": "未登录",
+    "accountSettingsTile": "设置",
+    "accountSignOutTile": "退出登录",
+    "accountBackupTile": "创建账户以保存数据",
+    "accountContentPreferencesTile": "关注的内容",
+    "accountSavedHeadlinesTile": "已保存的头条",
+    "accountRoleLabel": "角色：{role}",
+    "@accountRoleLabel": {
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
+    "accountMyContentSectionTitle": "我的内容",
+    "accountActivityAndRewardsSectionTitle": "活动与奖励",
+    "accountGeneralSectionTitle": "常规",
+    "accountEditProfileButton": "编辑个人资料",
+    "editProfilePageTitle": "编辑个人资料",
+    "editProfileNameInputLabel": "姓名",
+    "editProfileEmailInputLabel": "电子邮件",
+    "editProfileUpdateSuccessSnackbar": "个人资料更新成功。",
+    "editProfileUpdateFailureSnackbar": "更新个人资料失败。请重试。",
+    "followedContentPageTitle": "关注的项目",
+    "followedContentTopicsTab": "话题",
+    "followedContentSourcesTab": "来源",
+    "authenticationEmailSentSuccess": "请检查您的电子邮件以获取登录链接。",
+    "authenticationPageTitle": "登录 / 注册",
+    "authenticationEmailLabel": "电子邮件",
+    "authenticationSendLinkButton": "发送登录链接",
+    "authenticationOrDivider": "或",
+    "authenticationGoogleSignInButton": "使用 Google 登录",
+    "authenticationAnonymousSignInButton": "匿名继续",
+    "headlineDetailsInitialHeadline": "正在等待详情",
+    "headlineDetailsInitialSubheadline": "请稍候...",
+    "headlineDetailsLoadingHeadline": "正在加载头条",
+    "headlineDetailsLoadingSubheadline": "正在获取数据...",
+    "headlineDetailsContinueReadingButton": "继续阅读",
+    "headlinesFeedLoadingHeadline": "正在加载...",
+    "headlinesFeedLoadingSubheadline": "正在获取头条",
+    "headlinesFeedFilterTitle": "筛选头条",
+    "headlinesFeedFilterCategoryLabel": "类别",
+    "headlinesFeedFilterAllOption": "全部",
+    "headlinesFeedFilterCategoryTechnology": "科技",
+    "headlinesFeedFilterCategoryBusiness": "商业",
+    "headlinesFeedFilterCategorySports": "体育",
+    "headlinesFeedFilterSourceLabel": "来源",
+    "headlinesFeedFilterSourceCNN": "CNN",
+    "headlinesFeedFilterSourceReuters": "路透社",
+    "headlinesFeedFilterEventCountryLabel": "国家",
+    "headlinesFeedFilterSourceCountryLabel": "总部所在地",
+    "headlinesFeedFilterCountryUS": "美国",
+    "headlinesFeedFilterCountryUK": "英国",
+    "headlinesFeedFilterCountryCA": "加拿大",
+    "headlinesFeedFilterApplyButton": "应用筛选",
+    "headlinesFeedFilterResetButton": "重置筛选",
+    "headlinesSearchHintText": "搜索头条...",
+    "headlinesSearchInitialHeadline": "即刻查找头条",
+    "headlinesSearchInitialSubheadline": "在上方输入关键词以发现新闻文章。",
+    "headlinesSearchNoResultsHeadline": "无结果",
+    "headlinesSearchNoResultsSubheadline": "请尝试不同的搜索词",
+    "authenticationEmailSignInButton": "使用电子邮件继续",
+    "authenticationLinkingHeadline": "同步您的进度",
+    "authenticationLinkingSubheadline": "创建一个账户，以便在设备间保存您的设置、内容偏好等。",
+    "authenticationSignInHeadline": "Veritas",
+    "authenticationSignInSubheadline": "来自全球可信来源的未经过滤的新闻。",
+    "emailSignInPageTitle": "使用电子邮件登录",
+    "emailSignInExplanation": "在下方输入您的电子邮件。我们将向您发送一个安全的登录链接。无需密码！",
+    "emailLinkSentPageTitle": "检查您的电子邮件",
+    "emailLinkSentConfirmation": "链接已发送！请检查您的电子邮件收件箱（及垃圾邮件箱）。点击邮件中的链接以完成登录。",
+    "accountConnectPrompt": "关联账户",
+    "accountConnectBenefit": "在设备间保存您的偏好设置和阅读历史。",
+    "bottomNavFeedLabel": "信息流",
+    "bottomNavSearchLabel": "搜索",
+    "bottomNavAccountLabel": "账户",
+    "accountNotificationsTile": "通知",
+    "headlinesSearchActionTooltip": "搜索",
+    "notificationsTooltip": "查看通知",
+    "accountSignInPromptButton": "注册 / 登录",
+    "categoryFilterLoadingHeadline": "正在加载类别...",
+    "categoryFilterLoadingSubheadline": "请稍候，正在获取可用类别。",
+    "categoryFilterEmptyHeadline": "未找到类别",
+    "categoryFilterEmptySubheadline": "目前没有可用的类别。",
+    "countryFilterLoadingHeadline": "正在加载国家...",
+    "countryFilterLoadingSubheadline": "请稍候，正在获取可用国家。",
+    "countryFilterEmptyHeadline": "未找到国家",
+    "countryFilterEmptySubheadline": "目前没有可用的国家。",
+    "headlinesFeedAppBarTitle": "HT",
+    "headlinesFeedFilterTooltip": "筛选头条",
+    "headlinesFeedFilterAllLabel": "全部",
+    "headlinesFeedFilterSelectedCountLabel": "已选择 {count} 个",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "正在加载来源...",
+    "sourceFilterLoadingSubheadline": "请稍候，正在获取可用来源。",
+    "sourceFilterEmptyHeadline": "未找到来源",
+    "sourceFilterEmptySubheadline": "目前没有可用的来源。",
+    "settingsTitle": "设置",
+    "settingsLoadingHeadline": "正在加载设置...",
+    "settingsLoadingSubheadline": "请稍候，正在获取您的偏好设置。",
+    "settingsErrorDefault": "无法加载设置。",
+    "settingsAppearanceTitle": "外观",
+    "settingsFeedDisplayTitle": "信息流",
+    "settingsArticleDisplayTitle": "文章显示",
+    "settingsNotificationsTitle": "通知",
+    "settingsAppearanceThemeModeLight": "浅色",
+    "settingsAppearanceThemeModeDark": "深色",
+    "settingsAppearanceThemeModeSystem": "系统",
+    "settingsAppearanceThemeNameRed": "红色",
+    "settingsAppearanceThemeNameBlue": "蓝色",
+    "settingsAppearanceThemeNameGrey": "灰色",
+    "settingsAppearanceFontSizeSmall": "小",
+    "settingsAppearanceFontSizeLarge": "大",
+    "settingsAppearanceFontSizeMedium": "中",
+    "settingsAppearanceThemeModeLabel": "主题模式",
+    "settingsAppearanceThemeNameLabel": "配色方案",
+    "settingsAppearanceAppFontSizeLabel": "应用字体大小",
+    "settingsAppearanceAppFontTypeLabel": "应用字体",
+    "settingsAppearanceFontWeightLabel": "字体粗细",
+    "settingsFeedTileTypeImageTop": "图片置顶",
+    "settingsFeedTileTypeImageStart": "图片居前",
+    "settingsFeedTileTypeTextOnly": "仅文字",
+    "settingsFeedTileTypeLabel": "信息流卡片布局",
+    "settingsArticleFontSizeLabel": "文章字体大小",
+    "settingsNotificationsEnableLabel": "启用通知",
+    "settingsNotificationsCategoriesLabel": "关注的类别",
+    "settingsNotificationsSourcesLabel": "关注的来源",
+    "settingsNotificationsCountriesLabel": "关注的国家",
+    "settingsAppearanceSectionTitle": "外观",
+    "settingsFeedSectionTitle": "信息流",
+    "settingsGeneralSectionTitle": "常规",
+    "settingsAccentColorAndFontsTitle": "强调色与字体",
+    "settingsAccentColorLabel": "强调色",
+    "settingsFontFamilyLabel": "字体系列",
+    "settingsLayoutAndReadingTitle": "布局与阅读",
+    "appName": "头条工具箱",
+    "unknownError": "发生未知错误。",
+    "loadMoreError": "无法加载更多项目。",
+    "settingsAppearanceFontSizeExtraLarge": "特大",
+    "settingsAppearanceFontFamilySystemDefault": "系统默认",
+    "settingsAppearanceFontFamilyRoboto": "Roboto",
+    "settingsAppearanceFontFamilyOpenSans": "Open Sans",
+    "settingsAppearanceThemeSubPageTitle": "主题设置",
+    "settingsAppearanceFontSubPageTitle": "字体设置",
+    "settingsLanguageTitle": "语言",
+    "emailCodeSentPageTitle": "输入代码",
+    "emailCodeSentConfirmation": "验证码已发送至 {email}。请在下方输入。",
+    "@emailCodeSentConfirmation": {
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "请输入您收到的 6 位代码。",
+    "emailCodeVerificationHint": "6 位代码",
+    "emailCodeVerificationButtonLabel": "验证代码",
+    "emailCodeValidationEmptyError": "请输入 6 位代码。",
+    "emailCodeValidationLengthError": "代码必须为 6 位。",
+    "headlinesFeedEmptyFilteredHeadline": "没有符合筛选条件的头条",
+    "headlinesFeedEmptyFilteredSubheadline": "请尝试调整筛选标准或清除筛选以查看所有头条。",
+    "headlinesFeedClearFiltersButton": "清除筛选",
+    "headlinesFeedFilterLoadingCriteria": "正在加载筛选选项...",
+    "pleaseWait": "请稍候...",
+    "headlinesFeedFilterErrorCriteria": "无法加载筛选选项。",
+    "headlinesFeedFilterCountryLabel": "国家",
+    "headlinesFeedFilterSourceTypeLabel": "类型",
+    "headlinesFeedFilterErrorSources": "无法加载来源。",
+    "headlinesFeedFilterNoSourcesMatch": "没有符合所选筛选条件的来源。",
+    "searchModelTypeHeadline": "头条",
+    "searchModelTypeCategory": "类别",
+    "searchModelTypeSource": "来源",
+    "searchModelTypeCountry": "国家",
+    "searchHintTextHeadline": "例如：AI 进展、火星探测器...",
+    "searchHintTextGeneric": "搜索...",
+    "searchHintTextCategory": "例如：科技、体育、金融...",
+    "searchHintTextSource": "例如：BBC 新闻、TechCrunch、路透社...",
+    "searchHintTextCountry": "例如：美国、日本、巴西...",
+    "searchPageInitialHeadline": "开始搜索",
+    "searchPageInitialSubheadline": "选择类型并输入关键词以开始。",
+    "followedCategoriesPageTitle": "关注的类别",
+    "addCategoriesTooltip": "添加类别",
+    "noFollowedCategoriesMessage": "您尚未关注任何类别。",
+    "addCategoriesButtonLabel": "查找要关注的类别",
+    "unfollowCategoryTooltip": "取消关注 {categoryName}",
+    "@unfollowCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Technology"
+            }
+        }
+    },
+    "addTopicsPageTitle": "关注话题",
+    "topicFilterLoadingHeadline": "正在加载话题...",
+    "topicFilterError": "无法加载话题。请重试。",
+    "topicFilterEmptyHeadline": "未找到话题",
+    "topicFilterEmptySubheadline": "目前没有可用的话题。",
+    "unfollowTopicTooltip": "取消关注 {topicName}",
+    "@unfollowTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followTopicTooltip": "关注 {topicName}",
+    "@followTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "正在加载关注的来源...",
+    "followedSourcesErrorHeadline": "无法加载关注的来源",
+    "followedSourcesEmptyHeadline": "无关注的来源",
+    "followedSourcesEmptySubheadline": "开始关注来源以在此处查看它们。",
+    "headlinesFeedFilterTopicLabel": "话题",
+    "followedTopicsPageTitle": "关注的话题",
+    "addTopicsTooltip": "添加话题",
+    "followedTopicsLoadingHeadline": "正在加载关注的话题...",
+    "followedTopicsErrorHeadline": "无法加载关注的话题",
+    "followedTopicsEmptyHeadline": "无关注的话题",
+    "followedTopicsEmptySubheadline": "开始关注话题以在此处查看它们。",
+    "followedSourcesPageTitle": "关注的来源",
+    "addSourcesTooltip": "添加来源",
+    "noFollowedSourcesMessage": "您尚未关注任何来源。",
+    "addSourcesButtonLabel": "查找要关注的来源",
+    "unfollowSourceTooltip": "取消关注 {sourceName}",
+    "@unfollowSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "BBC News"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "关注的国家",
+    "addCountriesTooltip": "添加国家",
+    "noFollowedCountriesMessage": "您尚未关注任何国家。",
+    "addCountriesButtonLabel": "查找要关注的国家",
+    "unfollowCountryTooltip": "取消关注 {countryName}",
+    "@unfollowCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "United States"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "添加要关注的类别",
+    "categoryFilterError": "无法加载类别。请重试。",
+    "followCategoryTooltip": "关注 {categoryName}",
+    "@followCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "addSourcesPageTitle": "添加要关注的来源",
+    "sourceFilterError": "无法加载来源。请重试。",
+    "followSourceTooltip": "关注 {sourceName}",
+    "@followSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "Tech News"
+            }
+        }
+    },
+    "addCountriesPageTitle": "添加要关注的国家",
+    "followCountryTooltip": "关注 {countryName}",
+    "@followCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "Germany"
+            }
+        }
+    },
+    "headlineDetailsSaveTooltip": "保存头条",
+    "headlineDetailsRemoveFromSavedTooltip": "从已保存中移除",
+    "headlineSavedSuccessSnackbar": "头条已保存！",
+    "headlineUnsavedSuccessSnackbar": "头条已从保存中移除。",
+    "headlineSaveErrorSnackbar": "无法更新保存状态。请重试。",
+    "shareActionTooltip": "分享头条",
+    "sharingUnavailableSnackbar": "此设备或平台不支持分享。",
+    "similarHeadlinesSectionTitle": "您可能也喜欢",
+    "similarHeadlinesEmpty": "未找到相似头条。",
+    "detailsPageTitle": "详情",
+    "followButtonLabel": "关注",
+    "unfollowButtonLabel": "取消关注",
+    "noHeadlinesFoundMessage": "未找到此项目的头条。",
+    "failedToLoadMoreHeadlines": "无法加载更多头条。",
+    "headlinesSectionTitle": "头条",
+    "headlinesFeedFilterApplyFollowedLabel": "应用我关注的项目作为筛选条件",
+    "mustBeLoggedInToUseFeatureError": "您必须登录才能使用此功能。",
+    "noFollowedItemsForFilterSnackbar": "您尚未关注任何可用作筛选条件的项目。",
+    "requestCodePageHeadline": "输入您的电子邮件",
+    "requestCodePageSubheadline": "我们将向您的电子邮件发送一个安全代码以验证您的身份。",
+    "requestCodeEmailLabel": "电子邮件地址",
+    "requestCodeEmailHint": "you@example.com",
+    "requestCodeSendCodeButton": "发送代码",
+    "requestCodeResendButtonCooldown": "{seconds} 秒后重发",
+    "@requestCodeResendButtonCooldown": {
+        "placeholders": {
+            "seconds": {
+                "type": "int",
+                "example": "60"
+            }
+        }
+    },
+    "entityDetailsCategoryTitle": "类别",
+    "entityDetailsSourceTitle": "来源",
+    "entityDetailsTopicTitle": "话题",
+    "entityDetailsCountryTitle": "国家",
+    "savedHeadlinesLoadingHeadline": "正在加载已保存的头条...",
+    "savedHeadlinesLoadingSubheadline": "请稍候，正在获取您保存的文章。",
+    "savedHeadlinesErrorHeadline": "无法加载已保存的头条",
+    "savedHeadlinesEmptyHeadline": "无已保存的头条",
+    "savedHeadlinesEmptySubheadline": "您尚未保存任何文章。开始探索吧！",
+    "accountFollowedCountriesTile": "关注的国家",
+    "followedCountriesLoadingHeadline": "正在加载关注的国家...",
+    "followedCountriesErrorHeadline": "无法加载关注的国家",
+    "followedCountriesEmptyHeadline": "无关注的国家",
+    "followedCountriesEmptySubheadline": "开始关注国家以在此处查看它们。",
+    "countryFilterError": "无法加载国家。请重试。",
+    "followedCategoriesLoadingHeadline": "正在加载关注的类别...",
+    "followedCategoriesErrorHeadline": "无法加载关注的类别",
+    "followedCategoriesEmptyHeadline": "无关注的类别",
+    "followedCategoriesEmptySubheadline": "开始关注类别以在此处查看它们。",
+    "contentTypeHeadline": "头条",
+    "contentTypeTopic": "话题",
+    "contentTypeSource": "来源",
+    "contentTypeCountry": "国家",
+    "searchingFor": "正在搜索 {contentType}...",
+    "@searchingFor": {
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "细体",
+    "settingsAppearanceFontWeightRegular": "常规",
+    "settingsAppearanceFontWeightBold": "粗体",
+    "maintenanceHeadline": "维护中",
+    "maintenanceSubheadline": "我们目前正在进行维护。请稍后再试。",
+    "updateRequiredHeadline": "需要更新",
+    "updateRequiredSubheadline": "应用有新版本可用。请更新以继续使用。",
+    "updateRequiredButton": "立即更新",
+    "neverShowAgain": "不再显示",
+    "followButtonText": "关注",
+    "unfollowButtonText": "取消关注",
+    "adInfoPlaceholderText": "广告有助于保持此应用免费！",
+    "retryButtonText": "重试",
+    "headlinesFeedFilterLoadingHeadline": "正在加载筛选条件",
+    "suggestedTopicsTitle": "推荐话题",
+    "suggestedSourcesTitle": "推荐来源",
+    "couldNotOpenUpdateUrl": "无法打开更新链接：{url}",
+    "@couldNotOpenUpdateUrl": {
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
+    },
+    "currentAppVersionLabel": "当前版本：{version}",
+    "@currentAppVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "所需版本：{version}",
+    "@latestRequiredVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
+    },
+    "anonymousLimitTitle": "登录以执行更多操作",
+    "anonymousLimitBody": "创建一个免费账户以保存更多书签并关注更多内容。",
+    "anonymousLimitButton": "登录",
+    "standardLimitBody": "您已达到免费计划的上限。升级以保存和关注更多内容。",
+    "standardLimitButton": "升级到高级版",
+    "premiumLimitTitle": "您已达到上限",
+    "premiumLimitBody": "要添加新项目，请查看并管理您现有的已保存和已关注内容。",
+    "premiumLimitButton": "管理我的内容",
+    "saveButtonLabel": "保存",
+    "cancelButtonLabel": "取消",
+    "manageFiltersPageTitle": "管理筛选",
+    "manageFiltersEmptyHeadline": "无已保存的筛选",
+    "manageFiltersEmptySubheadline": "您可以从筛选页面保存筛选条件。",
+    "manageFiltersRenameTooltip": "重命名筛选",
+    "manageFiltersDeleteTooltip": "删除筛选",
+    "saveFilterDialogTitleSave": "保存筛选",
+    "saveFilterDialogTitleRename": "重命名筛选",
+    "saveFilterDialogInputLabel": "筛选名称",
+    "saveFilterDialogValidationEmpty": "名称不能为空",
+    "saveFilterDialogValidationTooLong": "名称太长",
+    "saveFilterDialogGenericError": "保存筛选时发生意外错误。",
+    "headlinesFilterSaveTooltip": "保存筛选",
+    "headlinesFilterManageTooltip": "管理筛选",
+    "savedFiltersBarOpenTooltip": "打开筛选",
+    "savedFiltersBarAllLabel": "全部",
+    "savedFiltersBarCustomLabel": "自定义",
+    "applyFilterDialogTitle": "应用筛选",
+    "applyFilterDialogContent": "您是想仅在本次会话中应用这些筛选设置，还是保存以供将来使用？",
+    "applyFilterDialogApplyOnlyButton": "仅应用",
+    "applyFilterDialogApplyAndSaveButton": "应用并保存",
+    "savedFiltersBarFollowedLabel": "已关注",
+    "sourceListFilterPageTitle": "筛选来源",
+    "sourceListFilterPageFilterButtonTooltip": "筛选来源列表",
+    "sourceListFilterByHeadquartersPageTitle": "总部位置",
+    "savedFiltersPageTitle": "已保存的筛选",
+    "savedFiltersEmptyHeadline": "无已保存的筛选",
+    "savedFiltersEmptySubheadline": "您从信息流中保存的筛选将显示在此处。",
+    "savedFiltersMenuRename": "重命名",
+    "savedFiltersMenuDelete": "删除",
+    "discoverPageTitle": "发现",
+    "bottomNavDiscoverLabel": "发现",
+    "feedSearchHint": "搜索头条...",
+    "headlineSearchEnterQuery": "从数千个来源中查找头条。",
+    "headlineSearchEnterQuerySubheadline": "通过关键词搜索以查找来自数千个来源的文章。",
+    "headlineSearchNoResults": "未找到头条。",
+    "headlineSearchNoResultsSubheadline": "我们找不到符合您搜索条件的头条。请尝试不同的关键词。",
+    "accountGuestAccount": "游客账户",
+    "accountRoleStandard": "标准用户",
+    "accountRolePremium": "高级用户",
+    "deleteConfirmationDialogTitle": "确认删除",
+    "deleteConfirmationDialogContent": "您确定要删除此项目吗？此操作无法撤销。",
+    "deleteConfirmationDialogConfirmButton": "删除",
+    "headlineSearchInitialHeadline": "搜索头条",
+    "headlineSearchInitialSubheadline": "输入关键词以查找文章。",
+    "accountGuestUserHeadline": "游客账户",
+    "accountGuestUserSubheadline": "登录以同步您的数据",
+    "discoverSearchHint": "搜索来源...",
+    "seeAllButtonLabel": "查看全部",
+    "failedToLoadMoreSources": "无法加载更多来源。",
+    "sourceTypeNewsAgency": "通讯社",
+    "sourceTypeLocalNewsOutlet": "地方新闻媒体",
+    "sourceTypeNationalNewsOutlet": "国家新闻媒体",
+    "sourceTypeInternationalNewsOutlet": "国际新闻媒体",
+    "sourceTypeSpecializedPublisher": "专业出版商",
+    "sourceTypeBlog": "博客",
+    "sourceTypeGovernmentSource": "政府来源",
+    "sourceTypeAggregator": "聚合器",
+    "sourceTypeOther": "其他",
+    "sourceTypeNewsAgencies": "通讯社",
+    "sourceTypeLocalNewsOutlets": "地方新闻媒体",
+    "sourceTypeNationalNewsOutlets": "国家新闻媒体",
+    "sourceTypeInternationalNewsOutlets": "国际新闻媒体",
+    "sourceTypeSpecializedPublishers": "专业出版商",
+    "sourceTypeBlogs": "博客",
+    "sourceTypeGovernmentSources": "政府来源",
+    "sourceTypeAggregators": "聚合器",
+    "sourceTypeOthers": "其他",
+    "sourceTypeFilterEmptyHeadline": "未找到来源类型",
+    "sourceTypeFilterEmptySubheadline": "目前没有可用的来源类型供筛选。",
+    "decoratorDismissedConfirmation": "建议已隐藏。",
+    "decoratorDismissAction": "隐藏建议",
+    "decoratorLinkAccountTitle_1": "保存您的文章与偏好",
+    "decoratorLinkAccountTitle_2": "永不丢失您保存的偏好",
+    "decoratorLinkAccountDescription_1": "创建一个免费账户以保存更多文章、关注更多话题，并在设备间同步您的偏好。",
+    "decoratorLinkAccountDescription_2": "注册以解锁更多保存、扩展关注内容，并让您的新闻流在各处保持一致。",
+    "decoratorLinkAccountCta_1": "立即注册",
+    "decoratorLinkAccountCta_2": "创建免费账户",
+    "decoratorUpgradeTitle_1": "享受不间断的新闻体验",
+    "decoratorUpgradeTitle_2": "解锁您的高级访问权限",
+    "decoratorUpgradeDescription_1": "去广告并大幅扩展您保存文章和关注内容的上限。",
+    "decoratorUpgradeDescription_2": "升级到高级版以获得无广告体验，并能够保存和关注更多您喜爱的内容。",
+    "decoratorUpgradeCta_1": "升级到高级版",
+    "decoratorUpgradeCta_2": "了解更多",
+    "decoratorRateAppTitle_1": "喜欢这个应用吗？",
+    "decoratorRateAppTitle_2": "分享您的反馈",
+    "decoratorRateAppDescription_1": "您的评分有助于我们为每个人改进新闻体验。您的意见很重要！",
+    "decoratorRateAppDescription_2": "您的反馈有助于我们提供更好的新闻。请花一点时间为我们评分！",
+    "decoratorRateAppCta_1": "立即评分",
+    "decoratorRateAppCta_2": "提供反馈",
+    "decoratorEnableNotificationsTitle_1": "绝不错过突发新闻",
+    "decoratorEnableNotificationsTitle_2": "即时掌握资讯",
+    "decoratorEnableNotificationsDescription_1": "获取您关注的话题和来源的突发新闻即时提醒和更新。",
+    "decoratorEnableNotificationsDescription_2": "启用通知以直接在您的设备上接收个性化的新闻更新。",
+    "decoratorEnableNotificationsCta_1": "开启提醒",
+    "decoratorEnableNotificationsCta_2": "开启通知",
+    "decoratorSuggestedTopicsTitle_1": "发现新兴趣",
+    "decoratorSuggestedTopicsTitle_2": "拓宽您的知识面",
+    "decoratorSuggestedSourcesTitle_1": "寻找新视角",
+    "decoratorSuggestedSourcesTitle_2": "发现可信来源",
+    "savedHeadlineFiltersPageTitle": "已保存的筛选",
+    "savedHeadlineFiltersCreateNewButton": "创建筛选",
+    "savedHeadlineFiltersLoadingHeadline": "正在加载您的筛选...",
+    "savedHeadlineFiltersEmptyHeadline": "尚无已保存的筛选",
+    "savedHeadlineFiltersEmptySubheadline": "您创建并保存的筛选将显示在此处。点击下方按钮开始。",
+    "savedFiltersMenuEdit": "编辑",
+    "saveFilterDialogPinToFeedLabel": "固定到筛选栏",
+    "saveFilterDialogNotificationsLabel": "通知偏好",
+    "notificationDeliveryTypeBreakingOnly": "突发新闻",
+    "notificationDeliveryTypeDailyDigest": "每日摘要",
+    "notificationDeliveryTypeWeeklyRoundup": "每周回顾",
+    "prePermissionDialogTitle": "启用通知？",
+    "prePermissionDialogBody": "为了向您发送此筛选条件的突发新闻提醒和摘要，请允许通知。",
+    "prePermissionDialogDenyButton": "以后再说",
+    "prePermissionDialogAllowButton": "允许",
+    "notificationPermissionDeniedError": "通知权限被拒绝。您可以在设备设置中启用它。",
+    "notificationCenterPageTitle": "通知",
+    "notificationCenterMarkAllAsReadButton": "全部标记为已读",
+    "notificationCenterLoadingHeadline": "正在加载通知...",
+    "notificationCenterLoadingSubheadline": "请稍候...",
+    "notificationCenterFailureHeadline": "加载通知失败",
+    "notificationCenterFailureSubheadline": "无法检索您的通知。请重试。",
+    "notificationCenterEmptyHeadline": "无通知",
+    "notificationCenterEmptySubheadline": "您没有新通知。",
+    "notificationCenterTabBreakingNews": "突发新闻",
+    "notificationCenterTabDigests": "摘要",
+    "deleteReadNotificationsButtonTooltip": "删除所有已读通知",
+    "deleteReadNotificationsDialogContent": "您确定要删除此标签页中的所有已读通知吗？此操作无法撤销。",
+    "deleteButtonLabel": "删除",
+    "breakingNewsPrefix": "突发新闻",
+    "settingsFeedClickBehaviorLabel": "打开链接方式",
+    "settingsFeedClickBehaviorDefault": "应用默认",
+    "settingsFeedClickBehaviorInApp": "应用内浏览器",
+    "settingsFeedClickBehaviorSystem": "系统浏览器",
+    "continueToArticleButtonLabel": "继续阅读文章",
+    "headlineActionsModalTitle": "操作",
+    "shareActionLabel": "分享",
+    "bookmarkActionLabel": "书签",
+    "removeBookmarkActionLabel": "移除书签",
+    "reportActionLabel": "举报",
+    "reportContentTitle": "举报内容",
+    "reportReasonSelectionPrompt": "请选择举报原因：",
+    "reportAdditionalCommentsLabel": "附加评论（可选）",
+    "reportSubmitButtonLabel": "提交举报",
+    "reportSuccessSnackbar": "举报已提交。感谢您的反馈。",
+    "reportFailureSnackbar": "提交举报失败。请重试。",
+    "commentsTitle": "评论",
+    "commentPostButtonLabel": "发布",
+    "commentInputHint": "添加评论...",
+    "commentRequiresReactionError": "请选择一个反应以发布评论。",
+    "likeActionLabel": "点赞",
+    "dislikeActionLabel": "踩",
+    "commentActionLabel": "评论",
+    "moreActionLabel": "更多",
+    "rateAppPromptTitle": "喜欢这个应用吗？",
+    "rateAppPromptBody": "您的反馈有助于我们改进。您介意为我们评分吗？",
+    "rateAppPromptYesButton": "太棒了！",
+    "rateAppPromptNoButton": "还有待改进",
+    "feedbackPromptTitle": "我们该如何改进？",
+    "feedbackPromptReasonUI": "UI / 设计",
+    "feedbackPromptReasonPerformance": "性能 / 速度",
+    "feedbackPromptReasonContent": "内容质量",
+    "feedbackPromptReasonOther": "其他",
+    "feedbackPromptSubmitButton": "提交反馈",
+    "rateAppNegativeFollowUpTitle_1": "我们现在做得怎么样？",
+    "rateAppNegativeFollowUpTitle_2": "我们有改进吗？",
+    "rateAppNegativeFollowUpBody_1": "我们一直在根据您的反馈进行改进。您会重新考虑您的评分吗？",
+    "rateAppNegativeFollowUpBody_2": "我们重视您的意见。如果情况变好了，请告诉我们。",
+    "noCommentsYet": "暂无评论。",
+    "commentInputNoReactionHint": "做出反应以添加评论",
+    "headlineReportReasonMisinformation": "虚假信息或假新闻",
+    "headlineReportReasonClickbait": "标题党或误导性标题",
+    "headlineReportReasonOffensive": "冒犯性或仇恨言论",
+    "headlineReportReasonSpam": "垃圾信息或诈骗",
+    "headlineReportReasonBrokenLink": "链接失效",
+    "headlineReportReasonPaywalled": "付费墙内容",
+    "sourceReportReasonLowQuality": "低质量新闻",
+    "sourceReportReasonHighAdDensity": "广告或弹窗过多",
+    "sourceReportReasonFrequentPaywalls": "频繁出现付费墙",
+    "sourceReportReasonImpersonation": "冒充他人",
+    "sourceReportReasonMisinformation": "虚假信息",
+    "commentReportReasonSpam": "垃圾信息或广告",
+    "commentReportReasonHarassment": "骚扰或欺凌",
+    "commentReportReasonHateSpeech": "仇恨言论",
+    "limitReachedTitle": "已达上限",
+    "manageMyContentButton": "管理我的内容",
+    "upgradeButton": "升级",
+    "createAccountButton": "创建账户",
+    "gotItButton": "知道了",
+    "commentsPageTitle": "评论",
+    "commentsCount": "{count,plural, =1{1 条评论}other{{count} 条评论}}",
+    "@commentsCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "需要账户",
+    "limitReachedGuestUserBody": "请创建一个免费账户或登录，以便参与社区互动并使用此功能。",
+    "limitReachedBodyFollow": "您已达到关注项目的上限。要关注更多，请查看您现有的关注内容。",
+    "limitReachedBodySave": "您已达到保存文章的上限。要保存更多，请查看您现有的已保存文章。",
+    "limitReachedBodySaveFilters": "您已达到保存筛选条件的上限。要创建新筛选，请查看您现有的筛选条件。",
+    "limitReachedBodyPinFilters": "您已达到固定筛选条件的上限。要固定新筛选，请取消固定现有筛选。",
+    "limitReachedBodySubscribeToNotifications": "您已达到通知订阅的上限。要订阅新提醒，请查看您现有的订阅。",
+    "limitReachedBodyComments": "您已达到每日发布评论的上限。请明天再试。",
+    "limitReachedBodyReactions": "您已达到每日反应的上限。请明天再试。",
+    "limitReachedBodyReports": "您已达到每日提交举报的上限。请明天再试。",
+    "commentEditButtonLabel": "更新",
+    "commentPostFailureSnackbar": "发布评论失败。请重试。",
+    "commentUpdateFailureSnackbar": "更新评论失败。请重试。",
+    "commentInputDisabledHint": "登录以加入对话",
+    "commentInputExistingHint": "您已经对此头条发表过评论。",
+    "commenterName": "用户 {id}",
+    "@commenterName": {
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
+    },
+    "accountRewardsTile": "奖励与优惠",
+    "rewardsPageTitle": "奖励",
+    "rewardsOfferTitle": "获取 {rewardName}，时长 {duration}",
+    "@rewardsOfferTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} 已激活",
+    "@rewardsOfferActiveTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "过期时间：{countdown}",
+    "@rewardsOfferExpiresIn": {
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "观看视频",
+    "rewardsOfferVerifyingButton": "正在验证...",
+    "rewardsOfferLoadingButton": "正在加载广告...",
+    "rewardsSnackbarSuccess": "奖励已解锁：{rewardName} 现已激活。",
+    "@rewardsSnackbarSuccess": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "验证失败。请稍后重试。",
+    "rewardsAdDismissedSnackbar": "广告已关闭。请观看完整广告以赚取奖励。",
+    "decoratorUnlockRewardsTitle": "解锁无广告体验",
+    "decoratorUnlockRewardsDescription": "观看一段短视频，即可在 {duration} 内享受无广告的应用体验。",
+    "@decoratorUnlockRewardsDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "decoratorUnlockRewardsCta": "立即观看",
+    "rewardsDurationDays": "{count, plural, =1{1 天} other{{count} 天}}",
+    "@rewardsDurationDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "rewardTypeAdFree": "无广告",
+    "rewardTypeDailyDigest": "每日摘要",
+    "unlockMoreButton": "解锁更多",
+    "requiresActiveReward": "需要激活奖励。您可以从“账户”页面解锁奖励。",
+    "rewardsAdFreeTitle": "享受无广告体验",
+    "rewardsAdFreeDescription": "观看一段短视频，即可在 {duration} 内移除应用中的所有广告。",
+    "@rewardsAdFreeDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "解锁每日新闻摘要",
+    "rewardsDailyDigestDescription": "接收每日推送通知，总结您已启用“每日摘要”选项的已保存筛选条件中的顶级头条。有效期为 {duration}。",
+    "@rewardsDailyDigestDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "已激活",
+    "rewardsAdFreePageTitle": "无广告体验",
+    "rewardsAdFreeInactiveHeadline": "享受无广告体验",
+    "rewardsAdFreeInactiveBody": "观看一段短广告，即可在 {duration} 内享受无干扰的应用体验。",
+    "@rewardsAdFreeInactiveBody": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "无广告体验已激活",
+    "rewardsAdFreeActiveBody": "您的无广告权限过期时间：",
+    "appTourStep1Title": "您的新闻，完美定制",
+    "appTourStep1Body": "获取为您量身定制的信息流。关注您最感兴趣的话题、来源和国家，剩下的交给我们。",
+    "appTourStep2Title": "策划并获取通知",
+    "appTourStep2Body": "为任何细分领域创建并保存自定义新闻流。订阅突发新闻提醒或每日摘要，掌握不容错过的故事。",
+    "appTourStep3Title": "分享您的观点",
+    "appTourStep3Body": "对文章做出反应并发表评论，与全球社区互动。您的声音有助于塑造对话。",
+    "appTourSkipButton": "跳过",
+    "appTourNextButton": "下一步",
+    "appTourGetStartedButton": "开始使用",
+    "initialPersonalizationTitle": "自定义您的信息流",
+    "initialPersonalizationSubtitle": "关注一些话题、来源或国家以开始。您可以随时更改这些设置。",
+    "initialPersonalizationStepTopicsTitle": "选择话题",
+    "initialPersonalizationStepSourcesTitle": "选择来源",
+    "initialPersonalizationStepCountriesTitle": "选择国家",
+    "initialPersonalizationTotalSelectionCountLabel": "已选择 {count} 个",
+    "@initialPersonalizationTotalSelectionCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "完成",
+    "deleteAccountDialogTitle": "注销账户",
+    "deleteAccountDialogContent": "您确定要永久注销您的账户吗？此操作无法撤销。",
+    "deleteAccountDialogConfirm": "注销账户",
+    "deleteAccountButton": "注销账户",
+    "followedContentEmpty": "您尚未在此类别中关注任何项目。",
+    "followedContentEmptySubheadline": "您关注的项目将显示在此处。使用“+”按钮添加更多。",
+    "multiSelectSearchPageSelectionCount": "{count}/{total}",
+    "@multiSelectSearchPageSelectionCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "guestUserDisplayName": "游客",
+    "accountPageSyncProgressButton": "同步进度",
+    "applyButtonLabel": "应用",
+    "commentStatusPending": "审核中"
+}

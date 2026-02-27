@@ -1,0 +1,786 @@
+{
+    "@@locale": "hi",
+    "accountLinkingPageTitle": "अपनी प्रगति सिंक करें",
+    "accountLinkingGenericError": "एक त्रुटि हुई",
+    "accountLinkingEmailSentSuccess": "साइन-इन लिंक के लिए अपना ईमेल देखें!",
+    "accountLinkingHeadline": "अपनी प्रगति सहेजें",
+    "accountLinkingBody": "अपने सभी डिवाइस पर अपने फ़ॉलो किए गए आइटम और प्राथमिकताओं को सिंक करने के लिए एक खाता बनाएं।",
+    "accountLinkingContinueWithGoogleButton": "गूगल के साथ जारी रखें",
+    "accountLinkingEmailInputLabel": "अपना ईमेल दर्ज करें",
+    "accountLinkingEmailInputHint": "you@example.com",
+    "accountLinkingEmailValidationError": "कृपया एक मान्य ईमेल पता दर्ज करें",
+    "accountLinkingSendLinkButton": "ईमेल के साथ सिंक करें",
+    "accountPageTitle": "खाता",
+    "accountAnonymousUser": "(अनाम)",
+    "accountNoNameUser": "कोई नाम नहीं",
+    "accountStatusAuthenticated": "प्रमाणित",
+    "accountStatusAnonymous": "अनाम सत्र",
+    "accountStatusUnauthenticated": "साइन इन नहीं किया गया",
+    "accountSettingsTile": "सेटिंग्स",
+    "accountSignOutTile": "साइन आउट करें",
+    "accountBackupTile": "डेटा सहेजने के लिए खाता बनाएं",
+    "accountContentPreferencesTile": "फ़ॉलो की गई सामग्री",
+    "accountSavedHeadlinesTile": "सहेजी गई हेडलाइंस",
+    "accountRoleLabel": "भूमिका: {role}",
+    "@accountRoleLabel": {
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
+    "accountMyContentSectionTitle": "मेरी सामग्री",
+    "accountActivityAndRewardsSectionTitle": "गतिविधि और पुरस्कार",
+    "accountGeneralSectionTitle": "सामान्य",
+    "accountEditProfileButton": "प्रोफ़ाइल संपादित करें",
+    "editProfilePageTitle": "प्रोफ़ाइल संपादित करें",
+    "editProfileNameInputLabel": "नाम",
+    "editProfileEmailInputLabel": "ईमेल",
+    "editProfileUpdateSuccessSnackbar": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई।",
+    "editProfileUpdateFailureSnackbar": "प्रोफ़ाइल अपडेट करने में विफल। कृपया पुन: प्रयास करें।",
+    "followedContentPageTitle": "फ़ॉलो किए गए आइटम",
+    "followedContentTopicsTab": "विषय",
+    "followedContentSourcesTab": "स्रोत",
+    "authenticationEmailSentSuccess": "साइन-इन लिंक के लिए अपना ईमेल देखें।",
+    "authenticationPageTitle": "साइन इन / रजिस्टर",
+    "authenticationEmailLabel": "ईमेल",
+    "authenticationSendLinkButton": "साइन-इन लिंक भेजें",
+    "authenticationOrDivider": "या",
+    "authenticationGoogleSignInButton": "गूगल के साथ साइन इन करें",
+    "authenticationAnonymousSignInButton": "गुमनाम रूप से जारी रखें",
+    "headlineDetailsInitialHeadline": "विवरण की प्रतीक्षा है",
+    "headlineDetailsInitialSubheadline": "कृपया प्रतीक्षा करें...",
+    "headlineDetailsLoadingHeadline": "हेडलाइन लोड हो रही है",
+    "headlineDetailsLoadingSubheadline": "डेटा प्राप्त किया जा रहा है...",
+    "headlineDetailsContinueReadingButton": "पढ़ना जारी रखें",
+    "headlinesFeedLoadingHeadline": "लोड हो रहा है...",
+    "headlinesFeedLoadingSubheadline": "हेडलाइंस प्राप्त की जा रही हैं",
+    "headlinesFeedFilterTitle": "हेडलाइंस फ़िल्टर करें",
+    "headlinesFeedFilterCategoryLabel": "श्रेणी",
+    "headlinesFeedFilterAllOption": "सभी",
+    "headlinesFeedFilterCategoryTechnology": "प्रौद्योगिकी",
+    "headlinesFeedFilterCategoryBusiness": "व्यापार",
+    "headlinesFeedFilterCategorySports": "खेल",
+    "headlinesFeedFilterSourceLabel": "स्रोत",
+    "headlinesFeedFilterSourceCNN": "CNN",
+    "headlinesFeedFilterSourceReuters": "रॉयटर्स",
+    "headlinesFeedFilterEventCountryLabel": "देश",
+    "headlinesFeedFilterSourceCountryLabel": "स्रोत मुख्यालय",
+    "headlinesFeedFilterCountryUS": "संयुक्त राज्य अमेरिका",
+    "headlinesFeedFilterCountryUK": "यूनाइटेड किंगडम",
+    "headlinesFeedFilterCountryCA": "कनाडा",
+    "headlinesFeedFilterApplyButton": "फ़िल्टर लागू करें",
+    "headlinesFeedFilterResetButton": "फ़िल्टर रीसेट करें",
+    "headlinesSearchHintText": "हेडलाइंस खोजें...",
+    "headlinesSearchInitialHeadline": "तुरंत हेडलाइंस खोजें",
+    "headlinesSearchInitialSubheadline": "समाचार लेख खोजने के लिए ऊपर कीवर्ड टाइप करें।",
+    "headlinesSearchNoResultsHeadline": "कोई परिणाम नहीं",
+    "headlinesSearchNoResultsSubheadline": "एक अलग खोज शब्द आज़माएं",
+    "authenticationEmailSignInButton": "ईमेल के साथ जारी रखें",
+    "authenticationLinkingHeadline": "अपनी प्रगति सिंक करें",
+    "authenticationLinkingSubheadline": "अपनी सेटिंग्स, सामग्री प्राथमिकताएं और बहुत कुछ डिवाइसों में सहेजने के लिए एक खाता बनाएं।",
+    "authenticationSignInHeadline": "वेरिटास",
+    "authenticationSignInSubheadline": "दुनिया भर के विश्वसनीय स्रोतों से अनफ़िल्टर्ड समाचार।",
+    "emailSignInPageTitle": "ईमेल के साथ साइन इन करें",
+    "emailSignInExplanation": "नीचे अपना ईमेल दर्ज करें। हम आपको तुरंत साइन इन करने के लिए एक सुरक्षित लिंक भेजेंगे। पासवर्ड की आवश्यकता नहीं है!",
+    "emailLinkSentPageTitle": "अपना ईमेल देखें",
+    "emailLinkSentConfirmation": "लिंक भेज दिया गया! हमारी ओर से संदेश के लिए अपना ईमेल इनबॉक्स (और स्पैम फ़ोल्डर) देखें। अपना साइन-इन पूरा करने के लिए अंदर दिए गए लिंक पर क्लिक करें।",
+    "accountConnectPrompt": "खाता कनेक्ट करें",
+    "accountConnectBenefit": "अपनी प्राथमिकताओं और पढ़ने के इतिहास को डिवाइसों में सहेजें।",
+    "bottomNavFeedLabel": "फ़ीड",
+    "bottomNavSearchLabel": "खोजें",
+    "bottomNavAccountLabel": "खाता",
+    "accountNotificationsTile": "सूचनाएं",
+    "headlinesSearchActionTooltip": "खोजें",
+    "notificationsTooltip": "सूचनाएं देखें",
+    "accountSignInPromptButton": "साइन अप / साइन इन",
+    "categoryFilterLoadingHeadline": "श्रेणियां लोड हो रही हैं...",
+    "categoryFilterLoadingSubheadline": "जब हम उपलब्ध श्रेणियां प्राप्त करते हैं तो कृपया प्रतीक्षा करें।",
+    "categoryFilterEmptyHeadline": "कोई श्रेणी नहीं मिली",
+    "categoryFilterEmptySubheadline": "फिलहाल कोई श्रेणी उपलब्ध नहीं है।",
+    "countryFilterLoadingHeadline": "देश लोड हो रहे हैं...",
+    "countryFilterLoadingSubheadline": "जब हम उपलब्ध देश प्राप्त करते हैं तो कृपया प्रतीक्षा करें।",
+    "countryFilterEmptyHeadline": "कोई देश नहीं मिला",
+    "countryFilterEmptySubheadline": "फिलहाल कोई देश उपलब्ध नहीं है।",
+    "headlinesFeedAppBarTitle": "HT",
+    "headlinesFeedFilterTooltip": "हेडलाइंस फ़िल्टर करें",
+    "headlinesFeedFilterAllLabel": "सभी",
+    "headlinesFeedFilterSelectedCountLabel": "{count} चयनित",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "स्रोत लोड हो रहे हैं...",
+    "sourceFilterLoadingSubheadline": "जब हम उपलब्ध स्रोत प्राप्त करते हैं तो कृपया प्रतीक्षा करें।",
+    "sourceFilterEmptyHeadline": "कोई स्रोत नहीं मिला",
+    "sourceFilterEmptySubheadline": "फिलहाल कोई स्रोत उपलब्ध नहीं है।",
+    "settingsTitle": "सेटिंग्स",
+    "settingsLoadingHeadline": "सेटिंग्स लोड हो रही हैं...",
+    "settingsLoadingSubheadline": "जब हम आपकी प्राथमिकताएं प्राप्त करते हैं तो कृपया प्रतीक्षा करें।",
+    "settingsErrorDefault": "सेटिंग्स लोड नहीं हो सकीं।",
+    "settingsAppearanceTitle": "दिखावट",
+    "settingsFeedDisplayTitle": "फ़ीड",
+    "settingsArticleDisplayTitle": "लेख प्रदर्शन",
+    "settingsNotificationsTitle": "सूचनाएं",
+    "settingsAppearanceThemeModeLight": "लाइट",
+    "settingsAppearanceThemeModeDark": "डार्क",
+    "settingsAppearanceThemeModeSystem": "सिस्टम",
+    "settingsAppearanceThemeNameRed": "लाल",
+    "settingsAppearanceThemeNameBlue": "नीला",
+    "settingsAppearanceThemeNameGrey": "ग्रे",
+    "settingsAppearanceFontSizeSmall": "छोटा",
+    "settingsAppearanceFontSizeLarge": "बड़ा",
+    "settingsAppearanceFontSizeMedium": "मध्यम",
+    "settingsAppearanceThemeModeLabel": "थीम मोड",
+    "settingsAppearanceThemeNameLabel": "रंग योजना",
+    "settingsAppearanceAppFontSizeLabel": "ऐप फ़ॉन्ट आकार",
+    "settingsAppearanceAppFontTypeLabel": "ऐप फ़ॉन्ट",
+    "settingsAppearanceFontWeightLabel": "फ़ॉन्ट मोटाई",
+    "settingsFeedTileTypeImageTop": "इमेज टॉप",
+    "settingsFeedTileTypeImageStart": "इमेज स्टार्ट",
+    "settingsFeedTileTypeTextOnly": "केवल टेक्स्ट",
+    "settingsFeedTileTypeLabel": "फ़ीड टाइल लेआउट",
+    "settingsArticleFontSizeLabel": "लेख फ़ॉन्ट आकार",
+    "settingsNotificationsEnableLabel": "सूचनाएं सक्षम करें",
+    "settingsNotificationsCategoriesLabel": "फ़ॉलो की गई श्रेणियां",
+    "settingsNotificationsSourcesLabel": "फ़ॉलो किए गए स्रोत",
+    "settingsNotificationsCountriesLabel": "फ़ॉलो किए गए देश",
+    "settingsAppearanceSectionTitle": "दिखावट",
+    "settingsFeedSectionTitle": "फ़ीड",
+    "settingsGeneralSectionTitle": "सामान्य",
+    "settingsAccentColorAndFontsTitle": "एक्सेंट रंग और फ़ॉन्ट",
+    "settingsAccentColorLabel": "एक्सेंट रंग",
+    "settingsFontFamilyLabel": "फ़ॉन्ट परिवार",
+    "settingsLayoutAndReadingTitle": "लेआउट और पढ़ना",
+    "appName": "हेडलाइंस टूलकिट",
+    "unknownError": "एक अज्ञात त्रुटि हुई।",
+    "loadMoreError": "अधिक आइटम लोड करने में विफल।",
+    "settingsAppearanceFontSizeExtraLarge": "बहुत बड़ा",
+    "settingsAppearanceFontFamilySystemDefault": "सिस्टम डिफ़ॉल्ट",
+    "settingsAppearanceFontFamilyRoboto": "रोबोटो",
+    "settingsAppearanceFontFamilyOpenSans": "ओपन संस",
+    "settingsAppearanceThemeSubPageTitle": "थीम सेटिंग्स",
+    "settingsAppearanceFontSubPageTitle": "फ़ॉन्ट सेटिंग्स",
+    "settingsLanguageTitle": "भाषा",
+    "emailCodeSentPageTitle": "कोड दर्ज करें",
+    "emailCodeSentConfirmation": "{email} पर एक सत्यापन कोड भेजा गया है। कृपया इसे नीचे दर्ज करें।",
+    "@emailCodeSentConfirmation": {
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "आपको प्राप्त 6-अंकीय कोड दर्ज करें।",
+    "emailCodeVerificationHint": "6-अंकीय कोड",
+    "emailCodeVerificationButtonLabel": "कोड सत्यापित करें",
+    "emailCodeValidationEmptyError": "कृपया 6-अंकीय कोड दर्ज करें।",
+    "emailCodeValidationLengthError": "कोड 6 अंकों का होना चाहिए।",
+    "headlinesFeedEmptyFilteredHeadline": "आपके फ़िल्टर से कोई हेडलाइन मेल नहीं खाती",
+    "headlinesFeedEmptyFilteredSubheadline": "सभी हेडलाइंस देखने के लिए अपने फ़िल्टर मानदंडों को समायोजित करने या उन्हें साफ़ करने का प्रयास करें।",
+    "headlinesFeedClearFiltersButton": "फ़िल्टर साफ़ करें",
+    "headlinesFeedFilterLoadingCriteria": "फ़िल्टर विकल्प लोड हो रहे हैं...",
+    "pleaseWait": "कृपया प्रतीक्षा करें...",
+    "headlinesFeedFilterErrorCriteria": "फ़िल्टर विकल्प लोड नहीं हो सके।",
+    "headlinesFeedFilterCountryLabel": "देश",
+    "headlinesFeedFilterSourceTypeLabel": "प्रकार",
+    "headlinesFeedFilterErrorSources": "स्रोत लोड नहीं हो सके।",
+    "headlinesFeedFilterNoSourcesMatch": "आपके चयनित फ़िल्टर से कोई स्रोत मेल नहीं खाता।",
+    "searchModelTypeHeadline": "हेडलाइंस",
+    "searchModelTypeCategory": "श्रेणियां",
+    "searchModelTypeSource": "स्रोत",
+    "searchModelTypeCountry": "देश",
+    "searchHintTextHeadline": "जैसे, एआई प्रगति, मंगल रोवर...",
+    "searchHintTextGeneric": "खोजें...",
+    "searchHintTextCategory": "जैसे, प्रौद्योगिकी, खेल, वित्त...",
+    "searchHintTextSource": "जैसे, बीबीसी न्यूज़, टेकक्रंच, रॉयटर्स...",
+    "searchHintTextCountry": "जैसे, भारत, जापान, ब्राजील...",
+    "searchPageInitialHeadline": "अपनी खोज शुरू करें",
+    "searchPageInitialSubheadline": "शुरू करने के लिए एक प्रकार चुनें और कीवर्ड दर्ज करें।",
+    "followedCategoriesPageTitle": "फ़ॉलो की गई श्रेणियां",
+    "addCategoriesTooltip": "श्रेणियां जोड़ें",
+    "noFollowedCategoriesMessage": "आप अभी तक किसी भी श्रेणी को फ़ॉलो नहीं कर रहे हैं।",
+    "addCategoriesButtonLabel": "फ़ॉलो करने के लिए श्रेणियां खोजें",
+    "unfollowCategoryTooltip": "{categoryName} को अनफ़ॉलो करें",
+    "@unfollowCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Technology"
+            }
+        }
+    },
+    "addTopicsPageTitle": "विषयों को फ़ॉलो करें",
+    "topicFilterLoadingHeadline": "विषय लोड हो रहे हैं...",
+    "topicFilterError": "विषय लोड नहीं हो सके। कृपया पुन: प्रयास करें।",
+    "topicFilterEmptyHeadline": "कोई विषय नहीं मिला",
+    "topicFilterEmptySubheadline": "फिलहाल कोई विषय उपलब्ध नहीं है।",
+    "unfollowTopicTooltip": "{topicName} को अनफ़ॉलो करें",
+    "@unfollowTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followTopicTooltip": "{topicName} को फ़ॉलो करें",
+    "@followTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "फ़ॉलो किए गए स्रोत लोड हो रहे हैं...",
+    "followedSourcesErrorHeadline": "फ़ॉलो किए गए स्रोत लोड नहीं हो सके",
+    "followedSourcesEmptyHeadline": "कोई फ़ॉलो किया गया स्रोत नहीं",
+    "followedSourcesEmptySubheadline": "उन्हें यहाँ देखने के लिए स्रोतों को फ़ॉलो करना शुरू करें।",
+    "headlinesFeedFilterTopicLabel": "विषय",
+    "followedTopicsPageTitle": "फ़ॉलो किए गए विषय",
+    "addTopicsTooltip": "विषय जोड़ें",
+    "followedTopicsLoadingHeadline": "फ़ॉलो किए गए विषय लोड हो रहे हैं...",
+    "followedTopicsErrorHeadline": "फ़ॉलो किए गए विषय लोड नहीं हो सके",
+    "followedTopicsEmptyHeadline": "कोई फ़ॉलो किया गया विषय नहीं",
+    "followedTopicsEmptySubheadline": "उन्हें यहाँ देखने के लिए विषयों को फ़ॉलो करना शुरू करें।",
+    "followedSourcesPageTitle": "फ़ॉलो किए गए स्रोत",
+    "addSourcesTooltip": "स्रोत जोड़ें",
+    "noFollowedSourcesMessage": "आप अभी तक किसी भी स्रोत को फ़ॉलो नहीं कर रहे हैं।",
+    "addSourcesButtonLabel": "फ़ॉलो करने के लिए स्रोत खोजें",
+    "unfollowSourceTooltip": "{sourceName} को अनफ़ॉलो करें",
+    "@unfollowSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "BBC News"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "फ़ॉलो किए गए देश",
+    "addCountriesTooltip": "देश जोड़ें",
+    "noFollowedCountriesMessage": "आप अभी तक किसी भी देश को फ़ॉलो नहीं कर रहे हैं।",
+    "addCountriesButtonLabel": "फ़ॉलो करने के लिए देश खोजें",
+    "unfollowCountryTooltip": "{countryName} को अनफ़ॉलो करें",
+    "@unfollowCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "United States"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "फ़ॉलो करने के लिए श्रेणियां जोड़ें",
+    "categoryFilterError": "श्रेणियां लोड नहीं हो सकीं। कृपया पुन: प्रयास करें।",
+    "followCategoryTooltip": "{categoryName} को फ़ॉलो करें",
+    "@followCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "addSourcesPageTitle": "फ़ॉलो करने के लिए स्रोत जोड़ें",
+    "sourceFilterError": "स्रोत लोड नहीं हो सके। कृपया पुन: प्रयास करें।",
+    "followSourceTooltip": "{sourceName} को फ़ॉलो करें",
+    "@followSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "Tech News"
+            }
+        }
+    },
+    "addCountriesPageTitle": "फ़ॉलो करने के लिए देश जोड़ें",
+    "followCountryTooltip": "{countryName} को फ़ॉलो करें",
+    "@followCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "Germany"
+            }
+        }
+    },
+    "headlineDetailsSaveTooltip": "हेडलाइन सहेजें",
+    "headlineDetailsRemoveFromSavedTooltip": "सहेजे गए से निकालें",
+    "headlineSavedSuccessSnackbar": "हेडलाइन सहेजी गई!",
+    "headlineUnsavedSuccessSnackbar": "हेडलाइन सहेजे गए से हटा दी गई।",
+    "headlineSaveErrorSnackbar": "सहेजी गई स्थिति को अपडेट नहीं किया जा सका। कृपया पुन: प्रयास करें।",
+    "shareActionTooltip": "हेडलाइन साझा करें",
+    "sharingUnavailableSnackbar": "इस डिवाइस या प्लेटफॉर्म पर साझा करना उपलब्ध नहीं है।",
+    "similarHeadlinesSectionTitle": "आपको यह भी पसंद आ सकता है",
+    "similarHeadlinesEmpty": "कोई समान हेडलाइन नहीं मिली।",
+    "detailsPageTitle": "विवरण",
+    "followButtonLabel": "फ़ॉलो करें",
+    "unfollowButtonLabel": "अनफ़ॉलो करें",
+    "noHeadlinesFoundMessage": "इस आइटम के लिए कोई हेडलाइन नहीं मिली।",
+    "failedToLoadMoreHeadlines": "अधिक हेडलाइन लोड करने में विफल।",
+    "headlinesSectionTitle": "हेडलाइंस",
+    "headlinesFeedFilterApplyFollowedLabel": "मेरे फ़ॉलो किए गए आइटम को फ़िल्टर के रूप में लागू करें",
+    "mustBeLoggedInToUseFeatureError": "इस सुविधा का उपयोग करने के लिए आपको लॉग इन होना चाहिए।",
+    "noFollowedItemsForFilterSnackbar": "फ़िल्टर के रूप में उपयोग करने के लिए आप किसी भी आइटम को फ़ॉलो नहीं कर रहे हैं।",
+    "requestCodePageHeadline": "अपना ईमेल दर्ज करें",
+    "requestCodePageSubheadline": "हम आपकी पहचान सत्यापित करने के लिए आपके ईमेल पर एक सुरक्षित कोड भेजेंगे।",
+    "requestCodeEmailLabel": "ईमेल पता",
+    "requestCodeEmailHint": "you@example.com",
+    "requestCodeSendCodeButton": "कोड भेजें",
+    "requestCodeResendButtonCooldown": "{seconds} सेकंड में पुन: भेजें",
+    "@requestCodeResendButtonCooldown": {
+        "placeholders": {
+            "seconds": {
+                "type": "int",
+                "example": "60"
+            }
+        }
+    },
+    "entityDetailsCategoryTitle": "श्रेणी",
+    "entityDetailsSourceTitle": "स्रोत",
+    "entityDetailsTopicTitle": "विषय",
+    "entityDetailsCountryTitle": "देश",
+    "savedHeadlinesLoadingHeadline": "सहेजी गई हेडलाइंस लोड हो रही हैं...",
+    "savedHeadlinesLoadingSubheadline": "जब हम आपके सहेजे गए लेख प्राप्त करते हैं तो कृपया प्रतीक्षा करें।",
+    "savedHeadlinesErrorHeadline": "सहेजी गई हेडलाइंस लोड नहीं हो सकीं",
+    "savedHeadlinesEmptyHeadline": "कोई सहेजी गई हेडलाइन नहीं",
+    "savedHeadlinesEmptySubheadline": "आपने अभी तक कोई लेख नहीं सहेजा है। खोजना शुरू करें!",
+    "accountFollowedCountriesTile": "फ़ॉलो किए गए देश",
+    "followedCountriesLoadingHeadline": "फ़ॉलो किए गए देश लोड हो रहे हैं...",
+    "followedCountriesErrorHeadline": "फ़ॉलो किए गए देश लोड नहीं हो सके",
+    "followedCountriesEmptyHeadline": "कोई फ़ॉलो किया गया देश नहीं",
+    "followedCountriesEmptySubheadline": "उन्हें यहाँ देखने के लिए देशों को फ़ॉलो करना शुरू करें।",
+    "countryFilterError": "देश लोड नहीं हो सके। कृपया पुन: प्रयास करें।",
+    "followedCategoriesLoadingHeadline": "फ़ॉलो की गई श्रेणियां लोड हो रही हैं...",
+    "followedCategoriesErrorHeadline": "फ़ॉलो की गई श्रेणियां लोड नहीं हो सकीं",
+    "followedCategoriesEmptyHeadline": "कोई फ़ॉलो की गई श्रेणी नहीं",
+    "followedCategoriesEmptySubheadline": "उन्हें यहाँ देखने के लिए श्रेणियों को फ़ॉलो करना शुरू करें।",
+    "contentTypeHeadline": "हेडलाइंस",
+    "contentTypeTopic": "विषय",
+    "contentTypeSource": "स्रोत",
+    "contentTypeCountry": "देश",
+    "searchingFor": "{contentType} के लिए खोजा जा रहा है...",
+    "@searchingFor": {
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "लाइट",
+    "settingsAppearanceFontWeightRegular": "रेगुलर",
+    "settingsAppearanceFontWeightBold": "बोल्ड",
+    "maintenanceHeadline": "रखरखाव चल रहा है",
+    "maintenanceSubheadline": "हम वर्तमान में रखरखाव कर रहे हैं। कृपया बाद में पुनः देखें।",
+    "updateRequiredHeadline": "अपडेट आवश्यक है",
+    "updateRequiredSubheadline": "ऐप का एक नया संस्करण उपलब्ध है। ऐप का उपयोग जारी रखने के लिए कृपया अपडेट करें।",
+    "updateRequiredButton": "अभी अपडेट करें",
+    "neverShowAgain": "इसे फिर कभी न दिखाएं",
+    "followButtonText": "फ़ॉलो करें",
+    "unfollowButtonText": "अनफ़ॉलो करें",
+    "adInfoPlaceholderText": "विज्ञापन इस ऐप को मुफ़्त रखने में मदद करते हैं!",
+    "retryButtonText": "पुन: प्रयास करें",
+    "headlinesFeedFilterLoadingHeadline": "फ़िल्टर लोड हो रहे हैं",
+    "suggestedTopicsTitle": "सुझाए गए विषय",
+    "suggestedSourcesTitle": "सुझाए गए स्रोत",
+    "couldNotOpenUpdateUrl": "अपडेट URL नहीं खोला जा सका: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
+    },
+    "currentAppVersionLabel": "आपका वर्तमान संस्करण: {version}",
+    "@currentAppVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "आवश्यक संस्करण: {version}",
+    "@latestRequiredVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
+    },
+    "anonymousLimitTitle": "अधिक करने के लिए साइन इन करें",
+    "anonymousLimitBody": "अधिक बुकमार्क करने और फ़ॉलो करने के लिए एक मुफ़्त खाता बनाएं।",
+    "anonymousLimitButton": "साइन इन करें",
+    "standardLimitBody": "आप मुफ़्त योजना की अपनी सीमा तक पहुँच गए हैं। अधिक सहेजने और फ़ॉलो करने के लिए अपग्रेड करें।",
+    "standardLimitButton": "प्रीमियम में अपग्रेड करें",
+    "premiumLimitTitle": "आप सीमा तक पहुँच गए हैं",
+    "premiumLimitBody": "नए आइटम जोड़ने के लिए, कृपया अपनी मौजूदा सहेजी गई और फ़ॉलो की गई सामग्री की समीक्षा करें और प्रबंधित करें।",
+    "premiumLimitButton": "मेरी सामग्री प्रबंधित करें",
+    "saveButtonLabel": "सहेजें",
+    "cancelButtonLabel": "रद्द करें",
+    "manageFiltersPageTitle": "फ़िल्टर प्रबंधित करें",
+    "manageFiltersEmptyHeadline": "कोई सहेजा गया फ़िल्टर नहीं",
+    "manageFiltersEmptySubheadline": "आप फ़िल्टर पेज से फ़िल्टर सहेज सकते हैं।",
+    "manageFiltersRenameTooltip": "फ़िल्टर का नाम बदलें",
+    "manageFiltersDeleteTooltip": "फ़िल्टर हटाएं",
+    "saveFilterDialogTitleSave": "फ़िल्टर सहेजें",
+    "saveFilterDialogTitleRename": "फ़िल्टर का नाम बदलें",
+    "saveFilterDialogInputLabel": "फ़िल्टर का नाम",
+    "saveFilterDialogValidationEmpty": "नाम खाली नहीं हो सकता",
+    "saveFilterDialogValidationTooLong": "नाम बहुत लंबा है",
+    "saveFilterDialogGenericError": "फ़िल्टर सहेजते समय एक अप्रत्याशित त्रुटि हुई।",
+    "headlinesFilterSaveTooltip": "फ़िल्टर सहेजें",
+    "headlinesFilterManageTooltip": "फ़िल्टर प्रबंधित करें",
+    "savedFiltersBarOpenTooltip": "फ़िल्टर खोलें",
+    "savedFiltersBarAllLabel": "सभी",
+    "savedFiltersBarCustomLabel": "कस्टम",
+    "applyFilterDialogTitle": "फ़िल्टर लागू करें",
+    "applyFilterDialogContent": "क्या आप इन फ़िल्टर सेटिंग्स को केवल इस सत्र के लिए लागू करना चाहते हैं, या भविष्य के उपयोग के लिए सहेजना चाहते हैं?",
+    "applyFilterDialogApplyOnlyButton": "केवल लागू करें",
+    "applyFilterDialogApplyAndSaveButton": "लागु करें और सहेजें",
+    "savedFiltersBarFollowedLabel": "फ़ॉलो किया गया",
+    "sourceListFilterPageTitle": "स्रोत फ़िल्टर करें",
+    "sourceListFilterPageFilterButtonTooltip": "स्रोत सूची फ़िल्टर करें",
+    "sourceListFilterByHeadquartersPageTitle": "मुख्यालय स्थान",
+    "savedFiltersPageTitle": "सहेजे गए फ़िल्टर",
+    "savedFiltersEmptyHeadline": "कोई सहेजा गया फ़िल्टर नहीं",
+    "savedFiltersEmptySubheadline": "फ़ीड से आपके द्वारा सहेजे गए फ़िल्टर यहाँ दिखाई देंगे।",
+    "savedFiltersMenuRename": "नाम बदलें",
+    "savedFiltersMenuDelete": "हटाएं",
+    "discoverPageTitle": "खोजें",
+    "bottomNavDiscoverLabel": "खोजें",
+    "feedSearchHint": "हेडलाइंस खोजें...",
+    "headlineSearchEnterQuery": "हजारों स्रोतों से हेडलाइंस खोजें।",
+    "headlineSearchEnterQuerySubheadline": "हजारों स्रोतों से लेख खोजने के लिए कीवर्ड द्वारा खोजें।",
+    "headlineSearchNoResults": "कोई हेडलाइन नहीं मिली।",
+    "headlineSearchNoResultsSubheadline": "हमें आपकी खोज से मेल खाने वाली कोई हेडलाइन नहीं मिली। कृपया अलग कीवर्ड आज़माएं।",
+    "accountGuestAccount": "अतिथि खाता",
+    "accountRoleStandard": "मानक उपयोगकर्ता",
+    "accountRolePremium": "प्रीमियम उपयोगकर्ता",
+    "deleteConfirmationDialogTitle": "विलोपन की पुष्टि करें",
+    "deleteConfirmationDialogContent": "क्या आप वाकई इस आइटम को हटाना चाहते हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।",
+    "deleteConfirmationDialogConfirmButton": "हटाएं",
+    "headlineSearchInitialHeadline": "हेडलाइंस खोजें",
+    "headlineSearchInitialSubheadline": "लेख खोजने के लिए कीवर्ड दर्ज करें।",
+    "accountGuestUserHeadline": "अतिथि खाता",
+    "accountGuestUserSubheadline": "अपना डेटा सिंक करने के लिए साइन इन करें",
+    "discoverSearchHint": "स्रोत खोजें...",
+    "seeAllButtonLabel": "सभी देखें",
+    "failedToLoadMoreSources": "अधिक स्रोत लोड करने में विफल।",
+    "sourceTypeNewsAgency": "समाचार एजेंसी",
+    "sourceTypeLocalNewsOutlet": "स्थानीय समाचार आउटलेट",
+    "sourceTypeNationalNewsOutlet": "राष्ट्रीय समाचार आउटलेट",
+    "sourceTypeInternationalNewsOutlet": "अंतर्राष्ट्रीय समाचार आउटलेट",
+    "sourceTypeSpecializedPublisher": "विशिष्ट प्रकाशक",
+    "sourceTypeBlog": "ब्लॉग",
+    "sourceTypeGovernmentSource": "सरकारी स्रोत",
+    "sourceTypeAggregator": "एग्रीगेटर",
+    "sourceTypeOther": "अन्य",
+    "sourceTypeNewsAgencies": "समाचार एजेंसियां",
+    "sourceTypeLocalNewsOutlets": "स्थानीय समाचार आउटलेट",
+    "sourceTypeNationalNewsOutlets": "राष्ट्रीय समाचार आउटलेट",
+    "sourceTypeInternationalNewsOutlets": "अंतर्राष्ट्रीय समाचार आउटलेट",
+    "sourceTypeSpecializedPublishers": "विशिष्ट प्रकाशक",
+    "sourceTypeBlogs": "ब्लॉग",
+    "sourceTypeGovernmentSources": "सरकारी स्रोत",
+    "sourceTypeAggregators": "एग्रीगेटर",
+    "sourceTypeOthers": "अन्य",
+    "sourceTypeFilterEmptyHeadline": "कोई स्रोत प्रकार नहीं मिला",
+    "sourceTypeFilterEmptySubheadline": "फिलहाल फ़िल्टर करने के लिए कोई स्रोत प्रकार उपलब्ध नहीं है।",
+    "decoratorDismissedConfirmation": "सुझाव छिपा दिया गया।",
+    "decoratorDismissAction": "सुझाव छिपाएं",
+    "decoratorLinkAccountTitle_1": "अपने लेख और प्राथमिकताएं सहेजें",
+    "decoratorLinkAccountTitle_2": "अपनी सहेजी गई प्राथमिकताएं कभी न खोएं",
+    "decoratorLinkAccountDescription_1": "अधिक लेख सहेजने, अधिक विषयों को फ़ॉलो करने और अपने डिवाइसों में अपनी प्राथमिकताओं को सिंक करने के लिए एक मुफ़्त खाता बनाएं।",
+    "decoratorLinkAccountDescription_2": "अधिक सहेजने, अपनी फ़ॉलो की गई सामग्री का विस्तार करने और अपने समाचार फ़ीड को हर जगह सुसंगत रखने के लिए साइन अप करें।",
+    "decoratorLinkAccountCta_1": "अभी साइन अप करें",
+    "decoratorLinkAccountCta_2": "मुफ़्त खाता बनाएं",
+    "decoratorUpgradeTitle_1": "निर्बाध समाचार अनुभव का आनंद लें",
+    "decoratorUpgradeTitle_2": "अपनी प्रीमियम पहुंच अनलॉक करें",
+    "decoratorUpgradeDescription_1": "विज्ञापन-मुक्त जाएं और सहेजे गए लेखों और फ़ॉलो की गई सामग्री के लिए अपनी सीमाओं का विस्तार करें।",
+    "decoratorUpgradeDescription_2": "विज्ञापन-मुक्त अनुभव और अपनी पसंद की सामग्री को बहुत अधिक सहेजने और फ़ॉलो करने की क्षमता के लिए प्रीमियम में अपग्रेड करें।",
+    "decoratorUpgradeCta_1": "प्रीमियम में अपग्रेड करें",
+    "decoratorUpgradeCta_2": "और जानें",
+    "decoratorRateAppTitle_1": "ऐप का आनंद ले रहे हैं?",
+    "decoratorRateAppTitle_2": "अपनी प्रतिक्रिया साझा करें",
+    "decoratorRateAppDescription_1": "आपकी रेटिंग हमें सभी के लिए समाचार अनुभव को बेहतर बनाने में मदद करती है। आपकी राय मायने रखती है!",
+    "decoratorRateAppDescription_2": "आपकी प्रतिक्रिया हमें बेहतर समाचार देने में मदद करती है। हमें रेट करने के लिए कुछ समय निकालें!",
+    "decoratorRateAppCta_1": "अभी रेट करें",
+    "decoratorRateAppCta_2": "प्रतिक्रिया दें",
+    "decoratorEnableNotificationsTitle_1": "ब्रेकिंग न्यूज़ कभी न चूकें",
+    "decoratorEnableNotificationsTitle_2": "सूचित रहें, तुरंत",
+    "decoratorEnableNotificationsDescription_1": "अपने फ़ॉलो किए गए विषयों और स्रोतों से ब्रेकिंग न्यूज़ और अपडेट के लिए तुरंत अलर्ट प्राप्त करें।",
+    "decoratorEnableNotificationsDescription_2": "सीधे अपने डिवाइस पर व्यक्तिगत समाचार अपडेट प्राप्त करने के लिए सूचनाएं सक्षम करें।",
+    "decoratorEnableNotificationsCta_1": "अलर्ट सक्षम करें",
+    "decoratorEnableNotificationsCta_2": "सूचनाएं चालू करें",
+    "decoratorSuggestedTopicsTitle_1": "नई रुचियां खोजें",
+    "decoratorSuggestedTopicsTitle_2": "अपना ज्ञान बढ़ाएं",
+    "decoratorSuggestedSourcesTitle_1": "नए दृष्टिकोण खोजें",
+    "decoratorSuggestedSourcesTitle_2": "विश्वसनीय स्रोत खोजें",
+    "savedHeadlineFiltersPageTitle": "सहेजे गए फ़िल्टर",
+    "savedHeadlineFiltersCreateNewButton": "फ़िल्टर बनाएं",
+    "savedHeadlineFiltersLoadingHeadline": "आपके फ़िल्टर लोड हो रहे हैं...",
+    "savedHeadlineFiltersEmptyHeadline": "अभी तक कोई सहेजा गया फ़िल्टर नहीं",
+    "savedHeadlineFiltersEmptySubheadline": "आपके द्वारा बनाए और सहेजे गए फ़िल्टर यहाँ दिखाई देंगे। शुरू करने के लिए नीचे दिए गए बटन पर टैप करें।",
+    "savedFiltersMenuEdit": "संपादित करें",
+    "saveFilterDialogPinToFeedLabel": "फ़िल्टर बार में पिन करें",
+    "saveFilterDialogNotificationsLabel": "अधिसूचना प्राथमिकताएं",
+    "notificationDeliveryTypeBreakingOnly": "ब्रेकिंग न्यूज़",
+    "notificationDeliveryTypeDailyDigest": "दैनिक डाइजेस्ट",
+    "notificationDeliveryTypeWeeklyRoundup": "साप्ताहिक राउंडअप",
+    "prePermissionDialogTitle": "सूचनाएं सक्षम करें?",
+    "prePermissionDialogBody": "आपको इस फ़िल्टर के लिए ब्रेकिंग न्यूज़ अलर्ट और डाइजेस्ट भेजने के लिए, कृपया सूचनाओं की अनुमति दें।",
+    "prePermissionDialogDenyButton": "अभी नहीं",
+    "prePermissionDialogAllowButton": "अनुमति दें",
+    "notificationPermissionDeniedError": "अधिसूचना अनुमति अस्वीकार कर दी गई थी। आप इसे अपनी डिवाइस सेटिंग्स में सक्षम कर सकते हैं।",
+    "notificationCenterPageTitle": "सूचनाएं",
+    "notificationCenterMarkAllAsReadButton": "सभी को पढ़ा हुआ चिह्नित करें",
+    "notificationCenterLoadingHeadline": "सूचनाएं लोड हो रही हैं...",
+    "notificationCenterLoadingSubheadline": "कृपया प्रतीक्षा करें...",
+    "notificationCenterFailureHeadline": "सूचनाएं लोड करने में विफल",
+    "notificationCenterFailureSubheadline": "आपकी सूचनाएं प्राप्त नहीं की जा सकीं। कृपया पुन: प्रयास करें।",
+    "notificationCenterEmptyHeadline": "कोई सूचना नहीं",
+    "notificationCenterEmptySubheadline": "आपके पास कोई नई सूचना नहीं है।",
+    "notificationCenterTabBreakingNews": "ब्रेकिंग न्यूज़",
+    "notificationCenterTabDigests": "डाइजेस्ट",
+    "deleteReadNotificationsButtonTooltip": "सभी पढ़ी गई सूचनाएं हटाएं",
+    "deleteReadNotificationsDialogContent": "क्या आप वाकई इस टैब की सभी पढ़ी गई सूचनाएं हटाना चाहते हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।",
+    "deleteButtonLabel": "हटाएं",
+    "breakingNewsPrefix": "ब्रेकिंग न्यूज़",
+    "settingsFeedClickBehaviorLabel": "लिंक खोलें",
+    "settingsFeedClickBehaviorDefault": "ऐप डिफ़ॉल्ट",
+    "settingsFeedClickBehaviorInApp": "इन-ऐप ब्राउज़र",
+    "settingsFeedClickBehaviorSystem": "सिस्टम ब्राउज़र",
+    "continueToArticleButtonLabel": "लेख पर जारी रखें",
+    "headlineActionsModalTitle": "क्रियाएं",
+    "shareActionLabel": "साझा करें",
+    "bookmarkActionLabel": "बुकमार्क",
+    "removeBookmarkActionLabel": "बुकमार्क हटाएं",
+    "reportActionLabel": "रिपोर्ट करें",
+    "reportContentTitle": "सामग्री की रिपोर्ट करें",
+    "reportReasonSelectionPrompt": "कृपया अपनी रिपोर्ट के लिए एक कारण चुनें:",
+    "reportAdditionalCommentsLabel": "अतिरिक्त टिप्पणियाँ (वैकल्पिक)",
+    "reportSubmitButtonLabel": "रिपोर्ट सबमिट करें",
+    "reportSuccessSnackbar": "रिपोर्ट सबमिट की गई। आपकी प्रतिक्रिया के लिए धन्यवाद।",
+    "reportFailureSnackbar": "रिपोर्ट सबमिट करने में विफल। कृपया पुन: प्रयास करें।",
+    "commentsTitle": "टिप्पणियाँ",
+    "commentPostButtonLabel": "पोस्ट करें",
+    "commentInputHint": "एक टिप्पणी जोड़ें...",
+    "commentRequiresReactionError": "टिप्पणी पोस्ट करने के लिए कृपया एक प्रतिक्रिया चुनें।",
+    "likeActionLabel": "पसंद करें",
+    "dislikeActionLabel": "नापसंद करें",
+    "commentActionLabel": "टिप्पणी",
+    "moreActionLabel": "अधिक",
+    "rateAppPromptTitle": "ऐप का आनंद ले रहे हैं?",
+    "rateAppPromptBody": "आपकी प्रतिक्रिया हमें बेहतर बनाने में मदद करती है। क्या आप हमें रेट करना चाहेंगे?",
+    "rateAppPromptYesButton": "यह बहुत अच्छा है!",
+    "rateAppPromptNoButton": "सुधार की आवश्यकता है",
+    "feedbackPromptTitle": "हम कैसे सुधार कर सकते हैं?",
+    "feedbackPromptReasonUI": "UI / डिज़ाइन",
+    "feedbackPromptReasonPerformance": "प्रदर्शन / गति",
+    "feedbackPromptReasonContent": "सामग्री की गुणवत्ता",
+    "feedbackPromptReasonOther": "अन्य",
+    "feedbackPromptSubmitButton": "प्रतिक्रिया सबमिट करें",
+    "rateAppNegativeFollowUpTitle_1": "अब हम कैसा कर रहे हैं?",
+    "rateAppNegativeFollowUpTitle_2": "क्या हमने सुधार किया है?",
+    "rateAppNegativeFollowUpBody_1": "हम आपकी प्रतिक्रिया पर काम कर रहे हैं। क्या आप अपनी रेटिंग पर पुनर्विचार करेंगे?",
+    "rateAppNegativeFollowUpBody_2": "हम आपकी राय को महत्व देते हैं। हमें बताएं कि क्या चीजें बेहतर हैं।",
+    "noCommentsYet": "अभी तक कोई टिप्पणी नहीं।",
+    "commentInputNoReactionHint": "टिप्पणी जोड़ने के लिए प्रतिक्रिया दें",
+    "headlineReportReasonMisinformation": "गलत सूचना या फर्जी खबर",
+    "headlineReportReasonClickbait": "क्लिकबेट या भ्रामक शीर्षक",
+    "headlineReportReasonOffensive": "अपमानजनक या नफरत फैलाने वाला भाषण",
+    "headlineReportReasonSpam": "स्पैम या घोटाला",
+    "headlineReportReasonBrokenLink": "टूटा हुआ लिंक",
+    "headlineReportReasonPaywalled": "पेवॉल सामग्री",
+    "sourceReportReasonLowQuality": "निम्न-गुणवत्ता वाली पत्रकारिता",
+    "sourceReportReasonHighAdDensity": "अत्यधिक विज्ञापन या पॉपअप",
+    "sourceReportReasonFrequentPaywalls": "बार-बार पेवॉल",
+    "sourceReportReasonImpersonation": "प्रतिरूपण",
+    "sourceReportReasonMisinformation": "गलत सूचना",
+    "commentReportReasonSpam": "स्पैम या विज्ञापन",
+    "commentReportReasonHarassment": "उत्पीड़न या बदमाशी",
+    "commentReportReasonHateSpeech": "नफरत फैलाने वाला भाषण",
+    "limitReachedTitle": "सीमा समाप्त",
+    "manageMyContentButton": "मेरी सामग्री प्रबंधित करें",
+    "upgradeButton": "अपग्रेड करें",
+    "createAccountButton": "खाता बनाएं",
+    "gotItButton": "समझ गया",
+    "commentsPageTitle": "टिप्पणियाँ",
+    "commentsCount": "{count,plural, =1{1 टिप्पणी}other{{count} टिप्पणियाँ}}",
+    "@commentsCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "खाता आवश्यक है",
+    "limitReachedGuestUserBody": "समुदाय के साथ जुड़ने और इस सुविधा का उपयोग करने के लिए कृपया एक मुफ़्त खाता बनाएं या साइन इन करें।",
+    "limitReachedBodyFollow": "आप फ़ॉलो किए गए आइटम की अपनी सीमा तक पहुँच गए हैं। अधिक फ़ॉलो करने के लिए, कृपया अपनी मौजूदा फ़ॉलो की गई सामग्री की समीक्षा करें।",
+    "limitReachedBodySave": "आप सहेजे गए लेखों की अपनी सीमा तक पहुँच गए हैं। अधिक सहेजने के लिए, कृपया अपने मौजूदा सहेजे गए लेखों की समीक्षा करें।",
+    "limitReachedBodySaveFilters": "आप सहेजे गए फ़िल्टर की अपनी सीमा तक पहुँच गए हैं। नए बनाने के लिए, कृपया अपने मौजूदा फ़िल्टर की समीक्षा करें।",
+    "limitReachedBodyPinFilters": "आप पिन किए गए फ़िल्टर की अपनी सीमा तक पहुँच गए हैं। एक नया पिन करने के लिए, कृपया मौजूदा फ़िल्टर को अन-पिन करें।",
+    "limitReachedBodySubscribeToNotifications": "आप अधिसूचना सदस्यता की अपनी सीमा तक पहुँच गए हैं। नए अलर्ट की सदस्यता लेने के लिए, कृपया अपनी मौजूदा सदस्यताओं की समीक्षा करें।",
+    "limitReachedBodyComments": "आप टिप्पणियाँ पोस्ट करने की अपनी दैनिक सीमा तक पहुँच गए हैं। कृपया कल पुन: प्रयास करें।",
+    "limitReachedBodyReactions": "आप प्रतिक्रियाओं की अपनी दैनिक सीमा तक पहुँच गए हैं। कृपया कल पुन: प्रयास करें।",
+    "limitReachedBodyReports": "आप रिपोर्ट सबमिट करने की अपनी दैनिक सीमा तक पहुँच गए हैं। कृपया कल पुन: प्रयास करें।",
+    "commentEditButtonLabel": "अपडेट करें",
+    "commentPostFailureSnackbar": "टिप्पणी पोस्ट करने में विफल। कृपया पुन: प्रयास करें।",
+    "commentUpdateFailureSnackbar": "टिप्पणी अपडेट करने में विफल। कृपया पुन: प्रयास करें।",
+    "commentInputDisabledHint": "बातचीत में शामिल होने के लिए साइन इन करें",
+    "commentInputExistingHint": "आपने इस हेडलाइन पर पहले ही टिप्पणी कर दी है।",
+    "commenterName": "उपयोगकर्ता {id}",
+    "@commenterName": {
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
+    },
+    "accountRewardsTile": "पुरस्कार और ऑफ़र",
+    "rewardsPageTitle": "पुरस्कार",
+    "rewardsOfferTitle": "{duration} के लिए {rewardName} प्राप्त करें",
+    "@rewardsOfferTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} सक्रिय",
+    "@rewardsOfferActiveTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "समाप्त होने में समय: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "वीडियो देखें",
+    "rewardsOfferVerifyingButton": "सत्यापित किया जा रहा है...",
+    "rewardsOfferLoadingButton": "विज्ञापन लोड हो रहा है...",
+    "rewardsSnackbarSuccess": "पुरस्कार अनलॉक: {rewardName} अब सक्रिय है।",
+    "@rewardsSnackbarSuccess": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "सत्यापन विफल। कृपया कुछ ही क्षणों में पुन: प्रयास करें।",
+    "rewardsAdDismissedSnackbar": "विज्ञापन खारिज कर दिया गया। पुरस्कार अर्जित करने के लिए कृपया पूरा विज्ञापन देखें।",
+    "decoratorUnlockRewardsTitle": "विज्ञापन-मुक्त अनुभव अनलॉक करें",
+    "decoratorUnlockRewardsDescription": "{duration} के लिए विज्ञापनों के बिना ऐप का आनंद लेने के लिए एक छोटा वीडियो देखें।",
+    "@decoratorUnlockRewardsDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "decoratorUnlockRewardsCta": "अभी देखें",
+    "rewardsDurationDays": "{count, plural, =1{1 दिन} other{{count} दिन}}",
+    "@rewardsDurationDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "rewardTypeAdFree": "विज्ञापन-मुक्त",
+    "rewardTypeDailyDigest": "दैनिक डाइजेस्ट",
+    "unlockMoreButton": "अधिक अनलॉक करें",
+    "requiresActiveReward": "एक सक्रिय पुरस्कार की आवश्यकता है। आप खाता पेज से पुरस्कार अनलॉक कर सकते हैं।",
+    "rewardsAdFreeTitle": "विज्ञापन-मुक्त अनुभव का आनंद लें",
+    "rewardsAdFreeDescription": "{duration} के लिए ऐप से सभी विज्ञापनों को हटाने के लिए एक छोटा वीडियो देखें।",
+    "@rewardsAdFreeDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "दैनिक समाचार डाइजेस्ट अनलॉक करें",
+    "rewardsDailyDigestDescription": "आपके सहेजे गए फ़िल्टर से शीर्ष हेडलाइंस का सारांश देने वाला दैनिक पुश नोटिफिकेशन प्राप्त करें जिनमें 'दैनिक डाइजेस्ट' विकल्प सक्षम है। {duration} के लिए सक्रिय।",
+    "@rewardsDailyDigestDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "सक्रिय",
+    "rewardsAdFreePageTitle": "विज्ञापन-मुक्त अनुभव",
+    "rewardsAdFreeInactiveHeadline": "विज्ञापन-मुक्त अनुभव का आनंद लें",
+    "rewardsAdFreeInactiveBody": "{duration} के लिए बिना किसी रुकावट के ऐप का आनंद लेने के लिए एक छोटा विज्ञापन देखें।",
+    "@rewardsAdFreeInactiveBody": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "विज्ञापन-मुक्त अनुभव सक्रिय है",
+    "rewardsAdFreeActiveBody": "आपकी विज्ञापन-मुक्त पहुंच समाप्त होने में समय:",
+    "appTourStep1Title": "आपका समाचार, पूरी तरह से अनुकूलित",
+    "appTourStep1Body": "एक फ़ीड प्राप्त करें जो आपके लिए बनाई गई है। उन विषयों, स्रोतों और देशों को फ़ॉलो करें जो आपके लिए सबसे अधिक मायने रखते हैं और हम बाकी काम संभाल लेंगे।",
+    "appTourStep2Title": "क्यूरेट करें और सूचित रहें",
+    "appTourStep2Body": "किसी भी क्षेत्र के लिए कस्टम समाचार फ़ीड बनाएं और सहेजें। उन कहानियों के लिए ब्रेकिंग न्यूज़ अलर्ट या दैनिक डाइजेस्ट प्राप्त करने के लिए सदस्यता लें जिन्हें आप छोड़ नहीं सकते।",
+    "appTourStep3Title": "अपना दृष्टिकोण साझा करें",
+    "appTourStep3Body": "वैश्विक समुदाय के साथ जुड़ने के लिए लेखों पर प्रतिक्रिया दें और टिप्पणी करें। आपकी आवाज़ बातचीत को आकार देने में मदद करती है।",
+    "appTourSkipButton": "छोड़ें",
+    "appTourNextButton": "अगला",
+    "appTourGetStartedButton": "शुरू करें",
+    "initialPersonalizationTitle": "अपना फ़ीड कस्टमाइज़ करें",
+    "initialPersonalizationSubtitle": "शुरू करने के लिए कुछ विषयों, स्रोतों या देशों को फ़ॉलो करें। आप इन्हें बाद में कभी भी बदल सकते हैं।",
+    "initialPersonalizationStepTopicsTitle": "विषय चुनें",
+    "initialPersonalizationStepSourcesTitle": "स्रोत चुनें",
+    "initialPersonalizationStepCountriesTitle": "देश चुनें",
+    "initialPersonalizationTotalSelectionCountLabel": "{count} चयनित",
+    "@initialPersonalizationTotalSelectionCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "समाप्त करें",
+    "deleteAccountDialogTitle": "खाता हटाएं",
+    "deleteAccountDialogContent": "क्या आप वाकई अपना खाता स्थायी रूप से हटाना चाहते हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।",
+    "deleteAccountDialogConfirm": "खाता हटाएं",
+    "deleteAccountButton": "खाता हटाएं",
+    "followedContentEmpty": "आप अभी तक इस श्रेणी में किसी भी आइटम को फ़ॉलो नहीं कर रहे हैं।",
+    "followedContentEmptySubheadline": "आपके द्वारा फ़ॉलो किए गए आइटम यहाँ दिखाई देंगे। और जोड़ने के लिए '+' बटन का उपयोग करें।",
+    "multiSelectSearchPageSelectionCount": "{count}/{total}",
+    "@multiSelectSearchPageSelectionCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "guestUserDisplayName": "अतिथि",
+    "accountPageSyncProgressButton": "प्रगति सिंक करें",
+    "applyButtonLabel": "लागू करें",
+    "commentStatusPending": "समीक्षाधीन"
+}

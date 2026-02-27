@@ -1,0 +1,786 @@
+{
+    "@@locale": "pt",
+    "accountLinkingPageTitle": "Sincronizar Seu Progresso",
+    "accountLinkingGenericError": "Ocorreu um erro",
+    "accountLinkingEmailSentSuccess": "Verifique seu e-mail para o link!",
+    "accountLinkingHeadline": "Salvar Seu Progresso",
+    "accountLinkingBody": "Crie uma conta para sincronizar seus itens seguidos.",
+    "accountLinkingContinueWithGoogleButton": "Continuar com Google",
+    "accountLinkingEmailInputLabel": "Digite seu e-mail",
+    "accountLinkingEmailInputHint": "voce@exemplo.com",
+    "accountLinkingEmailValidationError": "Insira um e-mail válido",
+    "accountLinkingSendLinkButton": "Sincronizar com E-mail",
+    "accountPageTitle": "Conta",
+    "accountAnonymousUser": "(Anônimo)",
+    "accountNoNameUser": "Sem Nome",
+    "accountStatusAuthenticated": "Autenticado",
+    "accountStatusAnonymous": "Sessão Anônima",
+    "accountStatusUnauthenticated": "Não Autenticado",
+    "accountSettingsTile": "Configurações",
+    "accountSignOutTile": "Sair",
+    "accountBackupTile": "Criar Conta para Salvar Dados",
+    "accountContentPreferencesTile": "Conteúdo seguido",
+    "accountSavedHeadlinesTile": "Manchetes Salvas",
+    "accountRoleLabel": "Papel: {role}",
+    "@accountRoleLabel": {
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
+    "accountMyContentSectionTitle": "Meu Conteúdo",
+    "accountActivityAndRewardsSectionTitle": "Atividade e Recompensas",
+    "accountGeneralSectionTitle": "Geral",
+    "accountEditProfileButton": "Editar Perfil",
+    "editProfilePageTitle": "Editar Perfil",
+    "editProfileNameInputLabel": "Nome",
+    "editProfileEmailInputLabel": "E-mail",
+    "editProfileUpdateSuccessSnackbar": "Perfil atualizado com sucesso.",
+    "editProfileUpdateFailureSnackbar": "Falha ao atualizar o perfil.",
+    "followedContentPageTitle": "Itens Seguidos",
+    "followedContentTopicsTab": "Tópicos",
+    "followedContentSourcesTab": "Fontes",
+    "authenticationEmailSentSuccess": "Verifique seu e-mail para o link.",
+    "authenticationPageTitle": "Entrar / Registrar",
+    "authenticationEmailLabel": "E-mail",
+    "authenticationSendLinkButton": "Enviar Link de Login",
+    "authenticationOrDivider": "OU",
+    "authenticationGoogleSignInButton": "Entrar com Google",
+    "authenticationAnonymousSignInButton": "Continuar Anonimamente",
+    "headlineDetailsInitialHeadline": "Aguardando Detalhes",
+    "headlineDetailsInitialSubheadline": "Por favor, aguarde...",
+    "headlineDetailsLoadingHeadline": "Carregando Manchete",
+    "headlineDetailsLoadingSubheadline": "Buscando dados...",
+    "headlineDetailsContinueReadingButton": "Continuar Lendo",
+    "headlinesFeedLoadingHeadline": "Carregando...",
+    "headlinesFeedLoadingSubheadline": "Buscando manchetes",
+    "headlinesFeedFilterTitle": "Filtrar Manchetes",
+    "headlinesFeedFilterCategoryLabel": "Categoria",
+    "headlinesFeedFilterAllOption": "Todos",
+    "headlinesFeedFilterCategoryTechnology": "Tecnologia",
+    "headlinesFeedFilterCategoryBusiness": "Negócios",
+    "headlinesFeedFilterCategorySports": "Esportes",
+    "headlinesFeedFilterSourceLabel": "Fontes",
+    "headlinesFeedFilterSourceCNN": "CNN",
+    "headlinesFeedFilterSourceReuters": "Reuters",
+    "headlinesFeedFilterEventCountryLabel": "Países",
+    "headlinesFeedFilterSourceCountryLabel": "Sede da Fonte",
+    "headlinesFeedFilterCountryUS": "Estados Unidos",
+    "headlinesFeedFilterCountryUK": "Reino Unido",
+    "headlinesFeedFilterCountryCA": "Canadá",
+    "headlinesFeedFilterApplyButton": "Aplicar Filtros",
+    "headlinesFeedFilterResetButton": "Redefinir Filtros",
+    "headlinesSearchHintText": "Pesquisar Manchetes...",
+    "headlinesSearchInitialHeadline": "Encontre Manchetes Instantaneamente",
+    "headlinesSearchInitialSubheadline": "Digite palavras-chave acima.",
+    "headlinesSearchNoResultsHeadline": "Nenhum resultado",
+    "headlinesSearchNoResultsSubheadline": "Tente outro termo",
+    "authenticationEmailSignInButton": "Continuar com E-mail",
+    "authenticationLinkingHeadline": "Sincronizar Seu Progresso",
+    "authenticationLinkingSubheadline": "Crie uma conta para salvar tudo.",
+    "authenticationSignInHeadline": "Veritas",
+    "authenticationSignInSubheadline": "Notícias de fontes confiáveis.",
+    "emailSignInPageTitle": "Entrar com E-mail",
+    "emailSignInExplanation": "Enviaremos um link seguro para seu e-mail.",
+    "emailLinkSentPageTitle": "Verifique Seu E-mail",
+    "emailLinkSentConfirmation": "Link enviado! Verifique sua caixa de entrada.",
+    "accountConnectPrompt": "Conectar Conta",
+    "accountConnectBenefit": "Salve suas preferências em vários dispositivos.",
+    "bottomNavFeedLabel": "Feed",
+    "bottomNavSearchLabel": "Pesquisar",
+    "bottomNavAccountLabel": "Conta",
+    "accountNotificationsTile": "Notificações",
+    "headlinesSearchActionTooltip": "Pesquisar",
+    "notificationsTooltip": "Ver notificações",
+    "accountSignInPromptButton": "Inscrever-se / Entrar",
+    "categoryFilterLoadingHeadline": "Carregando Categorias...",
+    "categoryFilterLoadingSubheadline": "Buscando categorias disponíveis.",
+    "categoryFilterEmptyHeadline": "Nenhuma Categoria Encontrada",
+    "categoryFilterEmptySubheadline": "Não há categorias disponíveis.",
+    "countryFilterLoadingHeadline": "Carregando Países...",
+    "countryFilterLoadingSubheadline": "Buscando países disponíveis.",
+    "countryFilterEmptyHeadline": "Nenhum País Encontrado",
+    "countryFilterEmptySubheadline": "Não há países disponíveis.",
+    "headlinesFeedAppBarTitle": "HT",
+    "headlinesFeedFilterTooltip": "Filtrar Manchetes",
+    "headlinesFeedFilterAllLabel": "Tudo",
+    "headlinesFeedFilterSelectedCountLabel": "{count} selecionados",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "Carregando Fontes...",
+    "sourceFilterLoadingSubheadline": "Buscando fontes disponíveis.",
+    "sourceFilterEmptyHeadline": "Nenhuma Fonte Encontrada",
+    "sourceFilterEmptySubheadline": "Não há fontes disponíveis.",
+    "settingsTitle": "Configurações",
+    "settingsLoadingHeadline": "Carregando Configurações...",
+    "settingsLoadingSubheadline": "Buscando suas preferências.",
+    "settingsErrorDefault": "Não foi possível carregar as configurações.",
+    "settingsAppearanceTitle": "Aparência",
+    "settingsFeedDisplayTitle": "Feed",
+    "settingsArticleDisplayTitle": "Exibição do Artigo",
+    "settingsNotificationsTitle": "Notificações",
+    "settingsAppearanceThemeModeLight": "Claro",
+    "settingsAppearanceThemeModeDark": "Escuro",
+    "settingsAppearanceThemeModeSystem": "Sistema",
+    "settingsAppearanceThemeNameRed": "Vermelho",
+    "settingsAppearanceThemeNameBlue": "Azul",
+    "settingsAppearanceThemeNameGrey": "Cinza",
+    "settingsAppearanceFontSizeSmall": "Pequeno",
+    "settingsAppearanceFontSizeLarge": "Grande",
+    "settingsAppearanceFontSizeMedium": "Médio",
+    "settingsAppearanceThemeModeLabel": "Modo do Tema",
+    "settingsAppearanceThemeNameLabel": "Esquema de Cores",
+    "settingsAppearanceAppFontSizeLabel": "Tamanho da Fonte do App",
+    "settingsAppearanceAppFontTypeLabel": "Fonte do App",
+    "settingsAppearanceFontWeightLabel": "Peso da Fonte",
+    "settingsFeedTileTypeImageTop": "Imagem no Topo",
+    "settingsFeedTileTypeImageStart": "Imagem no Início",
+    "settingsFeedTileTypeTextOnly": "Apenas Texto",
+    "settingsFeedTileTypeLabel": "Layout do Card do Feed",
+    "settingsArticleFontSizeLabel": "Tamanho da Fonte do Artigo",
+    "settingsNotificationsEnableLabel": "Ativar Notificações",
+    "settingsNotificationsCategoriesLabel": "Categorias Seguidas",
+    "settingsNotificationsSourcesLabel": "Fontes Seguidas",
+    "settingsNotificationsCountriesLabel": "Países Seguidos",
+    "settingsAppearanceSectionTitle": "APARÊNCIA",
+    "settingsFeedSectionTitle": "FEED",
+    "settingsGeneralSectionTitle": "GERAL",
+    "settingsAccentColorAndFontsTitle": "Cor de Destaque e Fontes",
+    "settingsAccentColorLabel": "Cor de Destaque",
+    "settingsFontFamilyLabel": "Família da Fonte",
+    "settingsLayoutAndReadingTitle": "Layout e Leitura",
+    "appName": "Headlines Toolkit",
+    "unknownError": "Ocorreu um erro desconhecido.",
+    "loadMoreError": "Falha ao carregar mais itens.",
+    "settingsAppearanceFontSizeExtraLarge": "Extra Grande",
+    "settingsAppearanceFontFamilySystemDefault": "Padrão do Sistema",
+    "settingsAppearanceFontFamilyRoboto": "Roboto",
+    "settingsAppearanceFontFamilyOpenSans": "Open Sans",
+    "settingsAppearanceThemeSubPageTitle": "Configurações de Tema",
+    "settingsAppearanceFontSubPageTitle": "Configurações de Fonte",
+    "settingsLanguageTitle": "Idioma",
+    "emailCodeSentPageTitle": "Digite o Código",
+    "emailCodeSentConfirmation": "Código enviado para {email}.",
+    "@emailCodeSentConfirmation": {
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "Digite o código de 6 dígitos recebido.",
+    "emailCodeVerificationHint": "Código de 6 dígitos",
+    "emailCodeVerificationButtonLabel": "Verificar Código",
+    "emailCodeValidationEmptyError": "Digite o código de 6 dígitos.",
+    "emailCodeValidationLengthError": "O código deve ter 6 dígitos.",
+    "headlinesFeedEmptyFilteredHeadline": "Nenhum Resultado para os Filtros",
+    "headlinesFeedEmptyFilteredSubheadline": "Tente ajustar seus filtros.",
+    "headlinesFeedClearFiltersButton": "Limpar Filtros",
+    "headlinesFeedFilterLoadingCriteria": "Carregando filtros...",
+    "pleaseWait": "Aguarde...",
+    "headlinesFeedFilterErrorCriteria": "Erro ao carregar filtros.",
+    "headlinesFeedFilterCountryLabel": "Países",
+    "headlinesFeedFilterSourceTypeLabel": "Tipos",
+    "headlinesFeedFilterErrorSources": "Erro ao carregar fontes.",
+    "headlinesFeedFilterNoSourcesMatch": "Nenhuma fonte corresponde ao filtro.",
+    "searchModelTypeHeadline": "Manchetes",
+    "searchModelTypeCategory": "Categorias",
+    "searchModelTypeSource": "Fontes",
+    "searchModelTypeCountry": "Países",
+    "searchHintTextHeadline": "ex: IA, Marte, Economia...",
+    "searchHintTextGeneric": "Pesquisar...",
+    "searchHintTextCategory": "ex: Tecnologia, Esportes...",
+    "searchHintTextSource": "ex: BBC, Reuters...",
+    "searchHintTextCountry": "ex: Brasil, Portugal...",
+    "searchPageInitialHeadline": "Inicie Sua Pesquisa",
+    "searchPageInitialSubheadline": "Selecione um tipo e digite palavras-chave.",
+    "followedCategoriesPageTitle": "Categorias Seguidas",
+    "addCategoriesTooltip": "Adicionar Categorias",
+    "noFollowedCategoriesMessage": "Você não segue nenhuma categoria.",
+    "addCategoriesButtonLabel": "Encontrar Categorias",
+    "unfollowCategoryTooltip": "Deixar de seguir {categoryName}",
+    "@unfollowCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Technology"
+            }
+        }
+    },
+    "addTopicsPageTitle": "Seguir Tópicos",
+    "topicFilterLoadingHeadline": "Carregando Tópicos...",
+    "topicFilterError": "Erro ao carregar tópicos.",
+    "topicFilterEmptyHeadline": "Nenhum Tópico Encontrado",
+    "topicFilterEmptySubheadline": "Não há tópicos disponíveis.",
+    "unfollowTopicTooltip": "Deixar de seguir {topicName}",
+    "@unfollowTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followTopicTooltip": "Seguir {topicName}",
+    "@followTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "Carregando Fontes Seguidas...",
+    "followedSourcesErrorHeadline": "Erro ao Carregar Fontes",
+    "followedSourcesEmptyHeadline": "Nenhuma Fonte Seguida",
+    "followedSourcesEmptySubheadline": "Siga fontes para vê-las aqui.",
+    "headlinesFeedFilterTopicLabel": "Tópico",
+    "followedTopicsPageTitle": "Tópicos Seguidos",
+    "addTopicsTooltip": "Adicionar Tópicos",
+    "followedTopicsLoadingHeadline": "Carregando Tópicos Seguidos...",
+    "followedTopicsErrorHeadline": "Erro ao Carregar Tópicos",
+    "followedTopicsEmptyHeadline": "Nenhum Tópico Seguido",
+    "followedTopicsEmptySubheadline": "Siga tópicos para vê-los aqui.",
+    "followedSourcesPageTitle": "Fontes Seguidas",
+    "addSourcesTooltip": "Adicionar Fontes",
+    "noFollowedSourcesMessage": "Você não segue nenhuma fonte.",
+    "addSourcesButtonLabel": "Encontrar Fontes",
+    "unfollowSourceTooltip": "Deixar de seguir {sourceName}",
+    "@unfollowSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "BBC News"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "Países Seguidos",
+    "addCountriesTooltip": "Adicionar Países",
+    "noFollowedCountriesMessage": "Você não segue nenhum país.",
+    "addCountriesButtonLabel": "Encontrar Países",
+    "unfollowCountryTooltip": "Deixar de seguir {countryName}",
+    "@unfollowCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "United States"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "Adicionar Categorias",
+    "categoryFilterError": "Erro ao carregar categorias.",
+    "followCategoryTooltip": "Seguir {categoryName}",
+    "@followCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "addSourcesPageTitle": "Adicionar Fontes",
+    "sourceFilterError": "Erro ao carregar fontes.",
+    "followSourceTooltip": "Seguir {sourceName}",
+    "@followSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "Tech News"
+            }
+        }
+    },
+    "addCountriesPageTitle": "Adicionar Países",
+    "followCountryTooltip": "Seguir {countryName}",
+    "@followCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "Germany"
+            }
+        }
+    },
+    "headlineDetailsSaveTooltip": "Salvar manchete",
+    "headlineDetailsRemoveFromSavedTooltip": "Remover dos salvos",
+    "headlineSavedSuccessSnackbar": "Manchete salva!",
+    "headlineUnsavedSuccessSnackbar": "Manchete removida.",
+    "headlineSaveErrorSnackbar": "Erro ao atualizar status.",
+    "shareActionTooltip": "Compartilhar manchete",
+    "sharingUnavailableSnackbar": "Compartilhamento indisponível.",
+    "similarHeadlinesSectionTitle": "Você Também Pode Gostar",
+    "similarHeadlinesEmpty": "Nenhuma manchete semelhante.",
+    "detailsPageTitle": "Detalhes",
+    "followButtonLabel": "Seguir",
+    "unfollowButtonLabel": "Deixar de seguir",
+    "noHeadlinesFoundMessage": "Nenhuma manchete encontrada.",
+    "failedToLoadMoreHeadlines": "Erro ao carregar mais manchetes.",
+    "headlinesSectionTitle": "Manchetes",
+    "headlinesFeedFilterApplyFollowedLabel": "Usar meus itens seguidos",
+    "mustBeLoggedInToUseFeatureError": "Você deve estar logado.",
+    "noFollowedItemsForFilterSnackbar": "Você não segue itens para filtrar.",
+    "requestCodePageHeadline": "Digite Seu E-mail",
+    "requestCodePageSubheadline": "Enviaremos um código de verificação.",
+    "requestCodeEmailLabel": "E-mail",
+    "requestCodeEmailHint": "voce@exemplo.com",
+    "requestCodeSendCodeButton": "Enviar Código",
+    "requestCodeResendButtonCooldown": "Reenviar em {seconds}s",
+    "@requestCodeResendButtonCooldown": {
+        "placeholders": {
+            "seconds": {
+                "type": "int",
+                "example": "60"
+            }
+        }
+    },
+    "entityDetailsCategoryTitle": "Categoria",
+    "entityDetailsSourceTitle": "Fonte",
+    "entityDetailsTopicTitle": "Tópico",
+    "entityDetailsCountryTitle": "País",
+    "savedHeadlinesLoadingHeadline": "Carregando Manchetes Salvas...",
+    "savedHeadlinesLoadingSubheadline": "Buscando seus artigos.",
+    "savedHeadlinesErrorHeadline": "Erro ao Carregar Salvos",
+    "savedHeadlinesEmptyHeadline": "Nenhuma Manchete Salva",
+    "savedHeadlinesEmptySubheadline": "Você ainda não salvou artigos.",
+    "accountFollowedCountriesTile": "Países Seguidos",
+    "followedCountriesLoadingHeadline": "Carregando Países Seguidos...",
+    "followedCountriesErrorHeadline": "Erro ao Carregar Países",
+    "followedCountriesEmptyHeadline": "Nenhum País Seguido",
+    "followedCountriesEmptySubheadline": "Siga países para vê-los aqui.",
+    "countryFilterError": "Erro ao carregar países.",
+    "followedCategoriesLoadingHeadline": "Carregando Categorias Seguidas...",
+    "followedCategoriesErrorHeadline": "Erro ao Carregar Categorias",
+    "followedCategoriesEmptyHeadline": "Nenhuma Categoria Seguida",
+    "followedCategoriesEmptySubheadline": "Siga categorias para vê-las aqui.",
+    "contentTypeHeadline": "Manchetes",
+    "contentTypeTopic": "Tópicos",
+    "contentTypeSource": "Fontes",
+    "contentTypeCountry": "Países",
+    "searchingFor": "Pesquisando por {contentType}...",
+    "@searchingFor": {
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "Leve",
+    "settingsAppearanceFontWeightRegular": "Regular",
+    "settingsAppearanceFontWeightBold": "Negrito",
+    "maintenanceHeadline": "Em Manutenção",
+    "maintenanceSubheadline": "Voltaremos em breve.",
+    "updateRequiredHeadline": "Atualização Necessária",
+    "updateRequiredSubheadline": "Atualize para continuar usando o app.",
+    "updateRequiredButton": "Atualizar Agora",
+    "neverShowAgain": "Não mostrar novamente",
+    "followButtonText": "Seguir",
+    "unfollowButtonText": "Deixar de seguir",
+    "adInfoPlaceholderText": "Anúncios mantêm o app gratuito!",
+    "retryButtonText": "Repetir",
+    "headlinesFeedFilterLoadingHeadline": "Carregando Filtros",
+    "suggestedTopicsTitle": "Tópicos Sugeridos",
+    "suggestedSourcesTitle": "Fontes Sugeridas",
+    "couldNotOpenUpdateUrl": "Erro ao abrir URL: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
+    },
+    "currentAppVersionLabel": "Versão atual: {version}",
+    "@currentAppVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "Versão necessária: {version}",
+    "@latestRequiredVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
+    },
+    "anonymousLimitTitle": "Entre para Fazer Mais",
+    "anonymousLimitBody": "Crie uma conta para marcar e seguir mais.",
+    "anonymousLimitButton": "Entrar",
+    "standardLimitBody": "Limite atingido. Faça upgrade para salvar mais.",
+    "standardLimitButton": "Upgrade para Premium",
+    "premiumLimitTitle": "Limite Atingido",
+    "premiumLimitBody": "Gerencie seu conteúdo para adicionar novos itens.",
+    "premiumLimitButton": "Gerenciar Conteúdo",
+    "saveButtonLabel": "Salvar",
+    "cancelButtonLabel": "Cancelar",
+    "manageFiltersPageTitle": "Gerenciar Filtros",
+    "manageFiltersEmptyHeadline": "Nenhum Filtro Salvo",
+    "manageFiltersEmptySubheadline": "Salve filtros na página de filtros.",
+    "manageFiltersRenameTooltip": "Renomear Filtro",
+    "manageFiltersDeleteTooltip": "Excluir Filtro",
+    "saveFilterDialogTitleSave": "Salvar Filtro",
+    "saveFilterDialogTitleRename": "Renomear Filtro",
+    "saveFilterDialogInputLabel": "Nome do Filtro",
+    "saveFilterDialogValidationEmpty": "O nome não pode estar vazio",
+    "saveFilterDialogValidationTooLong": "Nome muito longo",
+    "saveFilterDialogGenericError": "Erro ao salvar o filtro.",
+    "headlinesFilterSaveTooltip": "Salvar Filtro",
+    "headlinesFilterManageTooltip": "Gerenciar Filtros",
+    "savedFiltersBarOpenTooltip": "Abrir Filtros",
+    "savedFiltersBarAllLabel": "Tudo",
+    "savedFiltersBarCustomLabel": "Personalizado",
+    "applyFilterDialogTitle": "Aplicar Filtro",
+    "applyFilterDialogContent": "Deseja salvar este filtro para o futuro?",
+    "applyFilterDialogApplyOnlyButton": "Apenas Aplicar",
+    "applyFilterDialogApplyAndSaveButton": "Aplicar e Salvar",
+    "savedFiltersBarFollowedLabel": "Seguidos",
+    "sourceListFilterPageTitle": "Filtrar Fontes",
+    "sourceListFilterPageFilterButtonTooltip": "Filtrar lista",
+    "sourceListFilterByHeadquartersPageTitle": "Sede",
+    "savedFiltersPageTitle": "Filtros Salvos",
+    "savedFiltersEmptyHeadline": "Nenhum Filtro Salvo",
+    "savedFiltersEmptySubheadline": "Filtros salvos aparecerão aqui.",
+    "savedFiltersMenuRename": "Renomear",
+    "savedFiltersMenuDelete": "Excluir",
+    "discoverPageTitle": "Descobrir",
+    "bottomNavDiscoverLabel": "Descobrir",
+    "feedSearchHint": "Pesquisar manchetes...",
+    "headlineSearchEnterQuery": "Encontre manchetes de milhares de fontes.",
+    "headlineSearchEnterQuerySubheadline": "Pesquise por palavra-chave.",
+    "headlineSearchNoResults": "Nenhuma manchete encontrada.",
+    "headlineSearchNoResultsSubheadline": "Tente palavras-chave diferentes.",
+    "accountGuestAccount": "Conta de Convidado",
+    "accountRoleStandard": "Usuário Padrão",
+    "accountRolePremium": "Usuário Premium",
+    "deleteConfirmationDialogTitle": "Confirmar Exclusão",
+    "deleteConfirmationDialogContent": "Esta ação não pode ser desfeita.",
+    "deleteConfirmationDialogConfirmButton": "Excluir",
+    "headlineSearchInitialHeadline": "Pesquisar Manchetes",
+    "headlineSearchInitialSubheadline": "Digite palavras-chave.",
+    "accountGuestUserHeadline": "Conta de Convidado",
+    "accountGuestUserSubheadline": "Entre para sincronizar dados",
+    "discoverSearchHint": "Pesquisar fontes...",
+    "seeAllButtonLabel": "Ver tudo",
+    "failedToLoadMoreSources": "Erro ao carregar fontes.",
+    "sourceTypeNewsAgency": "Agência de Notícias",
+    "sourceTypeLocalNewsOutlet": "Notícias Locais",
+    "sourceTypeNationalNewsOutlet": "Notícias Nacionais",
+    "sourceTypeInternationalNewsOutlet": "Notícias Internacionais",
+    "sourceTypeSpecializedPublisher": "Editor Especializado",
+    "sourceTypeBlog": "Blog",
+    "sourceTypeGovernmentSource": "Fonte Governamental",
+    "sourceTypeAggregator": "Agregador",
+    "sourceTypeOther": "Outro",
+    "sourceTypeNewsAgencies": "Agências de Notícias",
+    "sourceTypeLocalNewsOutlets": "Veículos Locais",
+    "sourceTypeNationalNewsOutlets": "Veículos Nacionais",
+    "sourceTypeInternationalNewsOutlets": "Veículos Internacionais",
+    "sourceTypeSpecializedPublishers": "Editores Especializados",
+    "sourceTypeBlogs": "Blogs",
+    "sourceTypeGovernmentSources": "Fontes Governamentais",
+    "sourceTypeAggregators": "Agregadores",
+    "sourceTypeOthers": "Outros",
+    "sourceTypeFilterEmptyHeadline": "Nenhum Tipo Encontrado",
+    "sourceTypeFilterEmptySubheadline": "Não há tipos disponíveis.",
+    "decoratorDismissedConfirmation": "Sugestão ocultada.",
+    "decoratorDismissAction": "Ocultar",
+    "decoratorLinkAccountTitle_1": "Salve Seus Artigos",
+    "decoratorLinkAccountTitle_2": "Nunca Perca Suas Preferências",
+    "decoratorLinkAccountDescription_1": "Crie uma conta gratuita para salvar mais.",
+    "decoratorLinkAccountDescription_2": "Inscreva-se para manter seu feed consistente.",
+    "decoratorLinkAccountCta_1": "Inscrever-se Agora",
+    "decoratorLinkAccountCta_2": "Criar Conta Gratuita",
+    "decoratorUpgradeTitle_1": "Notícias Sem Interrupções",
+    "decoratorUpgradeTitle_2": "Acesso Premium",
+    "decoratorUpgradeDescription_1": "Fique livre de anúncios e expanda limites.",
+    "decoratorUpgradeDescription_2": "Upgrade para salvar e seguir muito mais.",
+    "decoratorUpgradeCta_1": "Upgrade para Premium",
+    "decoratorUpgradeCta_2": "Saiba Mais",
+    "decoratorRateAppTitle_1": "Gostando do App?",
+    "decoratorRateAppTitle_2": "Sua Opinião Importa",
+    "decoratorRateAppDescription_1": "Sua avaliação nos ajuda a melhorar.",
+    "decoratorRateAppDescription_2": "Reserve um momento para nos avaliar!",
+    "decoratorRateAppCta_1": "Avaliar Agora",
+    "decoratorRateAppCta_2": "Dar Feedback",
+    "decoratorEnableNotificationsTitle_1": "Notícias de Última Hora",
+    "decoratorEnableNotificationsTitle_2": "Fique Informado",
+    "decoratorEnableNotificationsDescription_1": "Receba alertas instantâneos.",
+    "decoratorEnableNotificationsDescription_2": "Ative notificações personalizadas.",
+    "decoratorEnableNotificationsCta_1": "Ativar Alertas",
+    "decoratorEnableNotificationsCta_2": "Ligar Notificações",
+    "decoratorSuggestedTopicsTitle_1": "Novos Interesses",
+    "decoratorSuggestedTopicsTitle_2": "Amplie Seu Conhecimento",
+    "decoratorSuggestedSourcesTitle_1": "Novas Perspectivas",
+    "decoratorSuggestedSourcesTitle_2": "Fontes Confiáveis",
+    "savedHeadlineFiltersPageTitle": "Filtros Salvos",
+    "savedHeadlineFiltersCreateNewButton": "Criar Filtro",
+    "savedHeadlineFiltersLoadingHeadline": "Carregando Filtros...",
+    "savedHeadlineFiltersEmptyHeadline": "Nenhum Filtro Salvo",
+    "savedHeadlineFiltersEmptySubheadline": "Filtros criados aparecerão aqui.",
+    "savedFiltersMenuEdit": "Editar",
+    "saveFilterDialogPinToFeedLabel": "Fixar na Barra",
+    "saveFilterDialogNotificationsLabel": "Notificações",
+    "notificationDeliveryTypeBreakingOnly": "Última Hora",
+    "notificationDeliveryTypeDailyDigest": "Resumo Diário",
+    "notificationDeliveryTypeWeeklyRoundup": "Resumo Semanal",
+    "prePermissionDialogTitle": "Ativar Notificações?",
+    "prePermissionDialogBody": "Permita notificações para receber alertas.",
+    "prePermissionDialogDenyButton": "Agora Não",
+    "prePermissionDialogAllowButton": "Permitir",
+    "notificationPermissionDeniedError": "Permissão negada.",
+    "notificationCenterPageTitle": "Notificações",
+    "notificationCenterMarkAllAsReadButton": "Marcar todas como lidas",
+    "notificationCenterLoadingHeadline": "Carregando...",
+    "notificationCenterLoadingSubheadline": "Aguarde...",
+    "notificationCenterFailureHeadline": "Erro ao Carregar",
+    "notificationCenterFailureSubheadline": "Tente novamente.",
+    "notificationCenterEmptyHeadline": "Sem Notificações",
+    "notificationCenterEmptySubheadline": "Você não tem novas notificações.",
+    "notificationCenterTabBreakingNews": "Última Hora",
+    "notificationCenterTabDigests": "Resumos",
+    "deleteReadNotificationsButtonTooltip": "Excluir lidas",
+    "deleteReadNotificationsDialogContent": "Excluir todas as lidas?",
+    "deleteButtonLabel": "Excluir",
+    "breakingNewsPrefix": "Última Hora",
+    "settingsFeedClickBehaviorLabel": "Abrir links com",
+    "settingsFeedClickBehaviorDefault": "Padrão do app",
+    "settingsFeedClickBehaviorInApp": "Navegador interno",
+    "settingsFeedClickBehaviorSystem": "Navegador do sistema",
+    "continueToArticleButtonLabel": "Ir para o Artigo",
+    "headlineActionsModalTitle": "Ações",
+    "shareActionLabel": "Compartilhar",
+    "bookmarkActionLabel": "Favoritar",
+    "removeBookmarkActionLabel": "Remover Favorito",
+    "reportActionLabel": "Reportar",
+    "reportContentTitle": "Reportar Conteúdo",
+    "reportReasonSelectionPrompt": "Selecione um motivo:",
+    "reportAdditionalCommentsLabel": "Comentários (Opcional)",
+    "reportSubmitButtonLabel": "Enviar Denúncia",
+    "reportSuccessSnackbar": "Denúncia enviada.",
+    "reportFailureSnackbar": "Erro ao enviar denúncia.",
+    "commentsTitle": "Comentários",
+    "commentPostButtonLabel": "Postar",
+    "commentInputHint": "Adicionar comentário...",
+    "commentRequiresReactionError": "Selecione uma reação.",
+    "likeActionLabel": "Curtir",
+    "dislikeActionLabel": "Descurtir",
+    "commentActionLabel": "Comentar",
+    "moreActionLabel": "Mais",
+    "rateAppPromptTitle": "Gostando do app?",
+    "rateAppPromptBody": "Você se importaria de nos avaliar?",
+    "rateAppPromptYesButton": "É Ótimo!",
+    "rateAppPromptNoButton": "Precisa Melhorar",
+    "feedbackPromptTitle": "Como podemos melhorar?",
+    "feedbackPromptReasonUI": "Design",
+    "feedbackPromptReasonPerformance": "Performance",
+    "feedbackPromptReasonContent": "Qualidade",
+    "feedbackPromptReasonOther": "Outro",
+    "feedbackPromptSubmitButton": "Enviar Feedback",
+    "rateAppNegativeFollowUpTitle_1": "Como estamos indo?",
+    "rateAppNegativeFollowUpTitle_2": "Melhoramos?",
+    "rateAppNegativeFollowUpBody_1": "Trabalhamos no seu feedback.",
+    "rateAppNegativeFollowUpBody_2": "Deixe-nos saber se está melhor.",
+    "noCommentsYet": "Sem comentários.",
+    "commentInputNoReactionHint": "Reaja para comentar",
+    "headlineReportReasonMisinformation": "Desinformação",
+    "headlineReportReasonClickbait": "Clickbait",
+    "headlineReportReasonOffensive": "Ofensivo",
+    "headlineReportReasonSpam": "Spam",
+    "headlineReportReasonBrokenLink": "Link Quebrado",
+    "headlineReportReasonPaywalled": "Paywall",
+    "sourceReportReasonLowQuality": "Baixa Qualidade",
+    "sourceReportReasonHighAdDensity": "Muitos Anúncios",
+    "sourceReportReasonFrequentPaywalls": "Paywalls Frequentes",
+    "sourceReportReasonImpersonation": "Falsificação",
+    "sourceReportReasonMisinformation": "Desinformação",
+    "commentReportReasonSpam": "Spam",
+    "commentReportReasonHarassment": "Assédio",
+    "commentReportReasonHateSpeech": "Ódio",
+    "limitReachedTitle": "Limite Atingido",
+    "manageMyContentButton": "Gerenciar Conteúdo",
+    "upgradeButton": "Upgrade",
+    "createAccountButton": "Criar Conta",
+    "gotItButton": "Entendi",
+    "commentsPageTitle": "Comentários",
+    "commentsCount": "{count,plural, =1{1 Comentário}other{{count} Comentários}}",
+    "@commentsCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "Conta Necessária",
+    "limitReachedGuestUserBody": "Entre para interagir com a comunidade.",
+    "limitReachedBodyFollow": "Limite de itens seguidos atingido.",
+    "limitReachedBodySave": "Limite de artigos salvos atingido.",
+    "limitReachedBodySaveFilters": "Limite de filtros salvos atingido.",
+    "limitReachedBodyPinFilters": "Limite de filtros fixados atingido.",
+    "limitReachedBodySubscribeToNotifications": "Limite de assinaturas atingido.",
+    "limitReachedBodyComments": "Limite diário de comentários atingido.",
+    "limitReachedBodyReactions": "Limite diário de reações atingido.",
+    "limitReachedBodyReports": "Limite diário de denúncias atingido.",
+    "commentEditButtonLabel": "Atualizar",
+    "commentPostFailureSnackbar": "Erro ao postar comentário.",
+    "commentUpdateFailureSnackbar": "Erro ao atualizar comentário.",
+    "commentInputDisabledHint": "Entre para participar",
+    "commentInputExistingHint": "Você já comentou aqui.",
+    "commenterName": "Usuário {id}",
+    "@commenterName": {
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
+    },
+    "accountRewardsTile": "Recompensas e Ofertas",
+    "rewardsPageTitle": "Recompensas",
+    "rewardsOfferTitle": "Ganhe {rewardName} por {duration}",
+    "@rewardsOfferTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} Ativo",
+    "@rewardsOfferActiveTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "Expira em: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "Assistir Vídeo",
+    "rewardsOfferVerifyingButton": "Verificando...",
+    "rewardsOfferLoadingButton": "Carregando...",
+    "rewardsSnackbarSuccess": "Recompensa: {rewardName} ativo.",
+    "@rewardsSnackbarSuccess": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "Falha na verificação.",
+    "rewardsAdDismissedSnackbar": "Assista ao anúncio completo.",
+    "decoratorUnlockRewardsTitle": "Sem Anúncios",
+    "decoratorUnlockRewardsDescription": "Assista a um vídeo por {duration} sem anúncios.",
+    "@decoratorUnlockRewardsDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "decoratorUnlockRewardsCta": "Assistir Agora",
+    "rewardsDurationDays": "{count, plural, =1{1 Dia} other{{count} Dias}}",
+    "@rewardsDurationDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "rewardTypeAdFree": "Sem Anúncios",
+    "rewardTypeDailyDigest": "Resumo Diário",
+    "unlockMoreButton": "Desbloquear Mais",
+    "requiresActiveReward": "Requer recompensa ativa.",
+    "rewardsAdFreeTitle": "Experiência Sem Anúncios",
+    "rewardsAdFreeDescription": "Remova anúncios por {duration}.",
+    "@rewardsAdFreeDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "Resumos Diários",
+    "rewardsDailyDigestDescription": "Receba resumos por {duration}.",
+    "@rewardsDailyDigestDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "Ativo",
+    "rewardsAdFreePageTitle": "Sem Anúncios",
+    "rewardsAdFreeInactiveHeadline": "Experiência Sem Anúncios",
+    "rewardsAdFreeInactiveBody": "Assista a um anúncio por {duration}.",
+    "@rewardsAdFreeInactiveBody": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "Sem Anúncios Ativo",
+    "rewardsAdFreeActiveBody": "Expira em:",
+    "appTourStep1Title": "Suas Notícias",
+    "appTourStep1Body": "Um feed feito para você.",
+    "appTourStep2Title": "Curadoria",
+    "appTourStep2Body": "Crie feeds personalizados.",
+    "appTourStep3Title": "Sua Perspectiva",
+    "appTourStep3Body": "Engaje com a comunidade.",
+    "appTourSkipButton": "Pular",
+    "appTourNextButton": "Próximo",
+    "appTourGetStartedButton": "Começar",
+    "initialPersonalizationTitle": "Personalize Seu Feed",
+    "initialPersonalizationSubtitle": "Siga itens para começar.",
+    "initialPersonalizationStepTopicsTitle": "Tópicos",
+    "initialPersonalizationStepSourcesTitle": "Fontes",
+    "initialPersonalizationStepCountriesTitle": "Países",
+    "initialPersonalizationTotalSelectionCountLabel": "{count} selecionados",
+    "@initialPersonalizationTotalSelectionCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "Finalizar",
+    "deleteAccountDialogTitle": "Excluir Conta",
+    "deleteAccountDialogContent": "Esta ação é permanente.",
+    "deleteAccountDialogConfirm": "Excluir Conta",
+    "deleteAccountButton": "Excluir Conta",
+    "followedContentEmpty": "Você não segue itens nesta categoria.",
+    "followedContentEmptySubheadline": "Itens seguidos aparecerão aqui.",
+    "multiSelectSearchPageSelectionCount": "{count}/{total}",
+    "@multiSelectSearchPageSelectionCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "guestUserDisplayName": "Convidado",
+    "accountPageSyncProgressButton": "Sincronizar Progresso",
+    "applyButtonLabel": "Aplicar",
+    "commentStatusPending": "Em Revisão"
+}

@@ -1,0 +1,786 @@
+{
+    "@@locale": "ja",
+    "accountLinkingPageTitle": "進捗を同期する",
+    "accountLinkingGenericError": "エラーが発生しました",
+    "accountLinkingEmailSentSuccess": "サインインリンクをメールで送信しました！",
+    "accountLinkingHeadline": "進捗を保存",
+    "accountLinkingBody": "アカウントを作成して、フォロー中のアイテムや設定をすべてのデバイスで同期しましょう。",
+    "accountLinkingContinueWithGoogleButton": "Googleで続行",
+    "accountLinkingEmailInputLabel": "メールアドレスを入力",
+    "accountLinkingEmailInputHint": "you@example.com",
+    "accountLinkingEmailValidationError": "有効なメールアドレスを入力してください",
+    "accountLinkingSendLinkButton": "メールで同期",
+    "accountPageTitle": "アカウント",
+    "accountAnonymousUser": "(匿名)",
+    "accountNoNameUser": "名前なし",
+    "accountStatusAuthenticated": "認証済み",
+    "accountStatusAnonymous": "匿名セッション",
+    "accountStatusUnauthenticated": "サインインしていません",
+    "accountSettingsTile": "設定",
+    "accountSignOutTile": "サインアウト",
+    "accountBackupTile": "データを保存するためにアカウントを作成",
+    "accountContentPreferencesTile": "フォロー中のコンテンツ",
+    "accountSavedHeadlinesTile": "保存した見出し",
+    "accountRoleLabel": "ロール: {role}",
+    "@accountRoleLabel": {
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
+    "accountMyContentSectionTitle": "マイコンテンツ",
+    "accountActivityAndRewardsSectionTitle": "アクティビティと特典",
+    "accountGeneralSectionTitle": "一般",
+    "accountEditProfileButton": "プロフィールを編集",
+    "editProfilePageTitle": "プロフィールを編集",
+    "editProfileNameInputLabel": "名前",
+    "editProfileEmailInputLabel": "メールアドレス",
+    "editProfileUpdateSuccessSnackbar": "プロフィールを更新しました。",
+    "editProfileUpdateFailureSnackbar": "プロフィールの更新に失敗しました。もう一度お試しください。",
+    "followedContentPageTitle": "フォロー中のアイテム",
+    "followedContentTopicsTab": "トピック",
+    "followedContentSourcesTab": "ソース",
+    "authenticationEmailSentSuccess": "サインインリンクをメールで送信しました。",
+    "authenticationPageTitle": "サインイン / 登録",
+    "authenticationEmailLabel": "メールアドレス",
+    "authenticationSendLinkButton": "サインインリンクを送信",
+    "authenticationOrDivider": "または",
+    "authenticationGoogleSignInButton": "Googleでサインイン",
+    "authenticationAnonymousSignInButton": "匿名で続行",
+    "headlineDetailsInitialHeadline": "詳細を待機中",
+    "headlineDetailsInitialSubheadline": "お待ちください...",
+    "headlineDetailsLoadingHeadline": "見出しを読み込み中",
+    "headlineDetailsLoadingSubheadline": "データを取得しています...",
+    "headlineDetailsContinueReadingButton": "続きを読む",
+    "headlinesFeedLoadingHeadline": "読み込み中...",
+    "headlinesFeedLoadingSubheadline": "見出しを取得しています",
+    "headlinesFeedFilterTitle": "見出しをフィルタ",
+    "headlinesFeedFilterCategoryLabel": "カテゴリ",
+    "headlinesFeedFilterAllOption": "すべて",
+    "headlinesFeedFilterCategoryTechnology": "テクノロジー",
+    "headlinesFeedFilterCategoryBusiness": "ビジネス",
+    "headlinesFeedFilterCategorySports": "スポーツ",
+    "headlinesFeedFilterSourceLabel": "ソース",
+    "headlinesFeedFilterSourceCNN": "CNN",
+    "headlinesFeedFilterSourceReuters": "ロイター",
+    "headlinesFeedFilterEventCountryLabel": "国",
+    "headlinesFeedFilterSourceCountryLabel": "ソースの本拠地",
+    "headlinesFeedFilterCountryUS": "アメリカ",
+    "headlinesFeedFilterCountryUK": "イギリス",
+    "headlinesFeedFilterCountryCA": "カナダ",
+    "headlinesFeedFilterApplyButton": "フィルタを適用",
+    "headlinesFeedFilterResetButton": "フィルタをリセット",
+    "headlinesSearchHintText": "見出しを検索...",
+    "headlinesSearchInitialHeadline": "見出しをすぐに見つける",
+    "headlinesSearchInitialSubheadline": "キーワードを入力してニュース記事を探しましょう。",
+    "headlinesSearchNoResultsHeadline": "結果なし",
+    "headlinesSearchNoResultsSubheadline": "別の検索ワードを試してください",
+    "authenticationEmailSignInButton": "メールで続行",
+    "authenticationLinkingHeadline": "進捗を同期する",
+    "authenticationLinkingSubheadline": "アカウントを作成して、設定やコンテンツの好みを保存しましょう。",
+    "authenticationSignInHeadline": "Veritas",
+    "authenticationSignInSubheadline": "世界中の信頼できるソースからのニュース。",
+    "emailSignInPageTitle": "メールでサインイン",
+    "emailSignInExplanation": "メールアドレスを入力してください。サインイン用のリンクを送信します。",
+    "emailLinkSentPageTitle": "メールを確認してください",
+    "emailLinkSentConfirmation": "リンクを送信しました！受信トレイを確認してください。",
+    "accountConnectPrompt": "アカウントを連携",
+    "accountConnectBenefit": "設定や読書履歴をデバイス間で保存します。",
+    "bottomNavFeedLabel": "フィード",
+    "bottomNavSearchLabel": "検索",
+    "bottomNavAccountLabel": "アカウント",
+    "accountNotificationsTile": "通知",
+    "headlinesSearchActionTooltip": "検索",
+    "notificationsTooltip": "通知を表示",
+    "accountSignInPromptButton": "登録 / サインイン",
+    "categoryFilterLoadingHeadline": "カテゴリを読み込み中...",
+    "categoryFilterLoadingSubheadline": "利用可能なカテゴリを取得しています。",
+    "categoryFilterEmptyHeadline": "カテゴリが見つかりません",
+    "categoryFilterEmptySubheadline": "現在利用可能なカテゴリはありません。",
+    "countryFilterLoadingHeadline": "国を読み込み中...",
+    "countryFilterLoadingSubheadline": "利用可能な国を取得しています。",
+    "countryFilterEmptyHeadline": "国が見つかりません",
+    "countryFilterEmptySubheadline": "現在利用可能な国はありません。",
+    "headlinesFeedAppBarTitle": "HT",
+    "headlinesFeedFilterTooltip": "見出しをフィルタ",
+    "headlinesFeedFilterAllLabel": "すべて",
+    "headlinesFeedFilterSelectedCountLabel": "{count}件選択済み",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "ソースを読み込み中...",
+    "sourceFilterLoadingSubheadline": "利用可能なソースを取得しています。",
+    "sourceFilterEmptyHeadline": "ソースが見つかりません",
+    "sourceFilterEmptySubheadline": "現在利用可能なソースはありません。",
+    "settingsTitle": "設定",
+    "settingsLoadingHeadline": "設定を読み込み中...",
+    "settingsLoadingSubheadline": "設定を取得しています。",
+    "settingsErrorDefault": "設定を読み込めませんでした。",
+    "settingsAppearanceTitle": "外観",
+    "settingsFeedDisplayTitle": "フィード",
+    "settingsArticleDisplayTitle": "記事の表示",
+    "settingsNotificationsTitle": "通知",
+    "settingsAppearanceThemeModeLight": "ライト",
+    "settingsAppearanceThemeModeDark": "ダーク",
+    "settingsAppearanceThemeModeSystem": "システム",
+    "settingsAppearanceThemeNameRed": "レッド",
+    "settingsAppearanceThemeNameBlue": "ブルー",
+    "settingsAppearanceThemeNameGrey": "グレー",
+    "settingsAppearanceFontSizeSmall": "小",
+    "settingsAppearanceFontSizeLarge": "大",
+    "settingsAppearanceFontSizeMedium": "中",
+    "settingsAppearanceThemeModeLabel": "テーマモード",
+    "settingsAppearanceThemeNameLabel": "カラースキーム",
+    "settingsAppearanceAppFontSizeLabel": "アプリのフォントサイズ",
+    "settingsAppearanceAppFontTypeLabel": "アプリのフォント",
+    "settingsAppearanceFontWeightLabel": "フォントの太さ",
+    "settingsFeedTileTypeImageTop": "画像上部",
+    "settingsFeedTileTypeImageStart": "画像左側",
+    "settingsFeedTileTypeTextOnly": "テキストのみ",
+    "settingsFeedTileTypeLabel": "フィードタイルのレイアウト",
+    "settingsArticleFontSizeLabel": "記事のフォントサイズ",
+    "settingsNotificationsEnableLabel": "通知を有効にする",
+    "settingsNotificationsCategoriesLabel": "フォロー中のカテゴリ",
+    "settingsNotificationsSourcesLabel": "フォロー中のソース",
+    "settingsNotificationsCountriesLabel": "フォロー中の国",
+    "settingsAppearanceSectionTitle": "外観",
+    "settingsFeedSectionTitle": "フィード",
+    "settingsGeneralSectionTitle": "一般",
+    "settingsAccentColorAndFontsTitle": "アクセントカラーとフォント",
+    "settingsAccentColorLabel": "アクセントカラー",
+    "settingsFontFamilyLabel": "フォントファミリー",
+    "settingsLayoutAndReadingTitle": "レイアウトと読書",
+    "appName": "Headlines Toolkit",
+    "unknownError": "不明なエラーが発生しました。",
+    "loadMoreError": "さらに読み込むことができませんでした。",
+    "settingsAppearanceFontSizeExtraLarge": "特大",
+    "settingsAppearanceFontFamilySystemDefault": "システムデフォルト",
+    "settingsAppearanceFontFamilyRoboto": "Roboto",
+    "settingsAppearanceFontFamilyOpenSans": "Open Sans",
+    "settingsAppearanceThemeSubPageTitle": "テーマ設定",
+    "settingsAppearanceFontSubPageTitle": "フォント設定",
+    "settingsLanguageTitle": "言語",
+    "emailCodeSentPageTitle": "コードを入力",
+    "emailCodeSentConfirmation": "{email}に確認コードを送信しました。",
+    "@emailCodeSentConfirmation": {
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "受信した6桁のコードを入力してください。",
+    "emailCodeVerificationHint": "6桁のコード",
+    "emailCodeVerificationButtonLabel": "コードを確認",
+    "emailCodeValidationEmptyError": "6桁のコードを入力してください。",
+    "emailCodeValidationLengthError": "コードは6桁である必要があります。",
+    "headlinesFeedEmptyFilteredHeadline": "フィルタに一致する見出しがありません",
+    "headlinesFeedEmptyFilteredSubheadline": "フィルタ条件を調整するか、クリアしてください。",
+    "headlinesFeedClearFiltersButton": "フィルタをクリア",
+    "headlinesFeedFilterLoadingCriteria": "フィルタオプションを読み込み中...",
+    "pleaseWait": "お待ちください...",
+    "headlinesFeedFilterErrorCriteria": "フィルタオプションを読み込めませんでした。",
+    "headlinesFeedFilterCountryLabel": "国",
+    "headlinesFeedFilterSourceTypeLabel": "タイプ",
+    "headlinesFeedFilterErrorSources": "ソースを読み込めませんでした。",
+    "headlinesFeedFilterNoSourcesMatch": "選択したフィルタに一致するソースはありません。",
+    "searchModelTypeHeadline": "見出し",
+    "searchModelTypeCategory": "カテゴリ",
+    "searchModelTypeSource": "ソース",
+    "searchModelTypeCountry": "国",
+    "searchHintTextHeadline": "例: AIの進歩、火星探査機...",
+    "searchHintTextGeneric": "検索...",
+    "searchHintTextCategory": "例: テクノロジー、スポーツ、金融...",
+    "searchHintTextSource": "例: BBC News、ロイター...",
+    "searchHintTextCountry": "例: 日本、アメリカ、ブラジル...",
+    "searchPageInitialHeadline": "検索を開始",
+    "searchPageInitialSubheadline": "タイプを選択し、キーワードを入力してください。",
+    "followedCategoriesPageTitle": "フォロー中のカテゴリ",
+    "addCategoriesTooltip": "カテゴリを追加",
+    "noFollowedCategoriesMessage": "まだカテゴリをフォローしていません。",
+    "addCategoriesButtonLabel": "フォローするカテゴリを探す",
+    "unfollowCategoryTooltip": "{categoryName}のフォローを解除",
+    "@unfollowCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Technology"
+            }
+        }
+    },
+    "addTopicsPageTitle": "トピックをフォロー",
+    "topicFilterLoadingHeadline": "トピックを読み込み中...",
+    "topicFilterError": "トピックを読み込めませんでした。",
+    "topicFilterEmptyHeadline": "トピックが見つかりません",
+    "topicFilterEmptySubheadline": "現在利用可能なトピックはありません。",
+    "unfollowTopicTooltip": "{topicName}のフォローを解除",
+    "@unfollowTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followTopicTooltip": "{topicName}をフォロー",
+    "@followTopicTooltip": {
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "フォロー中のソースを読み込み中...",
+    "followedSourcesErrorHeadline": "フォロー中のソースを読み込めませんでした",
+    "followedSourcesEmptyHeadline": "フォロー中のソースなし",
+    "followedSourcesEmptySubheadline": "ソースをフォローするとここに表示されます。",
+    "headlinesFeedFilterTopicLabel": "トピック",
+    "followedTopicsPageTitle": "フォロー中のトピック",
+    "addTopicsTooltip": "トピックを追加",
+    "followedTopicsLoadingHeadline": "フォロー中のトピックを読み込み中...",
+    "followedTopicsErrorHeadline": "フォロー中のトピックを読み込めませんでした",
+    "followedTopicsEmptyHeadline": "フォロー中のトピックなし",
+    "followedTopicsEmptySubheadline": "トピックをフォローするとここに表示されます。",
+    "followedSourcesPageTitle": "フォロー中のソース",
+    "addSourcesTooltip": "ソースを追加",
+    "noFollowedSourcesMessage": "まだソースをフォローしていません。",
+    "addSourcesButtonLabel": "フォローするソースを探す",
+    "unfollowSourceTooltip": "{sourceName}のフォローを解除",
+    "@unfollowSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "BBC News"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "フォロー中の国",
+    "addCountriesTooltip": "国を追加",
+    "noFollowedCountriesMessage": "まだ国をフォローしていません。",
+    "addCountriesButtonLabel": "フォローする国を探す",
+    "unfollowCountryTooltip": "{countryName}のフォローを解除",
+    "@unfollowCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "United States"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "フォローするカテゴリを追加",
+    "categoryFilterError": "カテゴリを読み込めませんでした。",
+    "followCategoryTooltip": "{categoryName}をフォロー",
+    "@followCategoryTooltip": {
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "addSourcesPageTitle": "フォローするソースを追加",
+    "sourceFilterError": "ソースを読み込めませんでした。",
+    "followSourceTooltip": "{sourceName}をフォロー",
+    "@followSourceTooltip": {
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "Tech News"
+            }
+        }
+    },
+    "addCountriesPageTitle": "フォローする国を追加",
+    "followCountryTooltip": "{countryName}をフォロー",
+    "@followCountryTooltip": {
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "Germany"
+            }
+        }
+    },
+    "headlineDetailsSaveTooltip": "見出しを保存",
+    "headlineDetailsRemoveFromSavedTooltip": "保存から削除",
+    "headlineSavedSuccessSnackbar": "見出しを保存しました！",
+    "headlineUnsavedSuccessSnackbar": "見出しを保存から削除しました。",
+    "headlineSaveErrorSnackbar": "保存状態を更新できませんでした。",
+    "shareActionTooltip": "見出しを共有",
+    "sharingUnavailableSnackbar": "このデバイスでは共有を利用できません。",
+    "similarHeadlinesSectionTitle": "こちらもおすすめ",
+    "similarHeadlinesEmpty": "類似の見出しは見つかりませんでした。",
+    "detailsPageTitle": "詳細",
+    "followButtonLabel": "フォロー",
+    "unfollowButtonLabel": "フォロー解除",
+    "noHeadlinesFoundMessage": "このアイテムの見出しは見つかりませんでした。",
+    "failedToLoadMoreHeadlines": "見出しの読み込みに失敗しました。",
+    "headlinesSectionTitle": "見出し",
+    "headlinesFeedFilterApplyFollowedLabel": "フォロー中のアイテムをフィルタとして適用",
+    "mustBeLoggedInToUseFeatureError": "この機能を使用するにはログインが必要です。",
+    "noFollowedItemsForFilterSnackbar": "フィルタとして使用するフォロー中のアイテムがありません。",
+    "requestCodePageHeadline": "メールアドレスを入力",
+    "requestCodePageSubheadline": "本人確認のため、メールに確認コードを送信します。",
+    "requestCodeEmailLabel": "メールアドレス",
+    "requestCodeEmailHint": "you@example.com",
+    "requestCodeSendCodeButton": "コードを送信",
+    "requestCodeResendButtonCooldown": "{seconds}秒後に再送",
+    "@requestCodeResendButtonCooldown": {
+        "placeholders": {
+            "seconds": {
+                "type": "int",
+                "example": "60"
+            }
+        }
+    },
+    "entityDetailsCategoryTitle": "カテゴリ",
+    "entityDetailsSourceTitle": "ソース",
+    "entityDetailsTopicTitle": "トピック",
+    "entityDetailsCountryTitle": "国",
+    "savedHeadlinesLoadingHeadline": "保存した見出しを読み込み中...",
+    "savedHeadlinesLoadingSubheadline": "保存した記事を取得しています。",
+    "savedHeadlinesErrorHeadline": "保存した見出しを読み込めませんでした",
+    "savedHeadlinesEmptyHeadline": "保存した見出しなし",
+    "savedHeadlinesEmptySubheadline": "まだ記事を保存していません。",
+    "accountFollowedCountriesTile": "フォロー中の国",
+    "followedCountriesLoadingHeadline": "フォロー中の国を読み込み中...",
+    "followedCountriesErrorHeadline": "フォロー中の国を読み込めませんでした",
+    "followedCountriesEmptyHeadline": "フォロー中の国なし",
+    "followedCountriesEmptySubheadline": "国をフォローするとここに表示されます。",
+    "countryFilterError": "国を読み込めませんでした。",
+    "followedCategoriesLoadingHeadline": "フォロー中のカテゴリを読み込み中...",
+    "followedCategoriesErrorHeadline": "フォロー中のカテゴリを読み込めませんでした",
+    "followedCategoriesEmptyHeadline": "フォロー中のカテゴリなし",
+    "followedCategoriesEmptySubheadline": "カテゴリをフォローするとここに表示されます。",
+    "contentTypeHeadline": "見出し",
+    "contentTypeTopic": "トピック",
+    "contentTypeSource": "ソース",
+    "contentTypeCountry": "国",
+    "searchingFor": "{contentType}を検索中...",
+    "@searchingFor": {
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "ライト",
+    "settingsAppearanceFontWeightRegular": "レギュラー",
+    "settingsAppearanceFontWeightBold": "ボールド",
+    "maintenanceHeadline": "メンテナンス中",
+    "maintenanceSubheadline": "現在メンテナンスを行っています。後ほどご確認ください。",
+    "updateRequiredHeadline": "アップデートが必要です",
+    "updateRequiredSubheadline": "新しいバージョンのアプリが利用可能です。",
+    "updateRequiredButton": "今すぐアップデート",
+    "neverShowAgain": "二度と表示しない",
+    "followButtonText": "フォロー",
+    "unfollowButtonText": "フォロー解除",
+    "adInfoPlaceholderText": "広告はこのアプリを無料で維持するのに役立ちます！",
+    "retryButtonText": "再試行",
+    "headlinesFeedFilterLoadingHeadline": "フィルタを読み込み中",
+    "suggestedTopicsTitle": "おすすめのトピック",
+    "suggestedSourcesTitle": "おすすめのソース",
+    "couldNotOpenUpdateUrl": "アップデートURLを開けませんでした: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
+    },
+    "currentAppVersionLabel": "現在のバージョン: {version}",
+    "@currentAppVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "必要なバージョン: {version}",
+    "@latestRequiredVersionLabel": {
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
+    },
+    "anonymousLimitTitle": "サインインしてさらに活用",
+    "anonymousLimitBody": "無料アカウントを作成して、より多くのブックマークやフォローをしましょう。",
+    "anonymousLimitButton": "サインイン",
+    "standardLimitBody": "無料プランの制限に達しました。アップグレードして保存やフォローを増やしましょう。",
+    "standardLimitButton": "プレミアムにアップグレード",
+    "premiumLimitTitle": "制限に達しました",
+    "premiumLimitBody": "新しいアイテムを追加するには、既存のコンテンツを管理してください。",
+    "premiumLimitButton": "マイコンテンツを管理",
+    "saveButtonLabel": "保存",
+    "cancelButtonLabel": "キャンセル",
+    "manageFiltersPageTitle": "フィルタを管理",
+    "manageFiltersEmptyHeadline": "保存されたフィルタなし",
+    "manageFiltersEmptySubheadline": "フィルタページからフィルタを保存できます。",
+    "manageFiltersRenameTooltip": "フィルタ名を変更",
+    "manageFiltersDeleteTooltip": "フィルタを削除",
+    "saveFilterDialogTitleSave": "フィルタを保存",
+    "saveFilterDialogTitleRename": "フィルタ名を変更",
+    "saveFilterDialogInputLabel": "フィルタ名",
+    "saveFilterDialogValidationEmpty": "名前を入力してください",
+    "saveFilterDialogValidationTooLong": "名前が長すぎます",
+    "saveFilterDialogGenericError": "フィルタの保存中に予期しないエラーが発生しました。",
+    "headlinesFilterSaveTooltip": "フィルタを保存",
+    "headlinesFilterManageTooltip": "フィルタを管理",
+    "savedFiltersBarOpenTooltip": "フィルタを開く",
+    "savedFiltersBarAllLabel": "すべて",
+    "savedFiltersBarCustomLabel": "カスタム",
+    "applyFilterDialogTitle": "フィルタを適用",
+    "applyFilterDialogContent": "この設定を今回のみ適用しますか、それとも保存しますか？",
+    "applyFilterDialogApplyOnlyButton": "適用のみ",
+    "applyFilterDialogApplyAndSaveButton": "適用して保存",
+    "savedFiltersBarFollowedLabel": "フォロー中",
+    "sourceListFilterPageTitle": "ソースをフィルタ",
+    "sourceListFilterPageFilterButtonTooltip": "ソースリストをフィルタ",
+    "sourceListFilterByHeadquartersPageTitle": "本拠地の場所",
+    "savedFiltersPageTitle": "保存されたフィルタ",
+    "savedFiltersEmptyHeadline": "保存されたフィルタなし",
+    "savedFiltersEmptySubheadline": "フィードから保存したフィルタがここに表示されます。",
+    "savedFiltersMenuRename": "名前を変更",
+    "savedFiltersMenuDelete": "削除",
+    "discoverPageTitle": "見つける",
+    "bottomNavDiscoverLabel": "見つける",
+    "feedSearchHint": "見出しを検索...",
+    "headlineSearchEnterQuery": "数千のソースから見出しを見つける。",
+    "headlineSearchEnterQuerySubheadline": "キーワードで検索して記事を見つけましょう。",
+    "headlineSearchNoResults": "見出しが見つかりませんでした。",
+    "headlineSearchNoResultsSubheadline": "一致する見出しがありません。別のキーワードを試してください。",
+    "accountGuestAccount": "ゲストアカウント",
+    "accountRoleStandard": "標準ユーザー",
+    "accountRolePremium": "プレミアムユーザー",
+    "deleteConfirmationDialogTitle": "削除の確認",
+    "deleteConfirmationDialogContent": "このアイテムを削除してもよろしいですか？この操作は取り消せません。",
+    "deleteConfirmationDialogConfirmButton": "削除",
+    "headlineSearchInitialHeadline": "見出しを検索",
+    "headlineSearchInitialSubheadline": "キーワードを入力して記事を探します。",
+    "accountGuestUserHeadline": "ゲストアカウント",
+    "accountGuestUserSubheadline": "サインインしてデータを同期",
+    "discoverSearchHint": "ソースを検索...",
+    "seeAllButtonLabel": "すべて見る",
+    "failedToLoadMoreSources": "ソースの読み込みに失敗しました。",
+    "sourceTypeNewsAgency": "通信社",
+    "sourceTypeLocalNewsOutlet": "地方ニュース",
+    "sourceTypeNationalNewsOutlet": "全国ニュース",
+    "sourceTypeInternationalNewsOutlet": "国際ニュース",
+    "sourceTypeSpecializedPublisher": "専門出版社",
+    "sourceTypeBlog": "ブログ",
+    "sourceTypeGovernmentSource": "政府ソース",
+    "sourceTypeAggregator": "アグリゲーター",
+    "sourceTypeOther": "その他",
+    "sourceTypeNewsAgencies": "通信社",
+    "sourceTypeLocalNewsOutlets": "地方ニュース",
+    "sourceTypeNationalNewsOutlets": "全国ニュース",
+    "sourceTypeInternationalNewsOutlets": "国際ニュース",
+    "sourceTypeSpecializedPublishers": "専門出版社",
+    "sourceTypeBlogs": "ブログ",
+    "sourceTypeGovernmentSources": "政府ソース",
+    "sourceTypeAggregators": "アグリゲーター",
+    "sourceTypeOthers": "その他",
+    "sourceTypeFilterEmptyHeadline": "ソースタイプが見つかりません",
+    "sourceTypeFilterEmptySubheadline": "現在利用可能なソースタイプはありません。",
+    "decoratorDismissedConfirmation": "提案を非表示にしました。",
+    "decoratorDismissAction": "提案を非表示",
+    "decoratorLinkAccountTitle_1": "記事と設定を保存",
+    "decoratorLinkAccountTitle_2": "保存した設定を失わないために",
+    "decoratorLinkAccountDescription_1": "無料アカウントを作成して、より多くの記事を保存し、デバイス間で同期しましょう。",
+    "decoratorLinkAccountDescription_2": "サインアップして、ニュースフィードをどこでも一貫して保ちましょう。",
+    "decoratorLinkAccountCta_1": "今すぐ登録",
+    "decoratorLinkAccountCta_2": "無料アカウントを作成",
+    "decoratorUpgradeTitle_1": "途切れることのないニュース体験を",
+    "decoratorUpgradeTitle_2": "プレミアムアクセスを解除",
+    "decoratorUpgradeDescription_1": "広告を非表示にし、保存やフォローの制限を大幅に拡大します。",
+    "decoratorUpgradeDescription_2": "プレミアムにアップグレードして、広告なしでより多くのコンテンツを楽しみましょう。",
+    "decoratorUpgradeCta_1": "プレミアムにアップグレード",
+    "decoratorUpgradeCta_2": "詳細を見る",
+    "decoratorRateAppTitle_1": "アプリを楽しんでいますか？",
+    "decoratorRateAppTitle_2": "フィードバックをお寄せください",
+    "decoratorRateAppDescription_1": "あなたの評価は、ニュース体験の向上に役立ちます。",
+    "decoratorRateAppDescription_2": "より良いニュースを届けるために、評価をお願いします！",
+    "decoratorRateAppCta_1": "今すぐ評価",
+    "decoratorRateAppCta_2": "フィードバックを送る",
+    "decoratorEnableNotificationsTitle_1": "速報を見逃さない",
+    "decoratorEnableNotificationsTitle_2": "常に最新情報を",
+    "decoratorEnableNotificationsDescription_1": "フォロー中のトピックやソースから速報アラートを受け取ります。",
+    "decoratorEnableNotificationsDescription_2": "通知を有効にして、パーソナライズされたニュースを受け取りましょう。",
+    "decoratorEnableNotificationsCta_1": "アラートを有効にする",
+    "decoratorEnableNotificationsCta_2": "通知をオンにする",
+    "decoratorSuggestedTopicsTitle_1": "新しい興味を見つける",
+    "decoratorSuggestedTopicsTitle_2": "知識を広げる",
+    "decoratorSuggestedSourcesTitle_1": "新しい視点を見つける",
+    "decoratorSuggestedSourcesTitle_2": "信頼できるソースを見つける",
+    "savedHeadlineFiltersPageTitle": "保存されたフィルタ",
+    "savedHeadlineFiltersCreateNewButton": "フィルタを作成",
+    "savedHeadlineFiltersLoadingHeadline": "フィルタを読み込み中...",
+    "savedHeadlineFiltersEmptyHeadline": "保存されたフィルタはまだありません",
+    "savedHeadlineFiltersEmptySubheadline": "作成したフィルタがここに表示されます。",
+    "savedFiltersMenuEdit": "編集",
+    "saveFilterDialogPinToFeedLabel": "フィルタバーに固定",
+    "saveFilterDialogNotificationsLabel": "通知設定",
+    "notificationDeliveryTypeBreakingOnly": "ニュース速報",
+    "notificationDeliveryTypeDailyDigest": "デイリーダイジェスト",
+    "notificationDeliveryTypeWeeklyRoundup": "ウィークリーラウンドアップ",
+    "prePermissionDialogTitle": "通知を有効にしますか？",
+    "prePermissionDialogBody": "速報アラートやダイジェストを送信するために、通知を許可してください。",
+    "prePermissionDialogDenyButton": "今はしない",
+    "prePermissionDialogAllowButton": "許可する",
+    "notificationPermissionDeniedError": "通知権限が拒否されました。デバイスの設定で有効にできます。",
+    "notificationCenterPageTitle": "通知",
+    "notificationCenterMarkAllAsReadButton": "すべて既読にする",
+    "notificationCenterLoadingHeadline": "通知を読み込み中...",
+    "notificationCenterLoadingSubheadline": "お待ちください...",
+    "notificationCenterFailureHeadline": "通知の読み込みに失敗しました",
+    "notificationCenterFailureSubheadline": "通知を取得できませんでした。もう一度お試しください。",
+    "notificationCenterEmptyHeadline": "通知なし",
+    "notificationCenterEmptySubheadline": "新しい通知はありません。",
+    "notificationCenterTabBreakingNews": "ニュース速報",
+    "notificationCenterTabDigests": "ダイジェスト",
+    "deleteReadNotificationsButtonTooltip": "既読の通知をすべて削除",
+    "deleteReadNotificationsDialogContent": "このタブの既読通知をすべて削除してもよろしいですか？",
+    "deleteButtonLabel": "削除",
+    "breakingNewsPrefix": "速報",
+    "settingsFeedClickBehaviorLabel": "リンクを開く方法",
+    "settingsFeedClickBehaviorDefault": "アプリのデフォルト",
+    "settingsFeedClickBehaviorInApp": "アプリ内ブラウザ",
+    "settingsFeedClickBehaviorSystem": "システムブラウザ",
+    "continueToArticleButtonLabel": "記事へ進む",
+    "headlineActionsModalTitle": "アクション",
+    "shareActionLabel": "共有",
+    "bookmarkActionLabel": "ブックマーク",
+    "removeBookmarkActionLabel": "ブックマークを削除",
+    "reportActionLabel": "報告",
+    "reportContentTitle": "コンテンツを報告",
+    "reportReasonSelectionPrompt": "報告の理由を選択してください:",
+    "reportAdditionalCommentsLabel": "追加のコメント（任意）",
+    "reportSubmitButtonLabel": "報告を送信",
+    "reportSuccessSnackbar": "報告を送信しました。フィードバックありがとうございます。",
+    "reportFailureSnackbar": "報告の送信に失敗しました。",
+    "commentsTitle": "コメント",
+    "commentPostButtonLabel": "投稿",
+    "commentInputHint": "コメントを追加...",
+    "commentRequiresReactionError": "コメントを投稿するにはリアクションを選択してください。",
+    "likeActionLabel": "いいね",
+    "dislikeActionLabel": "よくないね",
+    "commentActionLabel": "コメント",
+    "moreActionLabel": "もっと見る",
+    "rateAppPromptTitle": "アプリを楽しんでいますか？",
+    "rateAppPromptBody": "評価をお願いできますか？",
+    "rateAppPromptYesButton": "素晴らしい！",
+    "rateAppPromptNoButton": "改善が必要",
+    "feedbackPromptTitle": "どのように改善できますか？",
+    "feedbackPromptReasonUI": "UI / デザイン",
+    "feedbackPromptReasonPerformance": "パフォーマンス / 速度",
+    "feedbackPromptReasonContent": "コンテンツの質",
+    "feedbackPromptReasonOther": "その他",
+    "feedbackPromptSubmitButton": "フィードバックを送信",
+    "rateAppNegativeFollowUpTitle_1": "現在の状況はいかがですか？",
+    "rateAppNegativeFollowUpTitle_2": "改善されましたか？",
+    "rateAppNegativeFollowUpBody_1": "フィードバックに基づき改善を行いました。評価を再検討していただけませんか？",
+    "rateAppNegativeFollowUpBody_2": "皆様のご意見を大切にしています。改善されたかどうか教えてください。",
+    "noCommentsYet": "まだコメントはありません。",
+    "commentInputNoReactionHint": "リアクションしてコメントを追加",
+    "headlineReportReasonMisinformation": "誤報またはフェイクニュース",
+    "headlineReportReasonClickbait": "クリックベイトまたは紛らわしいタイトル",
+    "headlineReportReasonOffensive": "不快またはヘイトスピーチ",
+    "headlineReportReasonSpam": "スパムまたは詐欺",
+    "headlineReportReasonBrokenLink": "リンク切れ",
+    "headlineReportReasonPaywalled": "ペイウォール（有料記事）",
+    "sourceReportReasonLowQuality": "質の低いジャーナリズム",
+    "sourceReportReasonHighAdDensity": "過度な広告またはポップアップ",
+    "sourceReportReasonFrequentPaywalls": "頻繁なペイウォール",
+    "sourceReportReasonImpersonation": "なりすまし",
+    "sourceReportReasonMisinformation": "誤報",
+    "commentReportReasonSpam": "スパムまたは広告",
+    "commentReportReasonHarassment": "嫌がらせまたはいじめ",
+    "commentReportReasonHateSpeech": "ヘイトスピーチ",
+    "limitReachedTitle": "制限に達しました",
+    "manageMyContentButton": "マイコンテンツを管理",
+    "upgradeButton": "アップグレード",
+    "createAccountButton": "アカウントを作成",
+    "gotItButton": "了解",
+    "commentsPageTitle": "コメント",
+    "commentsCount": "{count,plural, other{{count} 件のコメント}}",
+    "@commentsCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "アカウントが必要です",
+    "limitReachedGuestUserBody": "コミュニティに参加してこの機能を使用するには、無料アカウントを作成するかサインインしてください。",
+    "limitReachedBodyFollow": "フォロー中のアイテムの制限に達しました。新しくフォローするには、既存のコンテンツを整理してください。",
+    "limitReachedBodySave": "保存した記事の制限に達しました。新しく保存するには、既存の記事を整理してください。",
+    "limitReachedBodySaveFilters": "保存されたフィルタの制限に達しました。新しく作成するには、既存のフィルタを整理してください。",
+    "limitReachedBodyPinFilters": "固定されたフィルタの制限に達しました。新しく固定するには、既存のフィルタの固定を解除してください。",
+    "limitReachedBodySubscribeToNotifications": "通知購読の制限に達しました。新しいアラートを購読するには、既存の購読を整理してください。",
+    "limitReachedBodyComments": "1日のコメント投稿制限に達しました。明日またお試しください。",
+    "limitReachedBodyReactions": "1日のリアクション制限に達しました。明日またお試しください。",
+    "limitReachedBodyReports": "1日の報告制限に達しました。明日またお試しください。",
+    "commentEditButtonLabel": "更新",
+    "commentPostFailureSnackbar": "コメントの投稿に失敗しました。もう一度お試しください。",
+    "commentUpdateFailureSnackbar": "コメントの更新に失敗しました。もう一度お試しください。",
+    "commentInputDisabledHint": "サインインして会話に参加",
+    "commentInputExistingHint": "この見出しには既にコメント済みです。",
+    "commenterName": "ユーザー {id}",
+    "@commenterName": {
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
+    },
+    "accountRewardsTile": "特典とオファー",
+    "rewardsPageTitle": "特典",
+    "rewardsOfferTitle": "{duration}間の{rewardName}を取得",
+    "@rewardsOfferTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} 有効",
+    "@rewardsOfferActiveTitle": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "有効期限: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "動画を視聴",
+    "rewardsOfferVerifyingButton": "確認中...",
+    "rewardsOfferLoadingButton": "広告を読み込み中...",
+    "rewardsSnackbarSuccess": "特典解除: {rewardName} が有効になりました。",
+    "@rewardsSnackbarSuccess": {
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "確認に失敗しました。しばらくしてからもう一度お試しください。",
+    "rewardsAdDismissedSnackbar": "広告が閉じられました。特典を獲得するには最後まで視聴してください。",
+    "decoratorUnlockRewardsTitle": "広告なしの体験を解除",
+    "decoratorUnlockRewardsDescription": "短い動画を視聴して、{duration}間アプリを広告なしで楽しみましょう。",
+    "@decoratorUnlockRewardsDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "decoratorUnlockRewardsCta": "今すぐ視聴",
+    "rewardsDurationDays": "{count, plural, other{{count} 日間}}",
+    "@rewardsDurationDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "rewardTypeAdFree": "広告なし",
+    "rewardTypeDailyDigest": "デイリーダイジェスト",
+    "unlockMoreButton": "さらに解除",
+    "requiresActiveReward": "有効な特典が必要です。アカウントページから特典を解除できます。",
+    "rewardsAdFreeTitle": "広告なしの体験を楽しむ",
+    "rewardsAdFreeDescription": "短い動画を視聴して、{duration}間アプリからすべての広告を削除します。",
+    "@rewardsAdFreeDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "デイリーニュースダイジェストを解除",
+    "rewardsDailyDigestDescription": "「デイリーダイジェスト」オプションが有効な保存済みフィルタから、主要な見出しをまとめたプッシュ通知を毎日受け取ります。{duration}間有効です。",
+    "@rewardsDailyDigestDescription": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "有効",
+    "rewardsAdFreePageTitle": "広告なし体験",
+    "rewardsAdFreeInactiveHeadline": "広告なしの体験を楽しむ",
+    "rewardsAdFreeInactiveBody": "短い広告を視聴して、{duration}間アプリを中断なしで楽しみましょう。",
+    "@rewardsAdFreeInactiveBody": {
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsAdFreeActiveHeadline": "広告なし体験が有効です",
+    "rewardsAdFreeActiveBody": "広告なしアクセスの有効期限:",
+    "appTourStep1Title": "あなたにぴったりのニュース",
+    "appTourStep1Body": "あなた専用のフィードを作成しましょう。関心のあるトピック、ソース、国をフォローすれば、あとはお任せください。",
+    "appTourStep2Title": "キュレートして通知を受け取る",
+    "appTourStep2Body": "あらゆるニッチな分野に合わせてカスタムニュースフィードを作成・保存。見逃せないニュースの速報アラートやデイリーダイジェストを購読しましょう。",
+    "appTourStep3Title": "あなたの視点を共有",
+    "appTourStep3Body": "記事にリアクションやコメントをして、グローバルコミュニティと交流しましょう。あなたの声が会話を形作ります。",
+    "appTourSkipButton": "スキップ",
+    "appTourNextButton": "次へ",
+    "appTourGetStartedButton": "はじめる",
+    "initialPersonalizationTitle": "フィードをカスタマイズ",
+    "initialPersonalizationSubtitle": "まずはトピック、ソース、または国をいくつかフォローしましょう。これらは後でいつでも変更できます。",
+    "initialPersonalizationStepTopicsTitle": "トピックを選択",
+    "initialPersonalizationStepSourcesTitle": "ソースを選択",
+    "initialPersonalizationStepCountriesTitle": "国を選択",
+    "initialPersonalizationTotalSelectionCountLabel": "{count}件選択済み",
+    "@initialPersonalizationTotalSelectionCountLabel": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "完了",
+    "deleteAccountDialogTitle": "アカウントの削除",
+    "deleteAccountDialogContent": "本当にアカウントを完全に削除しますか？この操作は取り消せません。",
+    "deleteAccountDialogConfirm": "アカウントを削除",
+    "deleteAccountButton": "アカウントを削除",
+    "followedContentEmpty": "このカテゴリにはまだフォロー中のアイテムがありません。",
+    "followedContentEmptySubheadline": "フォローしたアイテムがここに表示されます。「+」ボタンを使って追加してください。",
+    "multiSelectSearchPageSelectionCount": "{count}/{total}",
+    "@multiSelectSearchPageSelectionCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "guestUserDisplayName": "ゲスト",
+    "accountPageSyncProgressButton": "進捗を同期",
+    "applyButtonLabel": "適用",
+    "commentStatusPending": "審査中"
+}

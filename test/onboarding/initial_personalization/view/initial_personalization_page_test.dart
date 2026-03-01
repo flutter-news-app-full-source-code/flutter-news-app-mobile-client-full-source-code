@@ -214,8 +214,8 @@ void main() {
     ) async {
       final topic = Topic(
         id: '1',
-        name: 'Tech',
-        description: '',
+        name: const {SupportedLanguage.en: 'Tech'},
+        description: const {SupportedLanguage.en: 'Desc'},
         iconUrl: '',
         createdAt: DateTime(2024),
         updatedAt: DateTime(2024),

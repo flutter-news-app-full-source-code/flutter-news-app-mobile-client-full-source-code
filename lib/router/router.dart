@@ -436,6 +436,27 @@ GoRouter createRouter({
                       ),
                     ),
               ),
+              BlocProvider(
+                create: (context) {
+                  final appBloc = context.read<AppBloc>();
+                  return HeadlinesFeedBloc(
+                    headlinesRepository: context
+                        .read<DataRepository<Headline>>(),
+                    feedDecoratorService: FeedDecoratorService(),
+                    adService: context.read<AdService>(),
+                    appBloc: appBloc,
+                    inlineAdCacheService: context.read<InlineAdCacheService>(),
+                    feedCacheService: context.read<FeedCacheService>(),
+                    initialUserContentPreferences:
+                        appBloc.state.userContentPreferences,
+                    engagementRepository: context
+                        .read<DataRepository<Engagement>>(),
+                    contentLimitationService: context
+                        .read<ContentLimitationService>(),
+                    analyticsService: context.read<AnalyticsService>(),
+                  );
+                },
+              ),
             ],
             child: EntityDetailsPage(args: args),
           );

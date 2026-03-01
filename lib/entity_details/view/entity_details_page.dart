@@ -50,11 +50,24 @@ class EntityDetailsView extends StatefulWidget {
 class _EntityDetailsViewState extends State<EntityDetailsView> {
   final _scrollController = ScrollController();
   bool _isFollowingInProgress = false;
+  bool _isDeactivated = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void deactivate() {
+    _isDeactivated = true;
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _isDeactivated = false;
   }
 
   @override
@@ -66,6 +79,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   }
 
   void _onScroll() {
+    if (!mounted || _isDeactivated) return;
+
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
         EntityDetailsLoadMoreHeadlinesRequested(

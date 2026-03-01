@@ -82,6 +82,7 @@ class _MultiSelectSearchPageState<T extends FeedItem>
     _searchController.addListener(() {
       if (_debounce?.isActive ?? false) _debounce!.cancel();
       _debounce = Timer(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
         if (_searchQuery != _searchController.text) {
           setState(() => _searchQuery = _searchController.text);
           if (_isPaginated) {

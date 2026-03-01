@@ -18,32 +18,26 @@ void main() {
   group('CountryFilterPage', () {
     late HeadlinesFilterBloc headlinesFilterBloc;
 
-    final country1 = Country(
+    const country1 = Country(
       id: 'c1',
       isoCode: 'US',
-      name: 'USA',
+      name: {SupportedLanguage.en: 'USA'},
       flagUrl: '',
-      createdAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      updatedAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      status: ContentStatus.active,
     );
-    final country2 = Country(
+    const country2 = Country(
       id: 'c2',
       isoCode: 'GB',
-      name: 'United Kingdom',
+      name: {SupportedLanguage.en: 'United Kingdom'},
       flagUrl: '',
-      createdAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      updatedAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      status: ContentStatus.active,
     );
 
     setUp(() {
       headlinesFilterBloc = MockHeadlinesFilterBloc();
       when(() => headlinesFilterBloc.state).thenReturn(
-        HeadlinesFilterState(
+        const HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
           allCountries: [country1, country2],
-          selectedCountries: const {},
+          selectedCountries: {},
         ),
       );
     });
@@ -75,7 +69,7 @@ void main() {
 
       verify(
         () => headlinesFilterBloc.add(
-          FilterCountryToggled(country: country1, isSelected: true),
+          const FilterCountryToggled(country: country1, isSelected: true),
         ),
       ).called(1);
     });

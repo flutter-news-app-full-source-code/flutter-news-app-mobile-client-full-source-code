@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:go_router/go_router.dart';
 
 /// {@template saved_filters_bar}
@@ -213,7 +214,7 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                   ),
                   child: ChoiceChip(
                     label: Text(
-                      filter.name,
+                      filter.name.getValue(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

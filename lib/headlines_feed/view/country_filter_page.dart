@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:go_router/go_router.dart';
 
 /// {@template country_filter_page}
@@ -120,7 +121,10 @@ class _CountryFilterView extends StatelessWidget {
               );
 
               return CheckboxListTile(
-                title: Text(country.name, style: textTheme.titleMedium),
+                title: Text(
+                  country.name.getValue(context),
+                  style: textTheme.titleMedium,
+                ),
                 secondary: SizedBox(
                   width: AppSpacing.xl + AppSpacing.xs,
                   height: AppSpacing.lg + AppSpacing.sm,

@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:logging/logging.dart';
 
@@ -57,7 +58,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   void initState() {
     super.initState();
     final filter = widget.filterToEdit;
-    _controller = TextEditingController(text: filter?.name);
+    _controller = TextEditingController(text: filter?.name.getValue(context));
     _isPinned = filter?.isPinned ?? false;
     // Initialize with a new modifiable Set to prevent "Cannot modify
     // unmodifiable Set" errors when editing an existing filter.

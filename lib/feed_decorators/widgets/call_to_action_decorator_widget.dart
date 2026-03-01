@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 
 /// {@template call_to_action_decorator_widget}
 /// A widget to display a call-to-action feed decorator.
@@ -47,14 +48,14 @@ class CallToActionDecoratorWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.title,
+                  item.title.getValue(context),
                   style: theme.textTheme.titleLarge,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  item.description,
+                  item.description.getValue(context),
                   style: theme.textTheme.bodyMedium,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
@@ -64,7 +65,7 @@ class CallToActionDecoratorWidget extends StatelessWidget {
                   alignment: Alignment.bottomRight,
                   child: ElevatedButton(
                     onPressed: () => onCallToAction(item.callToActionUrl),
-                    child: Text(item.callToActionText),
+                    child: Text(item.callToActionText.getValue(context)),
                   ),
                 ),
               ],

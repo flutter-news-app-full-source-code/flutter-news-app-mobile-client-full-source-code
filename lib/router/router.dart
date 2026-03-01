@@ -510,6 +510,7 @@ GoRouter createRouter({
                                 .read<DataRepository<Source>>(),
                             countriesRepository: context
                                 .read<DataRepository<Country>>(),
+                            appBloc: context.read<AppBloc>(),
                           )..add(
                             FilterDataLoaded(
                               initialSelectedTopics: initialFilter.topics,

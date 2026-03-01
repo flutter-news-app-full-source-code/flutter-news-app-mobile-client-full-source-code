@@ -98,8 +98,11 @@ void main() {
           sort: any(named: 'sort'),
         ),
       ).thenAnswer(
-        (_) async =>
-            const PaginatedResponse(items: [country1], cursor: null, hasMore: false),
+        (_) async => const PaginatedResponse(
+          items: [country1],
+          cursor: null,
+          hasMore: false,
+        ),
       );
       when(
         () =>

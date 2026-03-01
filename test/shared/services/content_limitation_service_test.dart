@@ -483,7 +483,10 @@ void main() {
               userId: 'standard',
               entityId: 'h$i',
               entityType: EngageableType.headline,
-              comment: const Comment(language: SupportedLanguage.en, content: 'c'),
+              comment: const Comment(
+                language: SupportedLanguage.en,
+                content: 'c',
+              ),
               createdAt: testDate,
               updatedAt: testDate,
             ),
@@ -514,7 +517,7 @@ void main() {
             10,
             (i) => Headline(
               id: '$i',
-              title: const {SupportedLanguage.en :'t'},
+              title: const {SupportedLanguage.en: 't'},
               url: 'u',
               imageUrl: 'i',
               source: Source(

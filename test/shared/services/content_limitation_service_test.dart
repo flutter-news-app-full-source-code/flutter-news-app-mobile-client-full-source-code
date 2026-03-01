@@ -123,6 +123,10 @@ void main() {
           androidUpdateUrl: '',
         ),
         general: GeneralAppConfig(termsOfServiceUrl: '', privacyPolicyUrl: ''),
+        localization: LocalizationConfig(
+          enabledLanguages: [SupportedLanguage.en],
+          defaultLanguage: SupportedLanguage.en,
+        ),
       ),
       features: const FeaturesConfig(
         onboarding: OnboardingConfig(
@@ -479,18 +483,7 @@ void main() {
               userId: 'standard',
               entityId: 'h$i',
               entityType: EngageableType.headline,
-              comment: Comment(
-                language: Language(
-                  id: 'en',
-                  code: 'en',
-                  name: 'English',
-                  nativeName: 'English',
-                  createdAt: testDate,
-                  updatedAt: testDate,
-                  status: ContentStatus.active,
-                ),
-                content: 'c',
-              ),
+              comment: const Comment(language: SupportedLanguage.en, content: 'c'),
               createdAt: testDate,
               updatedAt: testDate,
             ),
@@ -521,51 +514,37 @@ void main() {
             10,
             (i) => Headline(
               id: '$i',
-              title: 't',
+              title: const {SupportedLanguage.en :'t'},
               url: 'u',
               imageUrl: 'i',
               source: Source(
                 id: 's',
-                name: 'n',
-                description: 'd',
+                name: const {SupportedLanguage.en: 'n'},
+                description: const {SupportedLanguage.en: 'd'},
                 url: 'u',
                 logoUrl: 'l',
                 sourceType: SourceType.newsAgency,
-                language: Language(
-                  id: 'en',
-                  code: 'en',
-                  name: 'English',
-                  nativeName: 'English',
-                  createdAt: DateTime(2023),
-                  updatedAt: DateTime(2023),
-                  status: ContentStatus.active,
-                ),
-                headquarters: Country(
+                language: SupportedLanguage.en,
+                headquarters: const Country(
                   isoCode: 'US',
-                  name: 'USA',
+                  name: {SupportedLanguage.en: 'USA'},
                   flagUrl: 'f',
                   id: 'c',
-                  createdAt: DateTime(2023),
-                  updatedAt: DateTime(2023),
-                  status: ContentStatus.active,
                 ),
                 createdAt: DateTime(2023),
                 updatedAt: DateTime(2023),
                 status: ContentStatus.active,
               ),
-              eventCountry: Country(
+              eventCountry: const Country(
                 isoCode: 'US',
-                name: 'USA',
+                name: {SupportedLanguage.en: 'USA'},
                 flagUrl: 'f',
                 id: 'c',
-                createdAt: DateTime(2023),
-                updatedAt: DateTime(2023),
-                status: ContentStatus.active,
               ),
               topic: Topic(
                 id: 't',
-                name: 't',
-                description: 'd',
+                name: const {SupportedLanguage.en: 't'},
+                description: const {SupportedLanguage.en: 'd'},
                 iconUrl: 'i',
                 createdAt: DateTime(2023),
                 updatedAt: DateTime(2023),
@@ -699,8 +678,8 @@ void main() {
             5, // Limit is 5
             (i) => Topic(
               id: '$i',
-              name: 't',
-              description: 'd',
+              name: const {SupportedLanguage.en: 't'},
+              description: const {SupportedLanguage.en: 'd'},
               iconUrl: 'i',
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
@@ -736,7 +715,7 @@ void main() {
             (i) => SavedHeadlineFilter(
               id: '$i',
               userId: 'standard',
-              name: 'filter',
+              name: const {SupportedLanguage.en: 'filter'},
               criteria: const HeadlineFilterCriteria(
                 topics: [],
                 sources: [],

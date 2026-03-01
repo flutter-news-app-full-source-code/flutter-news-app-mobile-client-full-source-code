@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/rewarded_ad.dart';
 
 /// {@template ad_service_interface}
 /// An interface for the service responsible for managing and providing ads.

@@ -3,7 +3,7 @@ import 'package:core_ui/core_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
 
 /// {@template user_avatar}
 /// A widget that displays a user's avatar.

@@ -2,12 +2,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/headline_actions_row.dart';
+import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
+import 'package:flutter_news_app_mobile_client/shared/widgets/feed_core/headline_source_row.dart';
+import 'package:flutter_news_app_mobile_client/shared/widgets/feed_core/headline_tap_handler.dart';
+import 'package:flutter_news_app_mobile_client/user_content/engagement/widgets/headline_actions_row.dart';
 
 /// {@template headline_tile_text_only}
 /// A widget to display a headline item with text only.

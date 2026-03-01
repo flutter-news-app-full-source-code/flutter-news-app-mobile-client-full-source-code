@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
 
 /// Defines the specific onboarding flow that is required.
 enum OnboardingStatus { preAuthTour, postAuthPersonalization }

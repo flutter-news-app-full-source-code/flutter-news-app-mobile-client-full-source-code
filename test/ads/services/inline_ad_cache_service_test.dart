@@ -1,8 +1,8 @@
 // ignore_for_file: inference_failure_on_function_invocation
 
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
+import 'package:flutter_news_app_mobile_client/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
 
 /// {@template native_ad_template_type}
 /// Defines the visual template type for an inline native ad.

@@ -2,12 +2,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
+import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
+import 'package:flutter_news_app_mobile_client/shared/widgets/multi_select_search_page.dart';
 
 class InitialPersonalizationPage extends StatelessWidget {
   const InitialPersonalizationPage({super.key});

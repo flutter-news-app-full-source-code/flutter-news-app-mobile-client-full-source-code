@@ -1,7 +1,7 @@
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
 
 /// {@template provide_feedback_bottom_sheet}
 /// A bottom sheet for collecting detailed user feedback after a negative

@@ -2,12 +2,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/router/routes.dart';
+import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client/shared/widgets/entity_list_tile.dart';
 import 'package:go_router/go_router.dart';
 
 /// {@template followed_content_page}

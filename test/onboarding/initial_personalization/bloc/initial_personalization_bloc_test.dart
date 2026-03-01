@@ -1,10 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
+import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client/app/models/initialization_result.dart';
+import 'package:flutter_news_app_mobile_client/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';

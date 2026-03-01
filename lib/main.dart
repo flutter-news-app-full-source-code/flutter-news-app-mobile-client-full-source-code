@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/bootstrap.dart';
+import 'package:flutter_news_app_mobile_client/app/config/config.dart';
+import 'package:flutter_news_app_mobile_client/app/view/app_hot_restart_wrapper.dart';
+import 'package:flutter_news_app_mobile_client/bootstrap.dart';
 
 // Determine the current application environment from compile-time variables.
 // Defaults to 'development' if no environment is specified.

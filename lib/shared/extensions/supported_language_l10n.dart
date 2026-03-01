@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
 
 /// Extension on [SupportedLanguage] to provide localized string representations.
 extension SupportedLanguageL10n on SupportedLanguage {

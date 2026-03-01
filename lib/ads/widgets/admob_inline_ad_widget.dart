@@ -1,8 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client/ads/models/native_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 

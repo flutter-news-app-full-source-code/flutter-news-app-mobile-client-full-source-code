@@ -1,5 +1,5 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
 
 /// An extension to provide localized names for the [SourceType] enum.
 extension SourceTypeL10n on SourceType {

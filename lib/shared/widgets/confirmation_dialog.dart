@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
 
 /// {@template confirmation_dialog}
 /// A reusable dialog for asking the user to confirm an action.

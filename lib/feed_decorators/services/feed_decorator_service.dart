@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/extensions/feed_decorator_type_l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/models/decorator_placeholder.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client/feed_decorators/extensions/feed_decorator_type_l10n.dart';
+import 'package:flutter_news_app_mobile_client/feed_decorators/models/decorator_placeholder.dart';
+import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client/router/routes.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 

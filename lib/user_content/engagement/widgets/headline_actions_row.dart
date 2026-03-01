@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/inline_reaction_selector.dart';
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client/user_content/engagement/view/comments_bottom_sheet.dart';
+import 'package:flutter_news_app_mobile_client/user_content/engagement/widgets/inline_reaction_selector.dart';
 
 /// {@template headline_actions_row}
 /// A widget that displays a row of engagement actions for a headline tile.

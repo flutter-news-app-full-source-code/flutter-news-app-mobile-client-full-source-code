@@ -1,8 +1,8 @@
 import 'package:core_ui/core_ui.dart' hide UiKitL10n;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template update_required_page}

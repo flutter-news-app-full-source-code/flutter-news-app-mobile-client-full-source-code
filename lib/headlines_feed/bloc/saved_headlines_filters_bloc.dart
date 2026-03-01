@@ -7,7 +7,7 @@ import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 // Import AppBloc with an alias to resolve the name collision between
 // the local `SavedHeadlineFiltersReordered` event and the one in AppBloc.
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart'
+import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart'
     as app_bloc;
 import 'package:logging/logging.dart';
 

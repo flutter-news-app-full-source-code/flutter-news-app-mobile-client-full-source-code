@@ -1,5 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client/analytics/providers/analytics_provider.dart';
 import 'package:logging/logging.dart';
 
 /// {@template firebase_analytics_provider}

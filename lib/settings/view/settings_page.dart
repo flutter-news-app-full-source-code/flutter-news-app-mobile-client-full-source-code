@@ -7,6 +7,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/supported_language_flag.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/supported_language_l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -236,13 +238,16 @@ class _LanguageSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final supportedLanguages = languagesFixturesData
-        .where((l) => l.code == 'en' || l.code == 'ar')
-        .toList();
+    final remoteConfig = context.select(
+      (AppBloc bloc) => bloc.state.remoteConfig,
+    );
+    final enabledLanguages =
+        remoteConfig?.app.localization.enabledLanguages ??
+        [SupportedLanguage.en];
 
     return ListTile(
       title: Text(l10n.settingsLanguageTitle),
-      subtitle: Text(settings.language.name),
+      subtitle: Text(settings.language.l10n(context)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => showDialog<void>(
         context: context,
@@ -252,11 +257,16 @@ class _LanguageSetting extends StatelessWidget {
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: supportedLanguages.length,
+              itemCount: enabledLanguages.length,
               itemBuilder: (context, index) {
-                final language = supportedLanguages[index];
-                return RadioListTile<Language>(
-                  title: Text(language.name),
+                final language = enabledLanguages[index];
+                return RadioListTile<SupportedLanguage>(
+                  title: Text(language.l10n(context)),
+                  secondary: Image.network(
+                    language.flagUrl,
+                    width: 32,
+                    errorBuilder: (_, __, ___) => const SizedBox(width: 32),
+                  ),
                   value: language,
                   groupValue: settings.language,
                   onChanged: (selectedLanguage) {

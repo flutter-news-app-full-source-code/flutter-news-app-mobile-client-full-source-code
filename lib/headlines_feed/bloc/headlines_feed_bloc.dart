@@ -93,6 +93,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                initialUserContentPreferences?.savedHeadlineFilters ?? const [],
          ),
        ) {
+    _lastUserRewards = _appBloc.state.userRewards;
+    _lastAppSettings = _appBloc.state.settings;
+
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -123,6 +126,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         }
       }
       _lastUserRewards = newRewards;
+
+      // Handle Language changes
+      final newSettings = appState.settings;
+      if (_lastAppSettings?.language != newSettings?.language) {
+        _logger.info(
+          'Language changed. Triggering feed refresh to fetch localized content.',
+        );
+        if (state.adThemeStyle != null) {
+          add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
+        }
+      }
+      _lastAppSettings = newSettings;
     });
 
     on<HeadlinesFeedStarted>(
@@ -189,6 +204,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
   UserRewards? _lastUserRewards;
+  AppSettings? _lastAppSettings;
 
   static const _allFilterId = 'all';
 

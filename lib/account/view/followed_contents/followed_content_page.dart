@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
 import 'package:go_router/go_router.dart';
@@ -99,7 +100,7 @@ class FollowedContentPage extends StatelessWidget {
           title: l10n.addTopicsPageTitle,
           repository: context.read<DataRepository<Topic>>(),
           initialSelectedItems: preferences.followedTopics.toSet(),
-          itemBuilder: (Topic topic) => topic.name,
+          itemBuilder: (Topic topic) => topic.name.getValue(context),
         );
         onSave = (newItems) {
           if (newItems == null) return;
@@ -115,7 +116,7 @@ class FollowedContentPage extends StatelessWidget {
           title: l10n.addSourcesPageTitle,
           repository: context.read<DataRepository<Source>>(),
           initialSelectedItems: preferences.followedSources.toSet(),
-          itemBuilder: (Source source) => source.name,
+          itemBuilder: (Source source) => source.name.getValue(context),
         );
         onSave = (newItems) {
           if (newItems == null) return;
@@ -131,7 +132,7 @@ class FollowedContentPage extends StatelessWidget {
           title: l10n.addCountriesPageTitle,
           repository: context.read<DataRepository<Country>>(),
           initialSelectedItems: preferences.followedCountries.toSet(),
-          itemBuilder: (Country country) => country.name,
+          itemBuilder: (Country country) => country.name.getValue(context),
         );
         onSave = (newItems) {
           if (newItems == null) return;

@@ -50,8 +50,8 @@ void main() {
     const userId = 'user-id';
     final topic1 = Topic(
       id: 't1',
-      name: 'Topic 1',
-      description: '',
+      name: const {SupportedLanguage.en: 'Topic 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime(2024),
       updatedAt: DateTime(2024),

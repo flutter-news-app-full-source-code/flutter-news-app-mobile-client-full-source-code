@@ -2,12 +2,12 @@ name: flutter_news_app_mobile_client
 description: Complete, production-ready source code for a feature-rich Flutter news app mobile client.
 version: 1.16.0
 publish_to: none
-homepage: https://github.com/flutter-news-app-full-source-code/
-repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client
-documentation: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client/wiki
-issue_tracker: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client/issues
+homepage: https://github.com/flutter-news-app/
+repository: https://github.com/flutter-news-app/flutter-news-app-mobile-client
+documentation: https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki
+issue_tracker: https://github.com/flutter-news-app/flutter-news-app-mobile-client/issues
 funding:
-  - https://github.com/sponsors/flutter-news-app-full-source-code
+  - https://github.com/sponsors/flutter-news-app
 topics:
   - flutter
   - flutter-full-app
@@ -16,9 +16,9 @@ topics:
   - flutter-news-app-source-code
 screenshots:
   - description: The flutter news app full source code dark logo.
-    path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+    path: assets/logo/flutter-news-app-dark-logo.png
   - description: The flutter news app full source code light logo.
-    path: assets/logo/flutter-news-app-full-source-code-light-logo.png
+    path: assets/logo/flutter-news-app-light-logo.png
 
 environment:
   sdk: ^3.9.0
@@ -29,11 +29,11 @@ dependencies:
   collection: ^1.19.1
   core:
     git:
-      url: https://github.com/flutter-news-app-full-source-code/core.git
+      url: https://github.com/flutter-news-app/core.git
       ref: v2.0.0
   core_ui:
     git:
-      url: https://github.com/flutter-news-app-full-source-code/core-ui.git
+      url: https://github.com/flutter-news-app/core-ui.git
       ref: v2.0.0
   equatable: ^2.0.7
   firebase_analytics: ^12.1.0
@@ -87,7 +87,7 @@ flutter:
     - assets/logo/
 
 flutter_launcher_icons:
-  image_path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+  image_path: assets/logo/flutter-news-app-dark-logo.png
   android: "launcher_icon"
   min_sdk_android: 21
   web:
@@ -98,8 +98,8 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#FFFFFF"
   color_dark: "#212121"
-  image: assets/logo/flutter-news-app-full-source-code-dark-logo.png
-  image_dark: assets/logo/flutter-news-app-full-source-code-light-logo.png
+  image: assets/logo/flutter-news-app-dark-logo.png
+  image_dark: assets/logo/flutter-news-app-light-logo.png
   android: true
   ios: true
   web: false

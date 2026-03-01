@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <!-- Accepts URIs that begin with your dynamic link domain -->
-                <data android:scheme="https" android:host="flutter-news-app-full-source-code.page.link" />
+                <data android:scheme="https" android:host="flutter-news-app.page.link" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

@@ -6,7 +6,7 @@
         </video>
       </td>
       <td valign="top" width="50%">
-  <img src="https://github.com/user-attachments/assets/f91c8153-8cfb-496f-8270-38a48bf0e40f" alt="flutter-news-app-full-source-code" width="440">
+  <img src="https://github.com/user-attachments/assets/f91c8153-8cfb-496f-8270-38a48bf0e40f" alt="flutter-news-app" width="440">
       </td>
     </tr>
   </table>
@@ -17,13 +17,13 @@
 
 
 <p align="center">
-  <a href="https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
+  <a href="https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
   <img src="https://img.shields.io/badge/coverage-25%25-green?style=for-the-badge" alt="coverage: _%">
   <a href="LICENSE"><img src="https://img.shields.io/badge/TRIAL_LICENSE-VIEW_TERMS-blue?style=for-the-badge" alt="Trial License: View Terms"></a>
-  <a href="https://github.com/sponsors/flutter-news-app-full-source-code"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
+  <a href="https://github.com/sponsors/flutter-news-app"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
 </p>
 
-This mobile client contains the complete, production-ready source code for a feature-rich Flutter news app mobile client. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App Full Source Code**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a Dart Frog [backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-backend-api-full-source-code) and a web-based [content management dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
+This repository contains the complete, production-ready source code for a feature-rich Flutter news app mobile client. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App Full Source Code**](https://github.com/flutter-news-app), an ecosystem that also includes a Dart Frog [backend API](https://github.com/flutter-news-app/flutter-news-app-backend-api-full-source-code) and a web-based [content management dashboard](https://github.com/flutter-news-app/flutter-news-app-web-dashboard-full-source-code).
 
 
 ## ⭐ Feature Showcase: Everything You Get, Ready to Go
@@ -194,10 +194,10 @@ The application is fully internationalized and includes working English and Arab
 
 ## 🚀 Getting Started & Running Locally
 
-For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client/wiki) tab in this repository.
+For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki) tab in this repository.
 
 ## 🔑 Licensing
 
 This source code is licensed for commercial use and is provided for local evaluation. A **Lifetime Commercial License** is required for any production or public-facing application.
 
-Please visit the main [Flutter News App Full Source Code](https://github.com/flutter-news-app-full-source-code) organization page to review the full license terms and to purchase.
+Please visit the main [Flutter News App Full Source Code](https://github.com/flutter-news-app) organization page to review the full license terms and to purchase.

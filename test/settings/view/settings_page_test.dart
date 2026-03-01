@@ -46,27 +46,17 @@ void main() {
   late GoRouter goRouter;
 
   // Fixture data
-  final language = Language(
-    id: 'en-id',
-    code: 'en',
-    name: 'English',
-    nativeName: 'English',
-    createdAt: DateTime(2023),
-    updatedAt: DateTime(2023),
-    status: ContentStatus.active,
-  );
-
-  final initialSettings = AppSettings(
+  const initialSettings = AppSettings(
     id: 'user-id',
-    language: language,
-    displaySettings: const DisplaySettings(
+    language: SupportedLanguage.en,
+    displaySettings: DisplaySettings(
       baseTheme: AppBaseTheme.system,
       accentTheme: AppAccentTheme.defaultBlue,
       fontFamily: 'SystemDefault',
       textScaleFactor: AppTextScaleFactor.medium,
       fontWeight: AppFontWeight.regular,
     ),
-    feedSettings: const FeedSettings(
+    feedSettings: FeedSettings(
       feedItemDensity: FeedItemDensity.standard,
       feedItemImageStyle: FeedItemImageStyle.smallThumbnail,
       feedItemClickBehavior: FeedItemClickBehavior.internalNavigation,
@@ -89,7 +79,7 @@ void main() {
     appBloc = MockAppBloc();
     goRouter = MockGoRouter();
     when(() => appBloc.state).thenReturn(
-      AppState(
+      const AppState(
         status: AppLifeCycleStatus.authenticated,
         settings: initialSettings,
       ),

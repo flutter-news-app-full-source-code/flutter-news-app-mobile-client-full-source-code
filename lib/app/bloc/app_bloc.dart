@@ -580,12 +580,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
     }
 
-    if (updatedSettings.language.code != originalSettings.language.code) {
+    if (updatedSettings.language != originalSettings.language) {
       unawaited(
         _analyticsService.logEvent(
           AnalyticsEvent.languageChanged,
           payload: LanguageChangedPayload(
-            languageCode: updatedSettings.language.code,
+            languageCode: updatedSettings.language.name,
           ),
         ),
       );
@@ -629,6 +629,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _logger.info(
         '[AppBloc] AppSettings successfully updated for user ${updatedSettings.id}.',
       );
+
+      // If the language changed, we must refresh the auth token to update the
+      // 'lang' claim. This ensures the API projects data correctly for the
+      // new language on subsequent requests.
+      if (updatedSettings.language != originalSettings.language) {
+        _logger.info(
+          '[AppBloc] Language changed. Refreshing auth token to update claims.',
+        );
+        await _authRepository.refreshToken();
+      }
     } catch (e, s) {
       _logger.severe(
         'Failed to persist AppSettings for user ${updatedSettings.id}.',

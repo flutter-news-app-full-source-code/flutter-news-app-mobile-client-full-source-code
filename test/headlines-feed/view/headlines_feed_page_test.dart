@@ -32,18 +32,18 @@ void main() {
 
   final headline1 = Headline(
     id: 'h1',
-    title: {SupportedLanguage.en: 'Title 1'},
+    title: const {SupportedLanguage.en: 'Title 1'},
     url: 'url1',
     imageUrl: 'imageUrl1',
     source: Source(
       id: 's1',
-      name: {SupportedLanguage.en: 'Source 1'},
-      description: {SupportedLanguage.en: 'Desc'},
+      name: const {SupportedLanguage.en: 'Source 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       url: '',
       logoUrl: '',
       sourceType: SourceType.newsAgency,
       language: SupportedLanguage.en,
-      headquarters: Country(
+      headquarters: const Country(
         isoCode: 'US',
         name: {SupportedLanguage.en: 'USA'},
         flagUrl: 'f',
@@ -53,7 +53,7 @@ void main() {
       updatedAt: DateTime(2023),
       status: ContentStatus.active,
     ),
-    eventCountry: Country(
+    eventCountry: const Country(
       isoCode: 'US',
       name: {SupportedLanguage.en: 'USA'},
       flagUrl: 'f',
@@ -61,8 +61,8 @@ void main() {
     ),
     topic: Topic(
       id: 't1',
-      name: {SupportedLanguage.en: 'Topic 1'},
-      description: {SupportedLanguage.en: 'Desc'},
+      name: const {SupportedLanguage.en: 'Topic 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
@@ -189,17 +189,17 @@ void main() {
           savedHeadlines: [],
           savedHeadlineFilters: [],
         ),
-        settings: AppSettings(
+        settings: const AppSettings(
           id: 'settings-id',
           language: SupportedLanguage.en,
-          displaySettings: const DisplaySettings(
+          displaySettings: DisplaySettings(
             baseTheme: AppBaseTheme.light,
             accentTheme: AppAccentTheme.defaultBlue,
             fontFamily: 'Roboto',
             textScaleFactor: AppTextScaleFactor.medium,
             fontWeight: AppFontWeight.regular,
           ),
-          feedSettings: const FeedSettings(
+          feedSettings: FeedSettings(
             feedItemDensity: FeedItemDensity.standard,
             feedItemImageStyle: FeedItemImageStyle.smallThumbnail,
             feedItemClickBehavior: FeedItemClickBehavior.internalNavigation,

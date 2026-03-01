@@ -12,8 +12,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';

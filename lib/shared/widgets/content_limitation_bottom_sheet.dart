@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
 
 /// {@template content_limitation_bottom_sheet}
 /// A bottom sheet that informs the user about content limitations and provides

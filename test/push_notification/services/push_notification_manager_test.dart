@@ -3,11 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 

@@ -1,6 +1,6 @@
+import 'package:core_ui/core_ui.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template ad_theme_style}
 /// A UI-agnostic data model representing the theme properties required for

@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -27,9 +26,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/status/view/main
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
 ///

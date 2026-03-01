@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -9,7 +10,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 class MockHeadlinesFeedBloc
     extends MockBloc<HeadlinesFeedEvent, HeadlinesFeedState>

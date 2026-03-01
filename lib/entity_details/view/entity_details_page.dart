@@ -1,6 +1,7 @@
 // ignore_for_file: no_default_cases
 
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
@@ -15,7 +16,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({

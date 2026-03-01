@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';

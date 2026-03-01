@@ -22,6 +22,7 @@ final class FilterDataLoaded extends HeadlinesFilterEvent {
     this.initialSelectedTopics = const [],
     this.initialSelectedSources = const [],
     this.initialSelectedCountries = const [],
+    this.forceRefresh = false,
   });
 
   /// The topics that were initially selected on the previous page.
@@ -33,11 +34,15 @@ final class FilterDataLoaded extends HeadlinesFilterEvent {
   /// The countries that were initially selected on the previous page.
   final List<Country> initialSelectedCountries;
 
+  /// Whether to force a refresh of the data even if it's already loaded.
+  final bool forceRefresh;
+
   @override
   List<Object> get props => [
     initialSelectedTopics,
     initialSelectedSources,
     initialSelectedCountries,
+    forceRefresh,
   ];
 }
 

@@ -296,8 +296,8 @@ void main() {
           selectedTopics: {
             Topic(
               id: 't1',
-              name: 'Test',
-              description: '',
+              name: {SupportedLanguage.en: 'Test'},
+              description: {SupportedLanguage.en: 'Desc'},
               iconUrl: '',
               createdAt: DateTime(2024),
               updatedAt: DateTime(2024),
@@ -341,8 +341,8 @@ void main() {
           selectedTopics: {
             Topic(
               id: 't1',
-              name: 'Test',
-              description: '',
+              name: {SupportedLanguage.en: 'Test'},
+              description: {SupportedLanguage.en: 'Desc'},
               iconUrl: '',
               createdAt: DateTime(2024),
               updatedAt: DateTime(2024),

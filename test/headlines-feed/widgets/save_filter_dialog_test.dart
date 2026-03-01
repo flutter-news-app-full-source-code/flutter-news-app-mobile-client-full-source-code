@@ -49,6 +49,10 @@ void main() {
           androidUpdateUrl: '',
         ),
         general: GeneralAppConfig(termsOfServiceUrl: '', privacyPolicyUrl: ''),
+        localization: LocalizationConfig(
+          enabledLanguages: [SupportedLanguage.en],
+          defaultLanguage: SupportedLanguage.en,
+        ),
       ),
       features: const FeaturesConfig(
         onboarding: OnboardingConfig(

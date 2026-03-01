@@ -906,9 +906,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         AnalyticsEvent.headlineFilterCreated,
         payload: HeadlineFilterCreatedPayload(
           filterId: event.filter.id,
-          criteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
-            event.filter.criteria,
-          ),
+          criteriaSummary: _getCriteriaSummary(event.filter.criteria),
           isPinned: event.filter.isPinned,
           deliveryTypes: event.filter.deliveryTypes,
         ),
@@ -961,11 +959,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         AnalyticsEvent.headlineFilterUpdated,
         payload: HeadlineFilterUpdatedPayload(
           filterId: event.filter.id,
-          newName: event.filter.name,
+          newName: _resolveLocalizedName(event.filter.name),
           pinStatusChangedTo: event.filter.isPinned,
-          newCriteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
-            event.filter.criteria,
-          ),
+          newCriteriaSummary: _getCriteriaSummary(event.filter.criteria),
         ),
       ),
     );
@@ -1011,6 +1007,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+  }
+
+  /// Helper to resolve a multilingual map to a string based on current app settings.
+  String _resolveLocalizedName(Map<SupportedLanguage, String> nameMap) {
+    final language = state.settings?.language ?? SupportedLanguage.en;
+    return nameMap[language] ??
+        nameMap[SupportedLanguage.en] ??
+        nameMap.values.firstOrNull ??
+        '';
+  }
+
+  /// Helper to generate criteria summary object.
+  HeadlineFilterCriteriaSummary _getCriteriaSummary(
+    HeadlineFilterCriteria criteria,
+  ) {
+    return HeadlineFilterCriteriaSummary.fromCriteria(criteria);
   }
 
   /// Handles reordering the list of saved headline filters.

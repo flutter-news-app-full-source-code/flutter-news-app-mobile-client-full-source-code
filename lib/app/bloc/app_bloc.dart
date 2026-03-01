@@ -638,6 +638,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           '[AppBloc] Language changed. Refreshing auth token to update claims.',
         );
         await _authRepository.refreshToken();
+
+        // Clear caches to prevent stale language data from being displayed.
+        _feedCacheService.clearAll();
+        _inlineAdCacheService.clearAllAds();
+        _logger.info(
+          '[AppBloc] Cleared feed and ad caches due to language change.',
+        );
       }
     } catch (e, s) {
       _logger.severe(

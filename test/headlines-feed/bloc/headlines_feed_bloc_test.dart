@@ -102,33 +102,22 @@ void main() {
 
   final headline1 = Headline(
     id: 'h1',
-    title: 'Title 1',
+    title: {SupportedLanguage.en: 'Title 1'},
     url: 'url1',
     imageUrl: 'imageUrl1',
     source: Source(
       id: 's1',
-      name: 'Source 1',
-      description: '',
+      name: {SupportedLanguage.en: 'Source 1'},
+      description: {SupportedLanguage.en: 'Desc'},
       url: '',
       logoUrl: '',
       sourceType: SourceType.newsAgency,
-      language: Language(
-        id: 'en',
-        code: 'en',
-        name: 'English',
-        nativeName: 'English',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
-      ),
+      language: SupportedLanguage.en,
       headquarters: Country(
         isoCode: 'US',
-        name: 'USA',
+        name: {SupportedLanguage.en: 'USA'},
         flagUrl: 'f',
         id: 'c',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
       ),
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
@@ -136,17 +125,14 @@ void main() {
     ),
     eventCountry: Country(
       isoCode: 'US',
-      name: 'USA',
+      name: {SupportedLanguage.en: 'USA'},
       flagUrl: 'f',
       id: 'c',
-      createdAt: DateTime(2023),
-      updatedAt: DateTime(2023),
-      status: ContentStatus.active,
     ),
     topic: Topic(
       id: 't1',
-      name: 'Topic 1',
-      description: '',
+      name: {SupportedLanguage.en: 'Topic 1'},
+      description: {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
@@ -178,6 +164,10 @@ void main() {
         androidUpdateUrl: '',
       ),
       general: GeneralAppConfig(termsOfServiceUrl: '', privacyPolicyUrl: ''),
+      localization: LocalizationConfig(
+        enabledLanguages: [SupportedLanguage.en],
+        defaultLanguage: SupportedLanguage.en,
+      ),
     ),
     features: const FeaturesConfig(
       onboarding: OnboardingConfig(
@@ -257,15 +247,7 @@ void main() {
 
   final appSettings = AppSettings(
     id: user.id,
-    language: Language(
-      id: 'en',
-      code: 'en',
-      name: 'English',
-      nativeName: 'English',
-      createdAt: DateTime(2023),
-      updatedAt: DateTime(2023),
-      status: ContentStatus.active,
-    ),
+    language: SupportedLanguage.en,
     displaySettings: const DisplaySettings(
       baseTheme: AppBaseTheme.light,
       accentTheme: AppAccentTheme.defaultBlue,

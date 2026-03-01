@@ -459,7 +459,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLayoutAndReadingTitle => 'Layout & Lesen';
 
   @override
-  String get appName => 'Headlines Toolkit';
+  String get appName => 'News App';
 
   @override
   String get unknownError => 'Ein unbekannter Fehler ist aufgetreten.';

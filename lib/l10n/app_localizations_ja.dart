@@ -438,7 +438,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsLayoutAndReadingTitle => 'レイアウトと読書';
 
   @override
-  String get appName => 'Headlines Toolkit';
+  String get appName => 'News App';
 
   @override
   String get unknownError => '不明なエラーが発生しました。';

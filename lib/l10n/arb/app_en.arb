@@ -576,7 +576,7 @@
     "@settingsLayoutAndReadingTitle": {
         "description": "Title for the feed layout and reading settings page."
     },
-    "appName": "Headlines Toolkit",
+    "appName": "News App",
     "@appName": {
         "description": "The name of the application."
     },

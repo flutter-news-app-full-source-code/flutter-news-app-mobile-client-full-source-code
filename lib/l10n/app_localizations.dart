@@ -963,7 +963,7 @@ abstract class AppLocalizations {
   /// The name of the application.
   ///
   /// In en, this message translates to:
-  /// **'Headlines Toolkit'**
+  /// **'News App'**
   String get appName;
 
   /// Generic error message shown when an operation fails unexpectedly

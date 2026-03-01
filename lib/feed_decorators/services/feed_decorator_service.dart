@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:core/core.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/extensions/feed_decorator_type_l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/models/decorator_placeholder.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -60,5 +63,109 @@ class FeedDecoratorService {
     }
 
     return decoratedFeed;
+  }
+
+  /// Constructs a fully hydrated [FeedItem] for a specific decorator type.
+  ///
+  /// This method handles the logic for both 'callToAction' and 'contentCollection'
+  /// decorators, including fetching necessary data from repositories and
+  /// generating localized strings.
+  Future<FeedItem?> buildDecoratorItem({
+    required FeedDecoratorType decoratorType,
+    required FeedDecoratorConfig decoratorConfig,
+    required AppLocalizations l10n,
+    required RemoteConfig remoteConfig,
+    required DataRepository<Topic> topicRepository,
+    required DataRepository<Source> sourceRepository,
+    required UserContentPreferences? userPreferences,
+  }) async {
+    // Get duration for rewards if applicable
+    String? rewardDuration;
+    if (decoratorType == FeedDecoratorType.unlockRewards) {
+      final adFreeReward =
+          remoteConfig.features.rewards.rewards[RewardType.adFree];
+      if (adFreeReward != null) {
+        rewardDuration = l10n.rewardsDurationDays(adFreeReward.durationDays);
+      }
+    }
+
+    switch (decoratorConfig.category) {
+      case FeedDecoratorCategory.callToAction:
+        // Determine the fixed CTA URL based on the decorator type.
+        String ctaUrl;
+        switch (decoratorType) {
+          case FeedDecoratorType.linkAccount:
+            ctaUrl = Routes.accountLinking;
+          case FeedDecoratorType.unlockRewards:
+            ctaUrl = '/${Routes.account}/${Routes.rewards}';
+          case FeedDecoratorType.rateApp:
+            ctaUrl = '#';
+          case FeedDecoratorType.suggestedTopics:
+          case FeedDecoratorType.suggestedSources:
+            throw UnsupportedError('only CTA decorators are supported.');
+        }
+
+        return CallToActionItem(
+          id: _uuid.v4(),
+          decoratorType: decoratorType,
+          title: decoratorType.getLocalizedTitleMap(l10n),
+          description: decoratorType.getLocalizedDescriptionMap(
+            l10n,
+            duration: rewardDuration,
+          ),
+          callToActionText: decoratorType.getLocalizedCtaMap(l10n),
+          callToActionUrl: ctaUrl,
+        );
+
+      case FeedDecoratorCategory.contentCollection:
+        final itemsToDisplay = decoratorConfig.itemsToDisplay;
+        if (itemsToDisplay == null) return null;
+
+        final followedTopicIds =
+            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [];
+        final followedSourceIds =
+            userPreferences?.followedSources.map((s) => s.id).toList() ?? [];
+
+        switch (decoratorType) {
+          case FeedDecoratorType.suggestedTopics:
+            final topics = await topicRepository.readAll(
+              pagination: PaginationOptions(limit: itemsToDisplay),
+              sort: [const SortOption('name', SortOrder.asc)],
+              filter: {
+                '_id': {r'$nin': followedTopicIds},
+                'status': ContentStatus.active.name,
+              },
+            );
+            if (topics.items.isEmpty) return null;
+            return ContentCollectionItem<Topic>(
+              id: _uuid.v4(),
+              decoratorType: decoratorType,
+              title: decoratorType.getLocalizedTitleMap(l10n),
+              items: topics.items,
+            );
+          case FeedDecoratorType.suggestedSources:
+            final sources = await sourceRepository.readAll(
+              pagination: PaginationOptions(limit: itemsToDisplay),
+              sort: [const SortOption('name', SortOrder.asc)],
+              filter: {
+                '_id': {r'$nin': followedSourceIds},
+                'status': ContentStatus.active.name,
+              },
+            );
+            if (sources.items.isEmpty) return null;
+            return ContentCollectionItem<Source>(
+              id: _uuid.v4(),
+              decoratorType: decoratorType,
+              title: decoratorType.getLocalizedTitleMap(l10n),
+              items: sources.items,
+            );
+          case FeedDecoratorType.linkAccount:
+          case FeedDecoratorType.unlockRewards:
+          case FeedDecoratorType.rateApp:
+            throw UnsupportedError(
+              'These decorators are not supported as ContentCollections.',
+            );
+        }
+    }
   }
 }

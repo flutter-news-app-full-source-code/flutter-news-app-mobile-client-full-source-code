@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/headline_actions_row.dart';
@@ -111,7 +112,7 @@ class HeadlineTileImageTop extends StatelessWidget {
                           color: colorScheme.primary,
                         ),
                       ),
-                    TextSpan(text: headline.title),
+                    TextSpan(text: headline.title.getValue(context)),
                   ],
                 ),
                 style: textTheme.titleMedium?.copyWith(

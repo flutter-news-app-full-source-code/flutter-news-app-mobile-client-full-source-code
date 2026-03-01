@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -85,7 +86,10 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    Text(widget.headline.source.name, style: sourceTextStyle),
+                    Text(
+                      widget.headline.source.name.getValue(context),
+                      style: sourceTextStyle,
+                    ),
                   ],
                 ),
               ),

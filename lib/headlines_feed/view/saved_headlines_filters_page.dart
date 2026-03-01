@@ -8,6 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/saved_headlines_filters_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:go_router/go_router.dart';
 
 /// {@template saved_headlines_filters_page}
@@ -116,7 +117,7 @@ class SavedHeadlinesFiltersView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      filter.name,
+                      filter.name.getValue(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,

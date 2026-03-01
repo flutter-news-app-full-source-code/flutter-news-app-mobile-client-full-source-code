@@ -31,7 +31,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/push_notificatio
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/clients/media_api.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';

@@ -24,8 +24,8 @@ void main() {
 
     final topic1 = Topic(
       id: '1',
-      name: {SupportedLanguage.en: 'Tech'},
-      description: {SupportedLanguage.en: 'Desc'},
+      name: const {SupportedLanguage.en: 'Tech'},
+      description: const {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime.parse('2024-01-01T12:00:00.000Z'),
       updatedAt: DateTime.parse('2024-01-01T12:00:00.000Z'),
@@ -33,13 +33,13 @@ void main() {
     );
     final source1 = Source(
       id: 's1',
-      name: {SupportedLanguage.en: 'Source 1'},
-      description: {SupportedLanguage.en: 'Desc'},
+      name: const {SupportedLanguage.en: 'Source 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       url: '',
       logoUrl: '',
       sourceType: SourceType.blog,
       language: SupportedLanguage.en,
-      headquarters: Country(
+      headquarters: const Country(
         id: 'c1',
         isoCode: 'US',
         name: {SupportedLanguage.en: 'USA'},
@@ -49,13 +49,13 @@ void main() {
       updatedAt: DateTime.parse('2024-01-01T12:00:00.000Z'),
       status: ContentStatus.active,
     );
-    final country1 = Country(
+    const country1 = Country(
       id: 'c1',
       isoCode: 'US',
       name: {SupportedLanguage.en: 'USA'},
       flagUrl: '',
     );
-    final country2 = Country(
+    const country2 = Country(
       id: 'c2',
       isoCode: 'GB',
       name: {SupportedLanguage.en: 'UK'},
@@ -99,13 +99,13 @@ void main() {
         ),
       ).thenAnswer(
         (_) async =>
-            PaginatedResponse(items: [country1], cursor: null, hasMore: false),
+            const PaginatedResponse(items: [country1], cursor: null, hasMore: false),
       );
       when(
         () =>
             countriesRepository.readAll(filter: null, sort: any(named: 'sort')),
       ).thenAnswer(
-        (_) async => PaginatedResponse(
+        (_) async => const PaginatedResponse(
           items: [country1, country2],
           cursor: null,
           hasMore: false,
@@ -134,8 +134,8 @@ void main() {
           status: HeadlinesFilterStatus.success,
           allTopics: [topic1],
           allSources: [source1],
-          allCountries: [country1],
-          allHeadquarterCountries: [country1, country2],
+          allCountries: const [country1],
+          allHeadquarterCountries: const [country1, country2],
           allSourceTypes: SourceType.values,
           selectedTopics: const {},
           selectedSources: const {},

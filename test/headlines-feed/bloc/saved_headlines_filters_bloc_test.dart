@@ -22,7 +22,7 @@ void main() {
     const filter1 = SavedHeadlineFilter(
       id: '1',
       userId: 'user1',
-      name: 'Filter 1',
+      name: {SupportedLanguage.en: 'Filter 1'},
       isPinned: true,
       deliveryTypes: {},
       criteria: HeadlineFilterCriteria(topics: [], sources: [], countries: []),
@@ -30,7 +30,7 @@ void main() {
     const filter2 = SavedHeadlineFilter(
       id: '2',
       userId: 'user1',
-      name: 'Filter 2',
+      name: {SupportedLanguage.en: 'Filter 2'},
       isPinned: false,
       deliveryTypes: {},
       criteria: HeadlineFilterCriteria(topics: [], sources: [], countries: []),

@@ -45,8 +45,17 @@ class SavedHeadlinesFiltersBloc
       transformer: sequential(),
     );
 
+    _lastAppSettings = _appBloc.state.settings;
+
     // Listen to the AppBloc for changes to the saved filters list.
     _appBlocSubscription = _appBloc.stream.listen((app_bloc.AppState appState) {
+      final newSettings = appState.settings;
+      if (_lastAppSettings?.language != newSettings?.language) {
+        _logger.info('Language changed. Requesting preferences refresh.');
+        _appBloc.add(const app_bloc.AppUserContentPreferencesRefreshed());
+      }
+      _lastAppSettings = newSettings;
+
       final newFilters = appState.userContentPreferences?.savedHeadlineFilters;
       if (newFilters != null &&
           !const DeepCollectionEquality().equals(newFilters, state.filters)) {
@@ -63,6 +72,7 @@ class SavedHeadlinesFiltersBloc
   final app_bloc.AppBloc _appBloc;
   final Logger _logger;
   late final StreamSubscription<app_bloc.AppState> _appBlocSubscription;
+  AppSettings? _lastAppSettings;
 
   /// Handles loading the initial list of saved filters from the AppBloc.
   void _onDataLoaded(

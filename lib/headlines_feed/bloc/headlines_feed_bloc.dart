@@ -1049,10 +1049,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       'HeadlinesFeedEngagementTapped: Opening engagement sheet for headline ${event.headline.id}.',
     );
     // The UI will listen for this state change and trigger navigation.
+    // NOTE: This URL is an "Internal Signal" intercepted by the HeadlinesFeedPage
+    // listener to open a modal bottom sheet. It is NOT a functional deep link
+    // registered in the GoRouter configuration, hence why we use a string literal
+    // instead of a named route constant.
     emit(
       state.copyWith(
-        navigationUrl:
-            '${Routes.feed}/${Routes.engagement.replaceFirst(':', '')}${event.headline.id}',
+        navigationUrl: '${Routes.feed}/engagement/${event.headline.id}',
         navigationArguments: event.headline,
       ),
     );

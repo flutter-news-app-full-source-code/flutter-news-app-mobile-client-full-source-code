@@ -1,8 +1,20 @@
 <div align="center">
-  <img src="https://repository-images.githubusercontent.com/946589707/1ee61062-ded3-44f9-bb6d-c35cd03b5d64" alt="Flutter News App Toolkit Mockup" width="440">
+  <table>
+    <tr>
+      <td valign="top" width="50%">
+        <video src="https://github.com/user-attachments/assets/32808fcd-6df5-4c72-805f-0bc77b7a07a0" controls="controls" width="100%">
+        </video>
+      </td>
+      <td valign="top" width="50%">
+  <img src="https://github.com/user-attachments/assets/f91c8153-8cfb-496f-8270-38a48bf0e40f" alt="flutter-news-app-full-source-code" width="440">
+      </td>
+    </tr>
+  </table>
+
   <h1>Flutter News App Mobile Client</h1>
   <p><strong>Complete, production-ready source code for a feature-rich Flutter news app mobile client.</strong></p>
 </div>
+
 
 <p align="center">
   <a href="https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>

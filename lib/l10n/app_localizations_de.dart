@@ -1907,4 +1907,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get commentStatusPending => 'In Prüfung';
+
+  @override
+  String get languageNameEn => 'Englisch';
+
+  @override
+  String get languageNameEs => 'Spanisch';
+
+  @override
+  String get languageNameFr => 'Französisch';
+
+  @override
+  String get languageNameAr => 'Arabisch';
+
+  @override
+  String get languageNamePt => 'Portugiesisch';
+
+  @override
+  String get languageNameDe => 'Deutsch';
+
+  @override
+  String get languageNameIt => 'Italienisch';
+
+  @override
+  String get languageNameZh => 'Chinesisch';
+
+  @override
+  String get languageNameHi => 'Hindi';
+
+  @override
+  String get languageNameJa => 'Japanisch';
 }

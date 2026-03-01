@@ -1763,4 +1763,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get commentStatusPending => '审核中';
+
+  @override
+  String get languageNameEn => '英语';
+
+  @override
+  String get languageNameEs => '西班牙语';
+
+  @override
+  String get languageNameFr => '法语';
+
+  @override
+  String get languageNameAr => '阿拉伯语';
+
+  @override
+  String get languageNamePt => '葡萄牙语';
+
+  @override
+  String get languageNameDe => '德语';
+
+  @override
+  String get languageNameIt => '意大利语';
+
+  @override
+  String get languageNameZh => '中文';
+
+  @override
+  String get languageNameHi => '印地语';
+
+  @override
+  String get languageNameJa => '日语';
 }

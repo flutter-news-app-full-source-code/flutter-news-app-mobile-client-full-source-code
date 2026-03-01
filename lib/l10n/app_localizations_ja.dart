@@ -1777,4 +1777,34 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get commentStatusPending => '審査中';
+
+  @override
+  String get languageNameEn => '英語';
+
+  @override
+  String get languageNameEs => 'スペイン語';
+
+  @override
+  String get languageNameFr => 'フランス語';
+
+  @override
+  String get languageNameAr => 'アラビア語';
+
+  @override
+  String get languageNamePt => 'ポルトガル語';
+
+  @override
+  String get languageNameDe => 'ドイツ語';
+
+  @override
+  String get languageNameIt => 'イタリア語';
+
+  @override
+  String get languageNameZh => '中国語';
+
+  @override
+  String get languageNameHi => 'ヒンディー語';
+
+  @override
+  String get languageNameJa => '日本語';
 }

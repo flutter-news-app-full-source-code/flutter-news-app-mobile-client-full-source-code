@@ -1881,4 +1881,34 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get commentStatusPending => 'समीक्षाधीन';
+
+  @override
+  String get languageNameEn => 'अंग्रेज़ी';
+
+  @override
+  String get languageNameEs => 'स्पेनिश';
+
+  @override
+  String get languageNameFr => 'फ्रेंच';
+
+  @override
+  String get languageNameAr => 'अरबी';
+
+  @override
+  String get languageNamePt => 'पुर्तगाली';
+
+  @override
+  String get languageNameDe => 'जर्मन';
+
+  @override
+  String get languageNameIt => 'इतालवी';
+
+  @override
+  String get languageNameZh => 'चीनी';
+
+  @override
+  String get languageNameHi => 'हिंदी';
+
+  @override
+  String get languageNameJa => 'जापानी';
 }

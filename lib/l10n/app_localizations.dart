@@ -3467,6 +3467,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Under Review'**
   String get commentStatusPending;
+
+  /// The name of the English language.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageNameEn;
+
+  /// The name of the Spanish language.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get languageNameEs;
+
+  /// The name of the French language.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get languageNameFr;
+
+  /// The name of the Arabic language.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get languageNameAr;
+
+  /// The name of the Portuguese language.
+  ///
+  /// In en, this message translates to:
+  /// **'Portuguese'**
+  String get languageNamePt;
+
+  /// The name of the German language.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get languageNameDe;
+
+  /// The name of the Italian language.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get languageNameIt;
+
+  /// The name of the Chinese language.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese'**
+  String get languageNameZh;
+
+  /// The name of the Hindi language.
+  ///
+  /// In en, this message translates to:
+  /// **'Hindi'**
+  String get languageNameHi;
+
+  /// The name of the Japanese language.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese'**
+  String get languageNameJa;
 }
 
 class _AppLocalizationsDelegate

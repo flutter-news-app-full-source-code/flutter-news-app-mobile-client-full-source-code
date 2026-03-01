@@ -1,5 +1,5 @@
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template notification_indicator}
 /// A widget that displays a small dot over its child to indicate a notification.

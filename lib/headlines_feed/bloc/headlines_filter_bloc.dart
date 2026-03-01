@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
@@ -29,11 +28,22 @@ class HeadlinesFilterBloc
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
+    required AppBloc appBloc,
   }) : _topicsRepository = topicsRepository,
        _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
+       _appBloc = appBloc,
        _logger = Logger('HeadlinesFilterBloc'),
        super(const HeadlinesFilterState()) {
+    _lastAppSettings = _appBloc.state.settings;
+    _appBlocSubscription = _appBloc.stream.listen((appState) {
+      final newSettings = appState.settings;
+      if (_lastAppSettings?.language != newSettings?.language) {
+        _logger.info('Language changed. Forcing filter data refresh.');
+        add(const FilterDataLoaded(forceRefresh: true));
+      }
+      _lastAppSettings = newSettings;
+    });
     on<FilterDataLoaded>(_onFilterDataLoaded, transformer: restartable());
     on<FilterTopicToggled>(_onFilterTopicToggled);
     on<FilterTopicsChanged>(_onFilterTopicsChanged);
@@ -48,6 +58,9 @@ class HeadlinesFilterBloc
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
+  final AppBloc _appBloc;
+  late final StreamSubscription<AppState> _appBlocSubscription;
+  AppSettings? _lastAppSettings;
   final Logger _logger;
 
   /// Handles the [FilterDataLoaded] event, fetching all necessary filter data.
@@ -60,8 +73,9 @@ class HeadlinesFilterBloc
     FilterDataLoaded event,
     Emitter<HeadlinesFilterState> emit,
   ) async {
-    if (state.status == HeadlinesFilterStatus.loading ||
-        state.status == HeadlinesFilterStatus.success) {
+    if (!event.forceRefresh &&
+        (state.status == HeadlinesFilterStatus.loading ||
+            state.status == HeadlinesFilterStatus.success)) {
       return;
     }
 
@@ -94,20 +108,57 @@ class HeadlinesFilterBloc
         ),
       ]);
 
+      final allTopics = (allTopicsResponse as PaginatedResponse<Topic>).items;
+      final allSources =
+          (allSourcesResponse as PaginatedResponse<Source>).items;
+      final allCountries =
+          (allEventCountriesResponse as PaginatedResponse<Country>).items;
+
+      // If forcing refresh (e.g. language change), we want to preserve the
+      // current selection IDs but map them to the NEW objects (which have
+      // the correct localized text).
+      // If not forcing refresh (initial load), use the event's initial lists.
+      Set<Topic> selectedTopics;
+      Set<Source> selectedSources;
+      Set<Country> selectedCountries;
+
+      if (event.forceRefresh) {
+        final selectedTopicIds = state.selectedTopics.map((e) => e.id).toSet();
+        final selectedSourceIds = state.selectedSources
+            .map((e) => e.id)
+            .toSet();
+        final selectedCountryIds = state.selectedCountries
+            .map((e) => e.id)
+            .toSet();
+
+        selectedTopics = allTopics
+            .where((e) => selectedTopicIds.contains(e.id))
+            .toSet();
+        selectedSources = allSources
+            .where((e) => selectedSourceIds.contains(e.id))
+            .toSet();
+        selectedCountries = allCountries
+            .where((e) => selectedCountryIds.contains(e.id))
+            .toSet();
+      } else {
+        selectedTopics = Set.from(event.initialSelectedTopics);
+        selectedSources = Set.from(event.initialSelectedSources);
+        selectedCountries = Set.from(event.initialSelectedCountries);
+      }
+
       emit(
         state.copyWith(
           status: HeadlinesFilterStatus.success,
-          allTopics: (allTopicsResponse as PaginatedResponse<Topic>).items,
-          allSources: (allSourcesResponse as PaginatedResponse<Source>).items,
-          allCountries:
-              (allEventCountriesResponse as PaginatedResponse<Country>).items,
+          allTopics: allTopics,
+          allSources: allSources,
+          allCountries: allCountries,
           allHeadquarterCountries:
               (allHeadquarterCountriesResponse as PaginatedResponse<Country>)
                   .items,
           allSourceTypes: SourceType.values,
-          selectedTopics: Set.from(event.initialSelectedTopics),
-          selectedSources: Set.from(event.initialSelectedSources),
-          selectedCountries: Set.from(event.initialSelectedCountries),
+          selectedTopics: selectedTopics,
+          selectedSources: selectedSources,
+          selectedCountries: selectedCountries,
           clearError: true,
         ),
       );
@@ -245,5 +296,11 @@ class HeadlinesFilterBloc
             event.selectedSourceTypes ?? state.selectedSourceTypes,
       ),
     );
+  }
+
+  @override
+  Future<void> close() {
+    _appBlocSubscription.cancel();
+    return super.close();
   }
 }

@@ -9,7 +9,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/bloc/app_tour_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

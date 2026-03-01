@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
@@ -6,9 +7,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/content_action_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
 
 /// {@template content_limitation_bottom_sheet}
 /// A bottom sheet that informs the user about content limitations and provides
@@ -153,21 +154,7 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
-      final body = switch (action) {
-        ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
-        ContentAction.followTopic ||
-        ContentAction.followSource ||
-        ContentAction.followCountry => l10n.limitReachedBodyFollow,
-        ContentAction.postComment => l10n.limitReachedBodyComments,
-        ContentAction.reactToContent => l10n.limitReachedBodyReactions,
-        ContentAction.submitReport => l10n.limitReachedBodyReports,
-        ContentAction.saveFilter => l10n.limitReachedBodySaveFilters,
-        ContentAction.pinFilter => l10n.limitReachedBodyPinFilters,
-        ContentAction.subscribeToSavedFilterNotifications =>
-          l10n.limitReachedBodySubscribeToNotifications,
-        // Add a default case for actions that don't have a specific message.
-        ContentAction.editProfile => l10n.standardLimitBody,
-      };
+      final body = action.getLocalizedMessage(l10n);
 
       final buttonText = l10n.unlockMoreButton;
 

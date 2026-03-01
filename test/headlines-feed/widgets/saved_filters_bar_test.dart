@@ -28,7 +28,7 @@ void main() {
     const filter1 = SavedHeadlineFilter(
       id: 'f1',
       userId: 'u1',
-      name: 'Pinned Filter',
+      name: {SupportedLanguage.en: 'Pinned Filter'},
       isPinned: true,
       deliveryTypes: {},
       criteria: HeadlineFilterCriteria(topics: [], sources: [], countries: []),
@@ -39,8 +39,8 @@ void main() {
       followedTopics: [
         Topic(
           id: 't1',
-          name: 'Tech',
-          description: '',
+          name: const {SupportedLanguage.en: 'Tech'},
+          description: const {SupportedLanguage.en: 'Desc'},
           iconUrl: '',
           createdAt: DateTime(2024),
           updatedAt: DateTime(2024),

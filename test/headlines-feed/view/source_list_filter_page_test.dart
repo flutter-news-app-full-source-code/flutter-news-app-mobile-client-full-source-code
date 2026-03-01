@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' hide HttpClient;
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/view/source_list_filter_page.dart';
@@ -142,25 +142,22 @@ void main() {
   group('SourceListFilterPage', () {
     late HeadlinesFilterBloc headlinesFilterBloc;
 
-    final country1 = Country(
+    const country1 = Country(
       id: 'c1',
       isoCode: 'US',
-      name: 'USA',
+      name: {SupportedLanguage.en: 'USA'},
       flagUrl: 'https://example.com/flag.png',
-      createdAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      updatedAt: DateTime.parse('2024-01-01T00:00:00.000Z'),
-      status: ContentStatus.active,
     );
 
     setUp(() {
       headlinesFilterBloc = MockHeadlinesFilterBloc();
       when(() => headlinesFilterBloc.state).thenReturn(
-        HeadlinesFilterState(
+        const HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
           allHeadquarterCountries: [country1],
-          allSourceTypes: const [SourceType.blog],
-          selectedSourceHeadquarterCountries: const {},
-          selectedSourceTypes: const {},
+          allSourceTypes: [SourceType.blog],
+          selectedSourceHeadquarterCountries: {},
+          selectedSourceTypes: {},
         ),
       );
     });

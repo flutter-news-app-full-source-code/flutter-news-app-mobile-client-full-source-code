@@ -1,6 +1,6 @@
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:core_ui/l10n/app_localizations.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,9 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/push_notificatio
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_initialization_page}
 /// A top-level widget that orchestrates the application's initialization
@@ -227,7 +225,10 @@ class AppInitializationPage extends StatelessWidget {
                   ...AppLocalizations.localizationsDelegates,
                   ...UiKitLocalizations.localizationsDelegates,
                 ],
-                supportedLocales: AppLocalizations.supportedLocales,
+                supportedLocales: const [
+                  ...AppLocalizations.supportedLocales,
+                  ...UiKitLocalizations.supportedLocales,
+                ],
                 home: switch (failureData.status) {
                   AppLifeCycleStatus.underMaintenance =>
                     const MaintenancePage(),
@@ -273,7 +274,10 @@ class AppInitializationPage extends StatelessWidget {
                   ...AppLocalizations.localizationsDelegates,
                   ...UiKitLocalizations.localizationsDelegates,
                 ],
-                supportedLocales: AppLocalizations.supportedLocales,
+                supportedLocales: const [
+                  ...AppLocalizations.supportedLocales,
+                  ...UiKitLocalizations.supportedLocales,
+                ],
                 home: const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 ),

@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -582,12 +580,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
     }
 
-    if (updatedSettings.language.code != originalSettings.language.code) {
+    if (updatedSettings.language != originalSettings.language) {
       unawaited(
         _analyticsService.logEvent(
           AnalyticsEvent.languageChanged,
           payload: LanguageChangedPayload(
-            languageCode: updatedSettings.language.code,
+            languageCode: updatedSettings.language.name,
           ),
         ),
       );
@@ -631,6 +629,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _logger.info(
         '[AppBloc] AppSettings successfully updated for user ${updatedSettings.id}.',
       );
+
+      // If the language changed, we must refresh the auth token to update the
+      // 'lang' claim. This ensures the API projects data correctly for the
+      // new language on subsequent requests.
+      if (updatedSettings.language != originalSettings.language) {
+        _logger.info(
+          '[AppBloc] Language changed. Refreshing auth token to update claims.',
+        );
+        await _authRepository.refreshToken();
+
+        // Clear caches to prevent stale language data from being displayed.
+        _feedCacheService.clearAll();
+        _inlineAdCacheService.clearAllAds();
+        _logger.info(
+          '[AppBloc] Cleared feed and ad caches due to language change.',
+        );
+      }
     } catch (e, s) {
       _logger.severe(
         'Failed to persist AppSettings for user ${updatedSettings.id}.',
@@ -891,9 +906,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         AnalyticsEvent.headlineFilterCreated,
         payload: HeadlineFilterCreatedPayload(
           filterId: event.filter.id,
-          criteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
-            event.filter.criteria,
-          ),
+          criteriaSummary: _getCriteriaSummary(event.filter.criteria),
           isPinned: event.filter.isPinned,
           deliveryTypes: event.filter.deliveryTypes,
         ),
@@ -946,11 +959,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         AnalyticsEvent.headlineFilterUpdated,
         payload: HeadlineFilterUpdatedPayload(
           filterId: event.filter.id,
-          newName: event.filter.name,
+          newName: _resolveLocalizedName(event.filter.name),
           pinStatusChangedTo: event.filter.isPinned,
-          newCriteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
-            event.filter.criteria,
-          ),
+          newCriteriaSummary: _getCriteriaSummary(event.filter.criteria),
         ),
       ),
     );
@@ -996,6 +1007,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+  }
+
+  /// Helper to resolve a multilingual map to a string based on current app settings.
+  String _resolveLocalizedName(Map<SupportedLanguage, String> nameMap) {
+    final language = state.settings?.language ?? SupportedLanguage.en;
+    return nameMap[language] ??
+        nameMap[SupportedLanguage.en] ??
+        nameMap.values.firstOrNull ??
+        '';
+  }
+
+  /// Helper to generate criteria summary object.
+  HeadlineFilterCriteriaSummary _getCriteriaSummary(
+    HeadlineFilterCriteria criteria,
+  ) {
+    return HeadlineFilterCriteriaSummary.fromCriteria(criteria);
   }
 
   /// Handles reordering the list of saved headline filters.

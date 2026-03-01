@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -103,51 +102,37 @@ void main() {
 
   final headline1 = Headline(
     id: 'h1',
-    title: 'Title 1',
+    title: const {SupportedLanguage.en: 'Title 1'},
     url: 'url1',
     imageUrl: 'imageUrl1',
     source: Source(
       id: 's1',
-      name: 'Source 1',
-      description: '',
+      name: const {SupportedLanguage.en: 'Source 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       url: '',
       logoUrl: '',
       sourceType: SourceType.newsAgency,
-      language: Language(
-        id: 'en',
-        code: 'en',
-        name: 'English',
-        nativeName: 'English',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
-      ),
-      headquarters: Country(
+      language: SupportedLanguage.en,
+      headquarters: const Country(
         isoCode: 'US',
-        name: 'USA',
+        name: {SupportedLanguage.en: 'USA'},
         flagUrl: 'f',
         id: 'c',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
       ),
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
       status: ContentStatus.active,
     ),
-    eventCountry: Country(
+    eventCountry: const Country(
       isoCode: 'US',
-      name: 'USA',
+      name: {SupportedLanguage.en: 'USA'},
       flagUrl: 'f',
       id: 'c',
-      createdAt: DateTime(2023),
-      updatedAt: DateTime(2023),
-      status: ContentStatus.active,
     ),
     topic: Topic(
       id: 't1',
-      name: 'Topic 1',
-      description: '',
+      name: const {SupportedLanguage.en: 'Topic 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
@@ -179,6 +164,10 @@ void main() {
         androidUpdateUrl: '',
       ),
       general: GeneralAppConfig(termsOfServiceUrl: '', privacyPolicyUrl: ''),
+      localization: LocalizationConfig(
+        enabledLanguages: [SupportedLanguage.en],
+        defaultLanguage: SupportedLanguage.en,
+      ),
     ),
     features: const FeaturesConfig(
       onboarding: OnboardingConfig(
@@ -258,15 +247,7 @@ void main() {
 
   final appSettings = AppSettings(
     id: user.id,
-    language: Language(
-      id: 'en',
-      code: 'en',
-      name: 'English',
-      nativeName: 'English',
-      createdAt: DateTime(2023),
-      updatedAt: DateTime(2023),
-      status: ContentStatus.active,
-    ),
+    language: SupportedLanguage.en,
     displaySettings: const DisplaySettings(
       baseTheme: AppBaseTheme.light,
       accentTheme: AppAccentTheme.defaultBlue,

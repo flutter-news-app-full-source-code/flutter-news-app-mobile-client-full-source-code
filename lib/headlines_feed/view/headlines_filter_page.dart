@@ -1,6 +1,7 @@
 // lib/headlines_feed/view/headlines_filter_page.dart
 
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,11 +13,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/w
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
 
 /// {@template headlines_filter_page}
@@ -139,9 +140,13 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
       return SaveFilterDialog(
         onSave: (result) {
           // This callback is executed when the user submits the save dialog.
+          final currentLanguage =
+              context.read<AppBloc>().state.settings?.language ??
+              SupportedLanguage.en;
+
           final newFilter = SavedHeadlineFilter(
             id: const Uuid().v4(),
-            name: result.name,
+            name: {currentLanguage: result.name},
             // The userId will be populated by the backend upon persistence.
             userId: '',
             criteria: HeadlineFilterCriteria(
@@ -201,9 +206,13 @@ Future<void> _updateAndApplyFilter(
         // Pass the full filter object to pre-populate the dialog.
         filterToEdit: filterToEdit,
         onSave: (result) {
+          final currentLanguage =
+              context.read<AppBloc>().state.settings?.language ??
+              SupportedLanguage.en;
+
           // Create the updated filter object with new criteria and metadata.
           final updatedFilter = filterToEdit.copyWith(
-            name: result.name,
+            name: {currentLanguage: result.name},
             isPinned: result.isPinned,
             deliveryTypes: result.deliveryTypes,
             criteria: HeadlineFilterCriteria(
@@ -430,7 +439,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                           allItems: filterState.allTopics,
                           initialSelectedItems: filterState.selectedTopics
                               .toSet(),
-                          itemBuilder: (Topic item) => item.name,
+                          itemBuilder: (Topic item) =>
+                              item.name.getValue(context),
                         ),
                       ),
                     );
@@ -463,7 +473,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                           allItems: filterState.allSources,
                           initialSelectedItems: filterState.selectedSources
                               .toSet(),
-                          itemBuilder: (Source item) => item.name,
+                          itemBuilder: (Source item) =>
+                              item.name.getValue(context),
                         ),
                       ),
                     );
@@ -496,7 +507,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                           allItems: filterState.allCountries,
                           initialSelectedItems: filterState.selectedCountries
                               .toSet(),
-                          itemBuilder: (Country item) => item.name,
+                          itemBuilder: (Country item) =>
+                              item.name.getValue(context),
                         ),
                       ),
                     );

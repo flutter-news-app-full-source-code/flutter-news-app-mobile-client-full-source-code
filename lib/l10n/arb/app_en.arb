@@ -2401,5 +2401,45 @@
     "commentStatusPending": "Under Review",
     "@commentStatusPending": {
         "description": "Status label for a comment that is pending moderation."
+    },
+    "languageNameEn": "English",
+    "@languageNameEn": {
+        "description": "The name of the English language."
+    },
+    "languageNameEs": "Spanish",
+    "@languageNameEs": {
+        "description": "The name of the Spanish language."
+    },
+    "languageNameFr": "French",
+    "@languageNameFr": {
+        "description": "The name of the French language."
+    },
+    "languageNameAr": "Arabic",
+    "@languageNameAr": {
+        "description": "The name of the Arabic language."
+    },
+    "languageNamePt": "Portuguese",
+    "@languageNamePt": {
+        "description": "The name of the Portuguese language."
+    },
+    "languageNameDe": "German",
+    "@languageNameDe": {
+        "description": "The name of the German language."
+    },
+    "languageNameIt": "Italian",
+    "@languageNameIt": {
+        "description": "The name of the Italian language."
+    },
+    "languageNameZh": "Chinese",
+    "@languageNameZh": {
+        "description": "The name of the Chinese language."
+    },
+    "languageNameHi": "Hindi",
+    "@languageNameHi": {
+        "description": "The name of the Hindi language."
+    },
+    "languageNameJa": "Japanese",
+    "@languageNameJa": {
+        "description": "The name of the Japanese language."
     }
 }

@@ -2,7 +2,7 @@
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -17,7 +17,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/m
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -297,8 +296,8 @@ void main() {
           selectedTopics: {
             Topic(
               id: 't1',
-              name: 'Test',
-              description: '',
+              name: const {SupportedLanguage.en: 'Test'},
+              description: const {SupportedLanguage.en: 'Desc'},
               iconUrl: '',
               createdAt: DateTime(2024),
               updatedAt: DateTime(2024),
@@ -342,8 +341,8 @@ void main() {
           selectedTopics: {
             Topic(
               id: 't1',
-              name: 'Test',
-              description: '',
+              name: const {SupportedLanguage.en: 'Test'},
+              description: const {SupportedLanguage.en: 'Desc'},
               iconUrl: '',
               createdAt: DateTime(2024),
               updatedAt: DateTime(2024),

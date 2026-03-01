@@ -163,7 +163,7 @@ class AppState extends Equatable {
   /// The currently selected locale for localization, derived from [settings].
   /// Defaults to English ('en') if [settings] are not yet loaded.
   Locale get locale {
-    return Locale(settings?.language.code ?? 'en');
+    return Locale(settings?.language.name ?? 'en');
   }
 
   @override

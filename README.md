@@ -28,6 +28,7 @@ A beautiful, infinitely scrolling feed serves as the core of the user experience
 - **Instantaneous Content Switching:** An intelligent, session-based cache pre-fetches and holds data, eliminating loading spinners when users switch between their preferred content views.
 - **Personalized Viewing:** Users control their experience with settings for information density and image presentation, adapting the feed to their reading style.
 - **Smart In-Feed Prompts:** The feed dynamically injects context-aware items like calls-to-action and content suggestions, driven by configurable rules to avoid user fatigue.
+- **Language-Adaptive Delivery:** Content is automatically projected into the user's preferred language by the backend, ensuring a seamless and relevant reading experience.
 > **Your Advantage:** You get a world-class, production-quality feed system out of the box. Skip the complex UI, state management, and performance optimization work.
 
 ---
@@ -173,8 +174,9 @@ Utilizes compile-time variables (`--dart-define`) to seamlessly switch between `
 
 ### 🌍 Localization-Ready from Day One
 The application is fully internationalized and includes working English and Arabic localizations out of the box.
-- **Simple Extensibility:** Adding new languages is a straightforward process using standard `.arb` files.
-> **Your Advantage:** The architecture is designed for a global audience, allowing you to easily adapt the application and expand into new markets.
+- **Dynamic Language Support:** The list of available languages is controlled remotely via configuration, allowing you to roll out new translations without app updates.
+- **Context-Aware Content:** The API automatically projects data into the user's preferred language based on their profile, reducing payload size and client-side complexity.
+> **Your Advantage:** The architecture is designed for a global audience, allowing you to easily adapt the application and expand into new markets with zero friction.
 
 </details>
 

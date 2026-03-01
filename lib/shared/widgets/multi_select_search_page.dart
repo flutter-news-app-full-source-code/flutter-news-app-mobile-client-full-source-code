@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template multi_select_search_page}
 /// A generic and reusable page for selecting multiple items from a searchable
@@ -83,6 +82,7 @@ class _MultiSelectSearchPageState<T extends FeedItem>
     _searchController.addListener(() {
       if (_debounce?.isActive ?? false) _debounce!.cancel();
       _debounce = Timer(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
         if (_searchQuery != _searchController.text) {
           setState(() => _searchQuery = _searchController.text);
           if (_isPaginated) {

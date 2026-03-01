@@ -2,9 +2,9 @@ name: flutter_news_app_mobile_client_full_source_code
 description: Complete, production-ready source code for a feature-rich Flutter news app mobile client.
 version: 1.15.0
 publish_to: none
+homepage: https://github.com/flutter-news-app-full-source-code/
 repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
-homepage: https://flutter-news-app-full-source-code.github.io/docs/
-documentation: https://flutter-news-app-full-source-code.github.io/docs/getting-started/
+documentation: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/wiki
 issue_tracker: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/issues
 funding:
   - https://github.com/sponsors/flutter-news-app-full-source-code
@@ -24,41 +24,17 @@ environment:
   sdk: ^3.9.0
 
 dependencies:
-  auth_api:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-api.git
-      ref: 599438a8320b2fad2be43686f9dd65b762f34b0b
-  auth_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-client.git
-      ref: 58cc4201ceb52f74e0b639106276e396e4ff03a6
-  auth_repository:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
-      ref: 598998586fd4170ee673b74abf0df112218d0e07
   bloc: ^9.0.1
   bloc_concurrency: ^0.3.0
   collection: ^1.19.1
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: v1.3.1
-  data_api:
+      ref: 28c7a57b5ce05e23ff70b953e067e3643368aea6
+  core_ui:
     git:
-      url: https://github.com/flutter-news-app-full-source-code/data-api.git
-      ref: v1.0.1
-  data_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-client.git
-      ref: v1.0.1
-  data_inmemory:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-inmemory.git
-      ref: v1.1.0
-  data_repository:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-repository.git
-      ref: v1.0.1
+      url: https://github.com/flutter-news-app-full-source-code/core-ui.git
+      ref: 6c36e18320e60ce202e64c564f3848da73cd2306
   equatable: ^2.0.7
   firebase_analytics: ^12.1.0
   firebase_core: ^4.2.1
@@ -75,23 +51,11 @@ dependencies:
   go_router: ^16.2.4
   google_fonts: ^6.3.2
   google_mobile_ads: ^6.0.0
-  http_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/http-client.git
-      ref: v1.0.1
   http_parser: ^4.1.2
   image_picker: ^1.2.1
   in_app_review: ^2.0.11
   intl: ^0.20.2
   js_interop: ^0.0.1
-  kv_storage_service:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
-      ref: v1.0.1
-  kv_storage_shared_preferences:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git
-      ref: v1.0.1
   logging: ^1.3.0
   meta: ^1.16.0
   mixpanel_flutter: ^2.4.4
@@ -103,10 +67,6 @@ dependencies:
   smooth_page_indicator: ^2.0.1
   stream_transform: ^2.1.1
   timeago: ^3.7.1
-  ui_kit:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/ui-kit.git
-      ref: v1.0.1
   url_launcher: ^6.3.1
   uuid: ^4.4.0
 
@@ -143,17 +103,3 @@ flutter_native_splash:
   android: true
   ios: true
   web: false
-
-dependency_overrides:
-  core:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: dff123083e742a6e278d6acfc73a97606660e6b9
-  http_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/http-client.git
-      ref: 8b9dcac71f93e2eeba875c60eaebe3111f210020
-  kv_storage_service:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
-      ref: v1.2.0

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/content_action_extension.dart';
 import 'package:logging/logging.dart';
 
 /// Defines the specific type of content-related action a user is trying to
@@ -332,7 +332,7 @@ class ContentLimitationService {
           'Bookmark limit check for tier "$tier": ${preferences.savedHeadlines.length}/$limit',
         );
         if (limit != null && preferences.savedHeadlines.length >= limit) {
-          _logLimitExceeded(LimitedAction.bookmarkHeadline);
+          _logLimitExceeded(action.toLimitedAction());
           return getLimitationStatusForTier(tier);
         }
 
@@ -352,12 +352,7 @@ class ContentLimitationService {
         };
         _logger.finer('Current count: $count, Limit: $limit');
         if (count >= limit) {
-          _logLimitExceeded(switch (action) {
-            ContentAction.followTopic => LimitedAction.followTopic,
-            ContentAction.followSource => LimitedAction.followSource,
-            ContentAction.followCountry => LimitedAction.followCountry,
-            _ => LimitedAction.followTopic,
-          });
+          _logLimitExceeded(action.toLimitedAction());
           return getLimitationStatusForTier(tier);
         }
 
@@ -367,7 +362,7 @@ class ContentLimitationService {
           'Save filter limit check for tier "$tier": ${preferences.savedHeadlineFilters.length}/$limit',
         );
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
-          _logLimitExceeded(LimitedAction.saveFilter);
+          _logLimitExceeded(action.toLimitedAction());
           return getLimitationStatusForTier(tier);
         }
 
@@ -382,7 +377,7 @@ class ContentLimitationService {
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
                 limit) {
-          _logLimitExceeded(LimitedAction.pinFilter);
+          _logLimitExceeded(action.toLimitedAction());
           return getLimitationStatusForTier(tier);
         }
 
@@ -408,9 +403,7 @@ class ContentLimitationService {
             'Current subscriptions for type "$deliveryType": $currentCountForType, Limit: $limitForType',
           );
           if (currentCountForType >= limitForType) {
-            _logLimitExceeded(
-              LimitedAction.subscribeToSavedFilterNotifications,
-            );
+            _logLimitExceeded(action.toLimitedAction());
             return getLimitationStatusForTier(tier);
           }
         }
@@ -455,12 +448,7 @@ class ContentLimitationService {
         );
 
         if (limit != null && (count ?? 0) >= limit) {
-          _logLimitExceeded(switch (action) {
-            ContentAction.postComment => LimitedAction.postComment,
-            ContentAction.reactToContent => LimitedAction.reactToContent,
-            ContentAction.submitReport => LimitedAction.submitReport,
-            _ => LimitedAction.reactToContent,
-          });
+          _logLimitExceeded(action.toLimitedAction());
           return getLimitationStatusForTier(tier);
         }
     }

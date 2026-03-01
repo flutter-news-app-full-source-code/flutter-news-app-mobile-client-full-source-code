@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:go_router/go_router.dart';
 
 /// {@template entity_list_tile}
@@ -49,11 +50,11 @@ class EntityListTile extends StatelessWidget {
 
     switch (item) {
       case final Topic topic:
-        title = topic.name;
+        title = topic.name.getValue(context);
       case final Source source:
-        title = source.name;
+        title = source.name.getValue(context);
       case final Country country:
-        title = country.name;
+        title = country.name.getValue(context);
       default:
         title = 'Unknown Item';
     }

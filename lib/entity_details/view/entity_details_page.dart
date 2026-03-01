@@ -1,6 +1,7 @@
 // ignore_for_file: no_default_cases
 
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
@@ -11,11 +12,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/multilingual_map_extension.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({
@@ -49,11 +50,24 @@ class EntityDetailsView extends StatefulWidget {
 class _EntityDetailsViewState extends State<EntityDetailsView> {
   final _scrollController = ScrollController();
   bool _isFollowingInProgress = false;
+  bool _isDeactivated = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void deactivate() {
+    _isDeactivated = true;
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _isDeactivated = false;
   }
 
   @override
@@ -65,6 +79,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   }
 
   void _onScroll() {
+    if (!mounted || _isDeactivated) return;
+
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
         EntityDetailsLoadMoreHeadlinesRequested(
@@ -152,15 +168,15 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
           if (entity is Topic) {
             final topic = entity;
-            appBarTitleText = topic.name;
+            appBarTitleText = topic.name.getValue(context);
             appBarIconData = Icons.category_outlined;
           } else if (state.entity is Source) {
             final src = state.entity! as Source;
-            appBarTitleText = src.name;
+            appBarTitleText = src.name.getValue(context);
             appBarIconData = Icons.source_outlined;
           } else if (state.entity is Country) {
             final country = state.entity! as Country;
-            appBarTitleText = country.name;
+            appBarTitleText = country.name.getValue(context);
             appBarIconData = Icons.flag_outlined;
           } else {
             appBarTitleText = l10n.detailsPageTitle;
@@ -272,8 +288,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   ) {
     final followButton = _buildFollowButton(context, state, colorScheme, l10n);
     final entityDescription = switch (state.entity) {
-      final Topic topic => topic.description,
-      final Source source => source.description,
+      final Topic topic => topic.description.getValue(context),
+      final Source source => source.description.getValue(context),
       _ => '',
     };
 

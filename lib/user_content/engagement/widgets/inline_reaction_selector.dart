@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template inline_reaction_selector}
 /// A row of reaction icons designed for inline placement within a feed tile.

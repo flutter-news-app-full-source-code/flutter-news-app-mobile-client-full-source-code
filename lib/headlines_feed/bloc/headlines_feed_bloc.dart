@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -94,6 +93,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                initialUserContentPreferences?.savedHeadlineFilters ?? const [],
          ),
        ) {
+    _lastUserRewards = _appBloc.state.userRewards;
+    _lastAppSettings = _appBloc.state.settings;
+
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -124,6 +126,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         }
       }
       _lastUserRewards = newRewards;
+
+      // Handle Language changes
+      final newSettings = appState.settings;
+      if (_lastAppSettings?.language != newSettings?.language) {
+        _logger.info(
+          'Language changed. Triggering feed refresh to fetch localized content.',
+        );
+        if (state.adThemeStyle != null) {
+          add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
+        }
+      }
+      _lastAppSettings = newSettings;
     });
 
     on<HeadlinesFeedStarted>(
@@ -190,6 +204,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
   UserRewards? _lastUserRewards;
+  AppSettings? _lastAppSettings;
 
   static const _allFilterId = 'all';
 
@@ -1034,10 +1049,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       'HeadlinesFeedEngagementTapped: Opening engagement sheet for headline ${event.headline.id}.',
     );
     // The UI will listen for this state change and trigger navigation.
+    // NOTE: This URL is an "Internal Signal" intercepted by the HeadlinesFeedPage
+    // listener to open a modal bottom sheet. It is NOT a functional deep link
+    // registered in the GoRouter configuration, hence why we use a string literal
+    // instead of a named route constant.
     emit(
       state.copyWith(
-        navigationUrl:
-            '${Routes.feed}/${Routes.engagement.replaceFirst(':', '')}${event.headline.id}',
+        navigationUrl: '${Routes.feed}/engagement/${event.headline.id}',
         navigationArguments: event.headline,
       ),
     );

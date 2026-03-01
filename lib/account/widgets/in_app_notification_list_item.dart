@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template in_app_notification_list_item}
 /// A widget that displays a single in-app notification in a list.

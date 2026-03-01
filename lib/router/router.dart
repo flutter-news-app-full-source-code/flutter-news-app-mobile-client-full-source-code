@@ -1,6 +1,4 @@
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
@@ -438,6 +436,27 @@ GoRouter createRouter({
                       ),
                     ),
               ),
+              BlocProvider(
+                create: (context) {
+                  final appBloc = context.read<AppBloc>();
+                  return HeadlinesFeedBloc(
+                    headlinesRepository: context
+                        .read<DataRepository<Headline>>(),
+                    feedDecoratorService: FeedDecoratorService(),
+                    adService: context.read<AdService>(),
+                    appBloc: appBloc,
+                    inlineAdCacheService: context.read<InlineAdCacheService>(),
+                    feedCacheService: context.read<FeedCacheService>(),
+                    initialUserContentPreferences:
+                        appBloc.state.userContentPreferences,
+                    engagementRepository: context
+                        .read<DataRepository<Engagement>>(),
+                    contentLimitationService: context
+                        .read<ContentLimitationService>(),
+                    analyticsService: context.read<AnalyticsService>(),
+                  );
+                },
+              ),
             ],
             child: EntityDetailsPage(args: args),
           );
@@ -512,6 +531,7 @@ GoRouter createRouter({
                                 .read<DataRepository<Source>>(),
                             countriesRepository: context
                                 .read<DataRepository<Country>>(),
+                            appBloc: context.read<AppBloc>(),
                           )..add(
                             FilterDataLoaded(
                               initialSelectedTopics: initialFilter.topics,

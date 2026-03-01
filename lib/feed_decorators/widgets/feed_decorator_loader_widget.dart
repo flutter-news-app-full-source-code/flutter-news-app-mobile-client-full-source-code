@@ -1,21 +1,18 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/extensions/feed_decorator_type_l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/content_collection_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:logging/logging.dart';
-import 'package:ui_kit/ui_kit.dart';
-import 'package:uuid/uuid.dart';
 
 /// The internal state of the [FeedDecoratorLoaderWidget].
 enum _DecoratorState {
@@ -75,7 +72,6 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   _DecoratorState _state = _DecoratorState.loading;
   Widget? _decoratorWidget;
   final _logger = Logger('FeedDecoratorLoaderWidget');
-  final _uuid = const Uuid();
 
   /// Flag to ensure the decorator loading logic is dispatched only once
   /// during the initial widget lifecycle.
@@ -137,10 +133,17 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       return;
     }
 
-    final decoratorItem = await _buildDecoratorItem(
-      dueDecoratorType,
-      decoratorConfig,
-    );
+    final decoratorItem = await context
+        .read<FeedDecoratorService>()
+        .buildDecoratorItem(
+          decoratorType: dueDecoratorType,
+          decoratorConfig: decoratorConfig,
+          l10n: AppLocalizationsX(context).l10n,
+          remoteConfig: remoteConfig,
+          topicRepository: context.read<DataRepository<Topic>>(),
+          sourceRepository: context.read<DataRepository<Source>>(),
+          userPreferences: appState.userContentPreferences,
+        );
 
     if (decoratorItem == null) {
       _logger.info('Decorator item could not be built for $dueDecoratorType.');
@@ -358,115 +361,6 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     if (dueCandidates.isEmpty) return null;
     dueCandidates.sort((a, b) => a.priority.compareTo(b.priority));
     return dueCandidates.first.type;
-  }
-
-  Future<FeedItem?> _buildDecoratorItem(
-    FeedDecoratorType decoratorType,
-    FeedDecoratorConfig decoratorConfig,
-  ) async {
-    // Access localization strings for dynamic text.
-    final l10n = AppLocalizationsX(context).l10n;
-    final remoteConfig = context.read<AppBloc>().state.remoteConfig;
-
-    // Get duration for rewards if applicable
-    String? rewardDuration;
-    if (decoratorType == FeedDecoratorType.unlockRewards) {
-      final adFreeReward =
-          remoteConfig?.features.rewards.rewards[RewardType.adFree];
-      if (adFreeReward != null) {
-        rewardDuration = l10n.rewardsDurationDays(adFreeReward.durationDays);
-      }
-    }
-
-    // This logic is a simplified version of the original service, as the
-    // content for CTAs is defined statically.
-    switch (decoratorConfig.category) {
-      case FeedDecoratorCategory.callToAction:
-        // Determine the fixed CTA URL based on the decorator type.
-        // This is a route and not a localized string.
-        String ctaUrl;
-        switch (decoratorType) {
-          case FeedDecoratorType.linkAccount:
-            ctaUrl = Routes.accountLinking;
-          case FeedDecoratorType.unlockRewards:
-            ctaUrl = '/${Routes.account}/${Routes.rewards}';
-          case FeedDecoratorType.rateApp:
-            ctaUrl = '#';
-          case FeedDecoratorType.suggestedTopics:
-          case FeedDecoratorType.suggestedSources:
-            throw UnsupportedError('only CTA decorators are supported.');
-        }
-
-        // Construct the CallToActionItem using randomized localized strings
-        // from the extension and the determined CTA URL.
-        return CallToActionItem(
-          id: _uuid.v4(),
-          decoratorType: decoratorType,
-          title: decoratorType.getRandomTitle(l10n),
-          description: decoratorType.getRandomDescription(
-            l10n,
-            duration: rewardDuration,
-          ),
-          callToActionText: decoratorType.getRandomCtaText(l10n),
-          callToActionUrl: ctaUrl,
-        );
-
-      case FeedDecoratorCategory.contentCollection:
-        final itemsToDisplay = decoratorConfig.itemsToDisplay;
-        if (itemsToDisplay == null) return null;
-
-        final userPreferences = context
-            .read<AppBloc>()
-            .state
-            .userContentPreferences;
-        final followedTopicIds =
-            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [];
-        final followedSourceIds =
-            userPreferences?.followedSources.map((s) => s.id).toList() ?? [];
-
-        switch (decoratorType) {
-          case FeedDecoratorType.suggestedTopics:
-            final topics = await context.read<DataRepository<Topic>>().readAll(
-              pagination: PaginationOptions(limit: itemsToDisplay),
-              sort: [const SortOption('name', SortOrder.asc)],
-              filter: {
-                '_id': {r'$nin': followedTopicIds},
-                'status': ContentStatus.active.name,
-              },
-            );
-            if (topics.items.isEmpty) return null;
-            return ContentCollectionItem<Topic>(
-              id: _uuid.v4(),
-              decoratorType: decoratorType,
-              title: decoratorType.getRandomTitle(l10n),
-              items: topics.items,
-            );
-          case FeedDecoratorType.suggestedSources:
-            final sources = await context
-                .read<DataRepository<Source>>()
-                .readAll(
-                  pagination: PaginationOptions(limit: itemsToDisplay),
-                  sort: [const SortOption('name', SortOrder.asc)],
-                  filter: {
-                    '_id': {r'$nin': followedSourceIds},
-                    'status': ContentStatus.active.name,
-                  },
-                );
-            if (sources.items.isEmpty) return null;
-            return ContentCollectionItem<Source>(
-              id: _uuid.v4(),
-              decoratorType: decoratorType,
-              title: decoratorType.getRandomTitle(l10n),
-              items: sources.items,
-            );
-          // ignore: no_default_cases
-          default:
-            _logger.warning(
-              'Unhandled ContentCollection decorator type: $decoratorType',
-            );
-            return null;
-        }
-    }
   }
 
   @override

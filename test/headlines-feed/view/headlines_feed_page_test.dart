@@ -1,5 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:core_ui/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -9,7 +11,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines_feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 class MockHeadlinesFeedBloc
     extends MockBloc<HeadlinesFeedEvent, HeadlinesFeedState>
@@ -31,51 +32,37 @@ void main() {
 
   final headline1 = Headline(
     id: 'h1',
-    title: 'Title 1',
+    title: const {SupportedLanguage.en: 'Title 1'},
     url: 'url1',
     imageUrl: 'imageUrl1',
     source: Source(
       id: 's1',
-      name: 'Source 1',
-      description: '',
+      name: const {SupportedLanguage.en: 'Source 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       url: '',
       logoUrl: '',
       sourceType: SourceType.newsAgency,
-      language: Language(
-        id: 'en',
-        code: 'en',
-        name: 'English',
-        nativeName: 'English',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
-      ),
-      headquarters: Country(
+      language: SupportedLanguage.en,
+      headquarters: const Country(
         isoCode: 'US',
-        name: 'USA',
+        name: {SupportedLanguage.en: 'USA'},
         flagUrl: 'f',
         id: 'c',
-        createdAt: DateTime(2023),
-        updatedAt: DateTime(2023),
-        status: ContentStatus.active,
       ),
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
       status: ContentStatus.active,
     ),
-    eventCountry: Country(
+    eventCountry: const Country(
       isoCode: 'US',
-      name: 'USA',
+      name: {SupportedLanguage.en: 'USA'},
       flagUrl: 'f',
       id: 'c',
-      createdAt: DateTime(2023),
-      updatedAt: DateTime(2023),
-      status: ContentStatus.active,
     ),
     topic: Topic(
       id: 't1',
-      name: 'Topic 1',
-      description: '',
+      name: const {SupportedLanguage.en: 'Topic 1'},
+      description: const {SupportedLanguage.en: 'Desc'},
       iconUrl: '',
       createdAt: DateTime(2023),
       updatedAt: DateTime(2023),
@@ -100,6 +87,10 @@ void main() {
         androidUpdateUrl: '',
       ),
       general: GeneralAppConfig(termsOfServiceUrl: '', privacyPolicyUrl: ''),
+      localization: LocalizationConfig(
+        enabledLanguages: [SupportedLanguage.en],
+        defaultLanguage: SupportedLanguage.en,
+      ),
     ),
     features: const FeaturesConfig(
       onboarding: OnboardingConfig(
@@ -198,25 +189,17 @@ void main() {
           savedHeadlines: [],
           savedHeadlineFilters: [],
         ),
-        settings: AppSettings(
+        settings: const AppSettings(
           id: 'settings-id',
-          language: Language(
-            id: 'l-id',
-            code: 'en',
-            name: 'English',
-            nativeName: 'English',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            status: ContentStatus.active,
-          ),
-          displaySettings: const DisplaySettings(
+          language: SupportedLanguage.en,
+          displaySettings: DisplaySettings(
             baseTheme: AppBaseTheme.light,
             accentTheme: AppAccentTheme.defaultBlue,
             fontFamily: 'Roboto',
             textScaleFactor: AppTextScaleFactor.medium,
             fontWeight: AppFontWeight.regular,
           ),
-          feedSettings: const FeedSettings(
+          feedSettings: FeedSettings(
             feedItemDensity: FeedItemDensity.standard,
             feedItemImageStyle: FeedItemImageStyle.smallThumbnail,
             feedItemClickBehavior: FeedItemClickBehavior.internalNavigation,
@@ -297,7 +280,10 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text(headline1.title, skipOffstage: false), findsNWidgets(5));
+      expect(
+        find.text(headline1.title[SupportedLanguage.en]!, skipOffstage: false),
+        findsNWidgets(5),
+      );
     });
 
     testWidgets('adds HeadlinesFeedFetchRequested when scrolled to bottom', (

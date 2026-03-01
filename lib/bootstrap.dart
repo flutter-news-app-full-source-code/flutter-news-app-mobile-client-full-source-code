@@ -1,10 +1,5 @@
-import 'package:auth_api/auth_api.dart';
-import 'package:auth_client/auth_client.dart';
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_api/data_api.dart';
-import 'package:data_client/data_client.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -36,19 +31,14 @@ import 'package:flutter_news_app_mobile_client_full_source_code/push_notificatio
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/clients/media_api.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/no_op_native_review_service.dart';
-import 'package:http_client/http_client.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
-import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
 import 'package:logging/logging.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:ui_kit/ui_kit.dart';
 
 Future<Widget> bootstrap(
   app_config.AppConfig appConfig,

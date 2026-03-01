@@ -782,5 +782,15 @@
     "guestUserDisplayName": "Gast",
     "accountPageSyncProgressButton": "Fortschritt synchronisieren",
     "applyButtonLabel": "Anwenden",
-    "commentStatusPending": "In Prüfung"
+    "commentStatusPending": "In Prüfung",
+    "languageNameEn": "Englisch",
+    "languageNameEs": "Spanisch",
+    "languageNameFr": "Französisch",
+    "languageNameAr": "Arabisch",
+    "languageNamePt": "Portugiesisch",
+    "languageNameDe": "Deutsch",
+    "languageNameIt": "Italienisch",
+    "languageNameZh": "Chinesisch",
+    "languageNameHi": "Hindi",
+    "languageNameJa": "Japanisch"
 }

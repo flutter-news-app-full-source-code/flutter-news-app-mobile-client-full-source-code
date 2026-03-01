@@ -782,5 +782,15 @@
     "guestUserDisplayName": "Ospite",
     "accountPageSyncProgressButton": "Sincronizza progressi",
     "applyButtonLabel": "Applica",
-    "commentStatusPending": "In revisione"
+    "commentStatusPending": "In revisione",
+    "languageNameEn": "Inglese",
+    "languageNameEs": "Spagnolo",
+    "languageNameFr": "Francese",
+    "languageNameAr": "Arabo",
+    "languageNamePt": "Portoghese",
+    "languageNameDe": "Tedesco",
+    "languageNameIt": "Italiano",
+    "languageNameZh": "Cinese",
+    "languageNameHi": "Hindi",
+    "languageNameJa": "Giapponese"
 }

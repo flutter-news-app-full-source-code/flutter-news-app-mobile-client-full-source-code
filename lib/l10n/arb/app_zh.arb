@@ -782,5 +782,15 @@
     "guestUserDisplayName": "游客",
     "accountPageSyncProgressButton": "同步进度",
     "applyButtonLabel": "应用",
-    "commentStatusPending": "审核中"
+    "commentStatusPending": "审核中",
+    "languageNameEn": "英语",
+    "languageNameEs": "西班牙语",
+    "languageNameFr": "法语",
+    "languageNameAr": "阿拉伯语",
+    "languageNamePt": "葡萄牙语",
+    "languageNameDe": "德语",
+    "languageNameIt": "意大利语",
+    "languageNameZh": "中文",
+    "languageNameHi": "印地语",
+    "languageNameJa": "日语"
 }

@@ -782,5 +782,15 @@
     "guestUserDisplayName": "ゲスト",
     "accountPageSyncProgressButton": "進捗を同期",
     "applyButtonLabel": "適用",
-    "commentStatusPending": "審査中"
+    "commentStatusPending": "審査中",
+    "languageNameEn": "英語",
+    "languageNameEs": "スペイン語",
+    "languageNameFr": "フランス語",
+    "languageNameAr": "アラビア語",
+    "languageNamePt": "ポルトガル語",
+    "languageNameDe": "ドイツ語",
+    "languageNameIt": "イタリア語",
+    "languageNameZh": "中国語",
+    "languageNameHi": "ヒンディー語",
+    "languageNameJa": "日本語"
 }

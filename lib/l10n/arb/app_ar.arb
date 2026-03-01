@@ -782,5 +782,15 @@
     "guestUserDisplayName": "زائر",
     "accountPageSyncProgressButton": "مزامنة التقدم",
     "applyButtonLabel": "تطبيق",
-    "commentStatusPending": "قيد المراجعة"
+    "commentStatusPending": "قيد المراجعة",
+    "languageNameEn": "الإنجليزية",
+    "languageNameEs": "الإسبانية",
+    "languageNameFr": "الفرنسية",
+    "languageNameAr": "العربية",
+    "languageNamePt": "البرتغالية",
+    "languageNameDe": "الألمانية",
+    "languageNameIt": "الإيطالية",
+    "languageNameZh": "الصينية",
+    "languageNameHi": "الهندية",
+    "languageNameJa": "اليابانية"
 }

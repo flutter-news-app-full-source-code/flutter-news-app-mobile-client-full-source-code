@@ -782,5 +782,15 @@
     "guestUserDisplayName": "अतिथि",
     "accountPageSyncProgressButton": "प्रगति सिंक करें",
     "applyButtonLabel": "लागू करें",
-    "commentStatusPending": "समीक्षाधीन"
+    "commentStatusPending": "समीक्षाधीन",
+    "languageNameEn": "अंग्रेज़ी",
+    "languageNameEs": "स्पेनिश",
+    "languageNameFr": "फ्रेंच",
+    "languageNameAr": "अरबी",
+    "languageNamePt": "पुर्तगाली",
+    "languageNameDe": "जर्मन",
+    "languageNameIt": "इतालवी",
+    "languageNameZh": "चीनी",
+    "languageNameHi": "हिंदी",
+    "languageNameJa": "जापानी"
 }

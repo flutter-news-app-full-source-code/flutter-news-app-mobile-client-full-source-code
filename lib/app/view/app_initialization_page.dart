@@ -225,7 +225,10 @@ class AppInitializationPage extends StatelessWidget {
                   ...AppLocalizations.localizationsDelegates,
                   ...UiKitLocalizations.localizationsDelegates,
                 ],
-                supportedLocales: AppLocalizations.supportedLocales,
+                supportedLocales: const [
+                  ...AppLocalizations.supportedLocales,
+                  ...UiKitLocalizations.supportedLocales,
+                ],
                 home: switch (failureData.status) {
                   AppLifeCycleStatus.underMaintenance =>
                     const MaintenancePage(),
@@ -271,7 +274,10 @@ class AppInitializationPage extends StatelessWidget {
                   ...AppLocalizations.localizationsDelegates,
                   ...UiKitLocalizations.localizationsDelegates,
                 ],
-                supportedLocales: AppLocalizations.supportedLocales,
+                supportedLocales: const [
+                  ...AppLocalizations.supportedLocales,
+                  ...UiKitLocalizations.supportedLocales,
+                ],
                 home: const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 ),

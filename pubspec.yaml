@@ -1,6 +1,6 @@
 name: flutter_news_app_mobile_client_full_source_code
 description: Complete, production-ready source code for a feature-rich Flutter news app mobile client.
-version: 1.15.0
+version: 1.16.0
 publish_to: none
 homepage: https://github.com/flutter-news-app-full-source-code/
 repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
@@ -30,11 +30,11 @@ dependencies:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: 28c7a57b5ce05e23ff70b953e067e3643368aea6
+      ref: v2.0.0
   core_ui:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core-ui.git
-      ref: 6c36e18320e60ce202e64c564f3848da73cd2306
+      ref: v2.0.0
   equatable: ^2.0.7
   firebase_analytics: ^12.1.0
   firebase_core: ^4.2.1

@@ -24,7 +24,6 @@ class TestHttpOverrides extends HttpOverrides {
 
 class _MockHttpClient extends Mock implements HttpClient {
   _MockHttpClient() {
-    registerFallbackValue(Uri());
     when(() => getUrl(any())).thenAnswer((_) async => _MockHttpClientRequest());
   }
 }
@@ -136,7 +135,15 @@ const List<int> kTransparentImage = <int>[
 
 void main() {
   setUpAll(() {
+    registerFallbackValue(Uri());
+  });
+
+  setUp(() {
     HttpOverrides.global = TestHttpOverrides();
+  });
+
+  tearDown(() {
+    HttpOverrides.global = null;
   });
 
   group('SourceListFilterPage', () {

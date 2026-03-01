@@ -149,20 +149,20 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "28c7a57b5ce05e23ff70b953e067e3643368aea6"
-      resolved-ref: "28c7a57b5ce05e23ff70b953e067e3643368aea6"
+      ref: "v2.0.0"
+      resolved-ref: "30aa2aab3b7c95bc0efac783b9bef447b85b364b"
       url: "https://github.com/flutter-news-app-full-source-code/core.git"
     source: git
-    version: "1.10.0"
+    version: "2.0.0"
   core_ui:
     dependency: "direct main"
     description:
       path: "."
-      ref: "6c36e18320e60ce202e64c564f3848da73cd2306"
-      resolved-ref: "6c36e18320e60ce202e64c564f3848da73cd2306"
+      ref: "v2.0.0"
+      resolved-ref: "324e1d19b04d4892fb898879bd647c59c842e777"
       url: "https://github.com/flutter-news-app-full-source-code/core-ui.git"
     source: git
-    version: "1.0.1"
+    version: "2.0.0"
   coverage:
     dependency: transitive
     description:

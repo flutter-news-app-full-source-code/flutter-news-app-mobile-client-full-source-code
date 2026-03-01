@@ -20,6 +20,19 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
     return options[randomIndex];
   }
 
+  /// Resolves the [SupportedLanguage] key corresponding to the current locale.
+  SupportedLanguage _getLanguageKey(AppLocalizations l10n) {
+    try {
+      // l10n.localeName typically returns 'en', 'ar', etc.
+      // We match this against the SupportedLanguage enum.
+      return SupportedLanguage.values.byName(l10n.localeName);
+    } catch (_) {
+      // Fallback to English if the locale is not supported or parsing fails.
+      // This ensures we always return a valid key for the map.
+      return SupportedLanguage.en;
+    }
+  }
+
   /// Gets a randomized, localized title for the decorator.
   ///
   /// Uses a switch statement on the decorator type to determine the correct
@@ -52,6 +65,12 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
     }
   }
 
+  /// Returns a map containing the randomized title keyed by the current language.
+  Map<SupportedLanguage, String> getLocalizedTitleMap(AppLocalizations l10n) {
+    final text = getRandomTitle(l10n);
+    return {_getLanguageKey(l10n): text};
+  }
+
   /// Gets a randomized, localized description for the decorator.
   ///
   /// This only applies to [FeedDecoratorCategory.callToAction] decorators.
@@ -82,6 +101,15 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
     }
   }
 
+  /// Returns a map containing the randomized description keyed by the current language.
+  Map<SupportedLanguage, String> getLocalizedDescriptionMap(
+    AppLocalizations l10n, {
+    String? duration,
+  }) {
+    final text = getRandomDescription(l10n, duration: duration);
+    return {_getLanguageKey(l10n): text};
+  }
+
   /// Gets a randomized, localized call-to-action text for the decorator.
   ///
   /// This only applies to [FeedDecoratorCategory.callToAction] decorators.
@@ -104,5 +132,11 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
       case FeedDecoratorType.suggestedSources:
         return '';
     }
+  }
+
+  /// Returns a map containing the randomized CTA text keyed by the current language.
+  Map<SupportedLanguage, String> getLocalizedCtaMap(AppLocalizations l10n) {
+    final text = getRandomCtaText(l10n);
+    return {_getLanguageKey(l10n): text};
   }
 }

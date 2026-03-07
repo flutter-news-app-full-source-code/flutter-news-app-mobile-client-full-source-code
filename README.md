@@ -10,11 +10,7 @@
       </td>
     </tr>
   </table>
-
-  <h1>Flutter News App Mobile Client</h1>
-  <p><strong>Complete, production-ready source code for a feature-rich Flutter news app mobile client.</strong></p>
 </div>
-
 
 <p align="center">
   <a href="https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
@@ -23,8 +19,20 @@
   <a href="https://github.com/sponsors/flutter-news-app"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
 </p>
 
-This repository contains the complete, production-ready source code for a feature-rich Flutter news app mobile client. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App Full Source Code**](https://github.com/flutter-news-app), an ecosystem that also includes a Dart Frog [backend API](https://github.com/flutter-news-app/flutter-news-app-backend-api-full-source-code) and a web-based [content management dashboard](https://github.com/flutter-news-app/flutter-news-app-web-dashboard-full-source-code).
 
+
+Part of the **[Verity News System](https://github.com/verity-hq)**.
+
+Verity Mobile is a production-ready news reader built with Flutter, focusing on performance, personalization, and secure monetization.
+
+
+---
+
+### ⚠️ Important Notice: Platform Verification
+**Verity Mobile has been developed and verified exclusively on Android.** 
+While the system is built using Flutter’s cross-platform framework, iOS deployment has not been tested in a production environment. Licensees should expect to perform their own platform-specific configuration, testing, and UI adjustments for iOS.
+
+---
 
 ## ⭐ Feature Showcase: Everything You Get, Ready to Go
 

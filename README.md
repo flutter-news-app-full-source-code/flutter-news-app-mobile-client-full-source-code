@@ -21,7 +21,7 @@
 
 ---
 
-Part of the **[Verity News System](https://github.com/verity-hq)**.
+Part of the **[Verity News Stack](https://github.com/verity-hq)**.
 
 Verity Mobile is a production-ready news reader built with Flutter, focusing on performance, personalization, and secure monetization.
 
@@ -205,4 +205,4 @@ For a complete guide on setting up your local environment and running this proje
 
 This source code is licensed for commercial use and is provided for local evaluation. A **Lifetime Commercial License** is required for any production or public-facing application.
 
-Please visit the main [Flutter News App Full Source Code](https://github.com/flutter-news-app) organization page to review the full license terms and to purchase.
+Please visit the main [Verity News Stack](https://github.com/verity-hq) organization page to review the full license terms and to purchase.

@@ -198,7 +198,7 @@ Verity is built using a standardized Flutter architecture for cross-platform com
 
 ## 🚀 Getting Started & Running Locally
 
-For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/veritas-hq/veritas-mobile/wiki) tab in this repository.
+For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/verity-hq/verity-mobile/wiki) tab in this repository.
 
 ## 🔑 Licensing
 

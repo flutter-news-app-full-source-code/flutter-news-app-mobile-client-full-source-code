@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/extensions/feed_decorator_type_l10n.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/models/decorator_placeholder.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
+import 'package:verity_mobile/feed_decorators/extensions/feed_decorator_type_l10n.dart';
+import 'package:verity_mobile/feed_decorators/models/decorator_placeholder.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/router/routes.dart';
 
 /// {@template feed_decorator_service}
 /// A service responsible for injecting a placeholder for non-ad decorators

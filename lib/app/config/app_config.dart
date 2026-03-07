@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter_news_app_mobile_client/app/config/app_environment.dart';
+import 'package:verity_mobile/app/config/app_environment.dart';
 
 /// {@template app_config}
 /// A centralized configuration class that provides all necessary

@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
+import 'package:verity_mobile/ads/models/inline_ad.dart';
 
 /// {@template banner_ad}
 /// A generic, provider-agnostic model representing an inline banner advertisement.

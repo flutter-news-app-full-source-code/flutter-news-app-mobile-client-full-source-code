@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
 
 /// Extension on [ContentAction] to centralize mapping logic.
 extension ContentActionExtension on ContentAction {

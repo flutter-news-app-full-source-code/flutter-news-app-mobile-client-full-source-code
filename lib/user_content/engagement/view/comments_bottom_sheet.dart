@@ -3,13 +3,13 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/user_avatar.dart';
-import 'package:flutter_news_app_mobile_client/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
+import 'package:verity_mobile/shared/widgets/user_avatar.dart';
+import 'package:verity_mobile/user_content/reporting/view/report_content_bottom_sheet.dart';
 
 /// {@template comments_bottom_sheet}
 /// A bottom sheet that displays comments for a headline and allows users

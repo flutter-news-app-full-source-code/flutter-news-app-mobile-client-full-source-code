@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/services/ad_service.dart';
+import 'package:verity_mobile/ads/services/inline_ad_cache_service.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/feed_decorators/services/feed_decorator_service.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:verity_mobile/headlines_feed/models/cached_feed.dart';
+import 'package:verity_mobile/headlines_feed/services/feed_cache_service.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
 
 // Mocks
 class MockHeadlinesRepository extends Mock

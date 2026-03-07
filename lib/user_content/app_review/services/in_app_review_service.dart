@@ -1,6 +1,6 @@
-import 'package:flutter_news_app_mobile_client/user_content/app_review/services/native_review_service.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/user_content/app_review/services/native_review_service.dart';
 
 /// {@template in_app_review_service}
 /// A concrete implementation of [NativeReviewService] that uses the

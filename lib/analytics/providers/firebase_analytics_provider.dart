@@ -1,6 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter_news_app_mobile_client/analytics/providers/analytics_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/analytics/providers/analytics_provider.dart';
 
 /// {@template firebase_analytics_provider}
 /// An implementation of [AnalyticsProvider] for Firebase Analytics.

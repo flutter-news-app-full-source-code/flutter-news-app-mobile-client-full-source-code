@@ -1,12 +1,12 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client/onboarding/app_tour/bloc/app_tour_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/initialization_result.dart';
+import 'package:verity_mobile/onboarding/app_tour/bloc/app_tour_bloc.dart';
 
 class MockAppBloc extends Mock implements AppBloc {}
 

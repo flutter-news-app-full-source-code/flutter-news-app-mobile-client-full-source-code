@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/rewards/bloc/rewards_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/rewards/bloc/rewards_bloc.dart';
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 

@@ -294,7 +294,7 @@
     "@authenticationLinkingSubheadline": {
         "description": "Subheadline explaining the benefit of linking an anonymous account"
     },
-    "authenticationSignInHeadline": "Veritas",
+    "authenticationSignInHeadline": "Verity",
     "@authenticationSignInHeadline": {
         "description": "Headline for the authentication page during standard sign-in"
     },

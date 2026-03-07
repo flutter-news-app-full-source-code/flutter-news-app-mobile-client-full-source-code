@@ -4,19 +4,19 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_placeholder.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/widgets/feed_ad_loader_widget.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/entity_details/bloc/entity_details_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/content_limitation_bottom_sheet.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/feed_core/feed_core.dart';
-import 'package:flutter_news_app_mobile_client/user_content/reporting/view/report_content_bottom_sheet.dart';
+import 'package:verity_mobile/ads/models/ad_placeholder.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/widgets/feed_ad_loader_widget.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/entity_details/bloc/entity_details_bloc.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
+import 'package:verity_mobile/shared/extensions/multilingual_map_extension.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/shared/widgets/content_limitation_bottom_sheet.dart';
+import 'package:verity_mobile/shared/widgets/feed_core/feed_core.dart';
+import 'package:verity_mobile/user_content/reporting/view/report_content_bottom_sheet.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({

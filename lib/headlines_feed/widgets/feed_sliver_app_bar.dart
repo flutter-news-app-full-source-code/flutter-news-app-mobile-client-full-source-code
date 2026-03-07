@@ -2,15 +2,15 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_search_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/view/headline_search_delegate.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/notification_indicator.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_search_bloc.dart';
+import 'package:verity_mobile/headlines_feed/view/headline_search_delegate.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/router/routes.dart';
+import 'package:verity_mobile/shared/widgets/notification_indicator.dart';
+import 'package:verity_mobile/shared/widgets/user_avatar.dart';
 
 /// {@template feed_sliver_app_bar}
 /// A sliver app bar for the feed page that includes a custom search bar.

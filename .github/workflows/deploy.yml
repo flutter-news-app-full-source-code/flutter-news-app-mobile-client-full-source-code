@@ -25,7 +25,7 @@ jobs:
 
       # 4. Build the Flutter web app
       - name: Build Web App
-        run: flutter build web --release --base-href /flutter-news-app-mobile-client/
+        run: flutter build web --release --base-href /verity-mobile/
 
       # 5. Deploy the built app to GitHub Pages
       - name: Deploy

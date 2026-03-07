@@ -4,11 +4,11 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/extensions.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_filter_bloc.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/extensions/extensions.dart';
+import 'package:verity_mobile/shared/widgets/multi_select_search_page.dart';
 
 /// {@template source_list_filter_page}
 /// A dedicated page for selecting filter criteria for the source list.

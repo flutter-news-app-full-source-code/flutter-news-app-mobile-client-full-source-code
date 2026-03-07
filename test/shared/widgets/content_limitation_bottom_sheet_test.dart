@@ -3,16 +3,16 @@ import 'package:core/core.dart';
 import 'package:core_ui/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/router/routes.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/shared/widgets/content_limitation_bottom_sheet.dart';
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 

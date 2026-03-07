@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/content_action_extension.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/shared/extensions/content_action_extension.dart';
 
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.

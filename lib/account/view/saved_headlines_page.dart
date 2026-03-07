@@ -2,12 +2,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
+import 'package:verity_mobile/shared/widgets/feed_core/feed_core.dart';
 
 /// {@template saved_headlines_page}
 /// Displays the list of headlines saved by the user.

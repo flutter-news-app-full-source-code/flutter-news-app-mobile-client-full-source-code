@@ -2,14 +2,14 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/push_notification/services/push_notification_service.dart';
+import 'package:verity_mobile/shared/extensions/multilingual_map_extension.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/shared/widgets/content_limitation_bottom_sheet.dart';
 
 /// {@template save_filter_dialog}
 /// A dialog for naming or renaming a saved filter.

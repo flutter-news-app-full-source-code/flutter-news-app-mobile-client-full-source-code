@@ -4,15 +4,15 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/widgets/call_to_action_decorator_widget.dart';
-import 'package:flutter_news_app_mobile_client/feed_decorators/widgets/content_collection_decorator_widget.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/feed_decorators/services/feed_decorator_service.dart';
+import 'package:verity_mobile/feed_decorators/widgets/call_to_action_decorator_widget.dart';
+import 'package:verity_mobile/feed_decorators/widgets/content_collection_decorator_widget.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/shared/widgets/content_limitation_bottom_sheet.dart';
 
 /// The internal state of the [FeedDecoratorLoaderWidget].
 enum _DecoratorState {

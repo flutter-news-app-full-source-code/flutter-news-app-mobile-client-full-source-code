@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/ads/models/inline_ad.dart';
+import 'package:verity_mobile/ads/services/ad_service.dart';
 
 /// {@template inline_ad_cache_service}
 /// A singleton service for caching loaded inline ad objects (native and banner).

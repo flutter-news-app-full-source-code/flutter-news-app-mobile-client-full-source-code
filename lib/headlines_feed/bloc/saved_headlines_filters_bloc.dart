@@ -5,11 +5,10 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
+import 'package:logging/logging.dart';
 // Import AppBloc with an alias to resolve the name collision between
 // the local `SavedHeadlineFiltersReordered` event and the one in AppBloc.
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart'
-    as app_bloc;
-import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart' as app_bloc;
 
 part 'saved_headlines_filters_event.dart';
 part 'saved_headlines_filters_state.dart';

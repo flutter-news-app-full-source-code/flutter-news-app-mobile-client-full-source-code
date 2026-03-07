@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/providers/push_notification_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/push_notification/providers/push_notification_provider.dart';
 
 /// A no-operation implementation of [PushNotificationProvider].
 ///

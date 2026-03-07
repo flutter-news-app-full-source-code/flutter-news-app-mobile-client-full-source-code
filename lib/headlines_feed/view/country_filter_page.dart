@@ -2,10 +2,10 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_filter_bloc.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/extensions/multilingual_map_extension.dart';
 
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.

@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/providers/push_notification_provider.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/services/push_notification_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/push_notification/providers/push_notification_provider.dart';
+import 'package:verity_mobile/push_notification/services/push_notification_manager.dart';
 
 class MockPushNotificationConfig extends Mock
     implements PushNotificationConfig {}

@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/interstitial_ad_manager.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/in_app_browser.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:verity_mobile/ads/services/interstitial_ad_manager.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/shared/widgets/in_app_browser.dart';
 
 /// {@template headline_tap_handler}
 /// A utility class for handling headline taps, including interstitial ad

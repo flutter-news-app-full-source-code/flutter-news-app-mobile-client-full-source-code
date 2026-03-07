@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
 
 part 'profile_event.dart';
 part 'profile_state.dart';

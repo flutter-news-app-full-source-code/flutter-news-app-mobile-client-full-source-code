@@ -4,12 +4,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/models/interstitial_ad.dart';
+import 'package:verity_mobile/ads/services/ad_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
 
 /// {@template interstitial_ad_manager}
 /// A service that manages the lifecycle of interstitial ads.

@@ -1,4 +1,4 @@
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
 
 /// Extension on [AppLifeCycleStatus] to provide a convenient way to check
 /// for "running" states.

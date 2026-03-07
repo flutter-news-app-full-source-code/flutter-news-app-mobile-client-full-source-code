@@ -5,8 +5,8 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
 
 part 'in_app_notification_center_event.dart';
 part 'in_app_notification_center_state.dart';

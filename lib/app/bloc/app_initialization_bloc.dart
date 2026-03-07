@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client/app/services/app_initializer.dart'
-    show AppInitializer;
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/app/models/initialization_result.dart';
+import 'package:verity_mobile/app/services/app_initializer.dart'
+    show AppInitializer;
 
 part 'app_initialization_event.dart';
 part 'app_initialization_state.dart';

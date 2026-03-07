@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/providers/push_notification_provider.dart';
-import 'package:flutter_news_app_mobile_client/push_notification/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
+import 'package:verity_mobile/push_notification/providers/push_notification_provider.dart';
+import 'package:verity_mobile/push_notification/services/push_notification_service.dart';
 
 /// A private model to structure the data stored for the last registration.
 class _LastRegistration {

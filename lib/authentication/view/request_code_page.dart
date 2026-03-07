@@ -6,11 +6,11 @@ import 'dart:async';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/authentication/bloc/authentication_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/authentication/bloc/authentication_bloc.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/router/routes.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
 
 /// {@template request_code_page}
 /// Page for initiating the email code sign-in process.

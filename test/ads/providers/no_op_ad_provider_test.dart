@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/providers/no_op_ad_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/providers/no_op_ad_provider.dart';
 
 class MockLogger extends Mock implements Logger {}
 

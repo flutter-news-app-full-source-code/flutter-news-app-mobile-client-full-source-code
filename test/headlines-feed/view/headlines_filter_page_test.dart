@@ -5,18 +5,18 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/view/headlines_filter_page.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/widgets/save_filter_dialog.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/multi_select_search_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_feed_bloc.dart';
+import 'package:verity_mobile/headlines_feed/bloc/headlines_filter_bloc.dart';
+import 'package:verity_mobile/headlines_feed/view/headlines_filter_page.dart';
+import 'package:verity_mobile/headlines_feed/widgets/save_filter_dialog.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
+import 'package:verity_mobile/shared/widgets/multi_select_search_page.dart';
 
 import '../../helpers/helpers.dart';
 

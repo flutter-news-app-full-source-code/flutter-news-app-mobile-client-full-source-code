@@ -2,11 +2,11 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/account/bloc/in_app_notification_center_bloc.dart';
-import 'package:flutter_news_app_mobile_client/account/widgets/in_app_notification_list_item.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/feed_core/headline_tap_handler.dart';
+import 'package:verity_mobile/account/bloc/in_app_notification_center_bloc.dart';
+import 'package:verity_mobile/account/widgets/in_app_notification_list_item.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
+import 'package:verity_mobile/shared/widgets/feed_core/headline_tap_handler.dart';
 
 /// {@template in_app_notification_center_page}
 /// A page that displays a chronological list of all in-app notifications.

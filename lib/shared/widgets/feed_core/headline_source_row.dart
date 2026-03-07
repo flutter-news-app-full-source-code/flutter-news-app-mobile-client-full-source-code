@@ -2,13 +2,13 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/interstitial_ad_manager.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
-import 'package:flutter_news_app_mobile_client/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:verity_mobile/ads/services/interstitial_ad_manager.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/router/routes.dart';
+import 'package:verity_mobile/shared/extensions/multilingual_map_extension.dart';
+import 'package:verity_mobile/shared/widgets/headline_actions_bottom_sheet.dart';
 
 /// {@template headline_source_row}
 /// A widget to display the source and publish date of a headline.

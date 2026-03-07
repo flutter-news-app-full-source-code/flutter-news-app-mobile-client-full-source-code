@@ -2,14 +2,14 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/router/routes.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/content_action_extension.dart';
-import 'package:flutter_news_app_mobile_client/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/router/routes.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
+import 'package:verity_mobile/shared/extensions/content_action_extension.dart';
+import 'package:verity_mobile/shared/services/content_limitation_service.dart';
 
 /// {@template content_limitation_bottom_sheet}
 /// A bottom sheet that informs the user about content limitations and provides

@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
 
 /// Extension on [Map<SupportedLanguage, String>] to provide safe access
 /// to localized strings based on the backend's projection logic.

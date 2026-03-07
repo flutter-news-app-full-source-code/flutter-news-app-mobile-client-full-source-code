@@ -4,12 +4,12 @@ import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/rewarded_ad_manager.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client/rewards/bloc/rewards_bloc.dart';
-import 'package:flutter_news_app_mobile_client/shared/constants/app_layout.dart';
+import 'package:verity_mobile/ads/services/rewarded_ad_manager.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
+import 'package:verity_mobile/rewards/bloc/rewards_bloc.dart';
+import 'package:verity_mobile/shared/constants/app_layout.dart';
 
 /// {@template rewards_page}
 /// A page that displays available rewards and offers to the user.

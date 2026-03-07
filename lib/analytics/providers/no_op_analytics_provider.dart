@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter_news_app_mobile_client/analytics/providers/analytics_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/analytics/providers/analytics_provider.dart';
 
 /// A no-operation implementation of [AnalyticsProvider].
 ///

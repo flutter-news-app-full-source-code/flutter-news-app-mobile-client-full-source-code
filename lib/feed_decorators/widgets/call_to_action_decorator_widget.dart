@@ -1,8 +1,8 @@
 import 'package:core/core.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client/shared/extensions/multilingual_map_extension.dart';
+import 'package:verity_mobile/l10n/l10n.dart';
+import 'package:verity_mobile/shared/extensions/multilingual_map_extension.dart';
 
 /// {@template call_to_action_decorator_widget}
 /// A widget to display a call-to-action feed decorator.

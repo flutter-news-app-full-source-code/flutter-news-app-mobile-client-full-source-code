@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_news_app_mobile_client/analytics/providers/analytics_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
+import 'package:verity_mobile/analytics/providers/analytics_provider.dart';
 
 /// {@template mixpanel_analytics_provider}
 /// An implementation of [AnalyticsProvider] for Mixpanel.

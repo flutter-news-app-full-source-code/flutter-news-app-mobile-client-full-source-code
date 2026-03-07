@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
 
 /// {@template app_status_service}
 /// A service dedicated to monitoring the application's lifecycle and

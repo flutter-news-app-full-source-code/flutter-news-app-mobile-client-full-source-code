@@ -4,17 +4,17 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/rewarded_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/rewarded_ad_manager.dart';
-import 'package:flutter_news_app_mobile_client/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/models/rewarded_ad.dart';
+import 'package:verity_mobile/ads/services/ad_service.dart';
+import 'package:verity_mobile/ads/services/rewarded_ad_manager.dart';
+import 'package:verity_mobile/analytics/services/analytics_service.dart';
+import 'package:verity_mobile/app/bloc/app_bloc.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
 
 // Mocks
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/l10n/app_localizations.dart';
 
 class MockGoRouter extends Mock implements GoRouter {}
 

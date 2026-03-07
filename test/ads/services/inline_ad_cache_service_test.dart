@@ -1,10 +1,10 @@
 // ignore_for_file: inference_failure_on_function_invocation
 
-import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/ads/models/inline_ad.dart';
+import 'package:verity_mobile/ads/services/ad_service.dart';
+import 'package:verity_mobile/ads/services/inline_ad_cache_service.dart';
 
 class MockAdService extends Mock implements AdService {}
 

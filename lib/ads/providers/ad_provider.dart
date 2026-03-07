@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/banner_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/native_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/rewarded_ad.dart';
+import 'package:verity_mobile/ads/models/ad_theme_style.dart';
+import 'package:verity_mobile/ads/models/banner_ad.dart';
+import 'package:verity_mobile/ads/models/interstitial_ad.dart';
+import 'package:verity_mobile/ads/models/native_ad.dart';
+import 'package:verity_mobile/ads/models/rewarded_ad.dart';
 
 /// {@template ad_provider}
 /// An abstract class defining the interface for any ad network provider.

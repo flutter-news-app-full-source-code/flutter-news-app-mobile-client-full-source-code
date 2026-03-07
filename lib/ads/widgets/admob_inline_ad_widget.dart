@@ -1,10 +1,10 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/banner_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client/ads/models/native_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
+import 'package:verity_mobile/ads/models/banner_ad.dart';
+import 'package:verity_mobile/ads/models/inline_ad.dart';
+import 'package:verity_mobile/ads/models/native_ad.dart';
 
 /// {@template admob_inline_ad_widget}
 /// A stateless widget that renders a pre-loaded inline Google AdMob ad.

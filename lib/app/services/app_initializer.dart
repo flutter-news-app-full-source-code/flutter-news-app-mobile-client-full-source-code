@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client/app/services/package_info_service.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
+import 'package:verity_mobile/app/models/app_life_cycle_status.dart';
+import 'package:verity_mobile/app/models/initialization_result.dart';
+import 'package:verity_mobile/app/services/package_info_service.dart';
 
 /// A dedicated service that orchestrates the entire application startup
 /// sequence.

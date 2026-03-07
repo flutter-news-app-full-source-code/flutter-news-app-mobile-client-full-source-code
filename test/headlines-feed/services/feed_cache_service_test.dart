@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client/headlines_feed/services/feed_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:verity_mobile/headlines_feed/models/cached_feed.dart';
+import 'package:verity_mobile/headlines_feed/services/feed_cache_service.dart';
 
 class MockLogger extends Mock implements Logger {}
 

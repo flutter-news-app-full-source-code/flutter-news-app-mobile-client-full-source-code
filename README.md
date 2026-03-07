@@ -194,8 +194,7 @@ The application is fully internationalized and includes working English and Arab
 </details>
 
 ## ⚠️ Important Notice:
-**Verity Mobile has been developed and verified exclusively on Android.** 
-While the system is built using Flutter’s cross-platform framework, iOS deployment has not been tested in a production environment. Licensees should expect to perform their own platform-specific configuration, testing, and UI adjustments for iOS.
+Verity is built using a standardized Flutter architecture for cross-platform compatibility. Please note that the current version has been developed and verified exclusively on Android. While the codebase is iOS-ready by design, iOS builds have not been tested in a live environment and may require platform-specific configuration by the developer.
 
 ## 🚀 Getting Started & Running Locally
 

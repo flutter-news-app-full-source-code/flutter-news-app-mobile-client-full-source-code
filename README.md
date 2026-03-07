@@ -1,3 +1,10 @@
+<p align="center">
+  <a href="https://github.com/veritas-hq/veritas-mobile/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
+  <img src="https://img.shields.io/badge/coverage-25%25-green?style=for-the-badge" alt="coverage: _%">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/TRIAL_LICENSE-VIEW_TERMS-blue?style=for-the-badge" alt="Trial License: View Terms"></a>
+  <a href="https://github.com/sponsors/veritas-hq"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
+</p>
+
 <div align="center">
   <table>
     <tr>
@@ -12,25 +19,11 @@
   </table>
 </div>
 
-<p align="center">
-  <a href="https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki/Local-Setup"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
-  <img src="https://img.shields.io/badge/coverage-25%25-green?style=for-the-badge" alt="coverage: _%">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/TRIAL_LICENSE-VIEW_TERMS-blue?style=for-the-badge" alt="Trial License: View Terms"></a>
-  <a href="https://github.com/sponsors/flutter-news-app"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
-</p>
-
-
+---
 
 Part of the **[Verity News System](https://github.com/verity-hq)**.
 
 Verity Mobile is a production-ready news reader built with Flutter, focusing on performance, personalization, and secure monetization.
-
-
----
-
-### ⚠️ Important Notice: Platform Verification
-**Verity Mobile has been developed and verified exclusively on Android.** 
-While the system is built using Flutter’s cross-platform framework, iOS deployment has not been tested in a production environment. Licensees should expect to perform their own platform-specific configuration, testing, and UI adjustments for iOS.
 
 ---
 
@@ -200,9 +193,13 @@ The application is fully internationalized and includes working English and Arab
 
 </details>
 
+## ⚠️ Important Notice:
+**Verity Mobile has been developed and verified exclusively on Android.** 
+While the system is built using Flutter’s cross-platform framework, iOS deployment has not been tested in a production environment. Licensees should expect to perform their own platform-specific configuration, testing, and UI adjustments for iOS.
+
 ## 🚀 Getting Started & Running Locally
 
-For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/flutter-news-app/flutter-news-app-mobile-client/wiki) tab in this repository.
+For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/veritas-hq/veritas-mobile/wiki) tab in this repository.
 
 ## 🔑 Licensing
 

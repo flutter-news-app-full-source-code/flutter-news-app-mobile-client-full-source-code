@@ -234,7 +234,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'أنشئ حسابًا لحفظ إعداداتك وتفضيلات المحتوى والمزيد عبر الأجهزة.';
 
   @override
-  String get authenticationSignInHeadline => 'فيريتاس';
+  String get authenticationSignInHeadline => 'فيريتاي';
 
   @override
   String get authenticationSignInSubheadline =>

@@ -227,7 +227,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authenticationLinkingSubheadline => '创建一个账户，以便在设备间保存您的设置、内容偏好等。';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline => '来自全球可信来源的未经过滤的新闻。';

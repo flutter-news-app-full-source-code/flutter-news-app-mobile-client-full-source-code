@@ -234,7 +234,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Crie uma conta para salvar tudo.';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline =>

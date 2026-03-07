@@ -236,7 +236,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Crea un account per salvare le tue impostazioni, preferenze sui contenuti e altro su tutti i dispositivi.';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline =>

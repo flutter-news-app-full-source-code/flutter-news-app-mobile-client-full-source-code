@@ -237,7 +237,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erstellen Sie ein Konto, um Ihre Einstellungen, Inhaltspräferenzen und mehr geräteübergreifend zu speichern.';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline =>

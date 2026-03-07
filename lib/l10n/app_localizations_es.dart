@@ -236,7 +236,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Crea una cuenta para guardar tus ajustes y preferencias.';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline =>

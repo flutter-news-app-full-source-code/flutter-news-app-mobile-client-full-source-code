@@ -229,7 +229,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'アカウントを作成して、設定やコンテンツの好みを保存しましょう。';
 
   @override
-  String get authenticationSignInHeadline => 'Veritas';
+  String get authenticationSignInHeadline => 'Verity';
 
   @override
   String get authenticationSignInSubheadline => '世界中の信頼できるソースからのニュース。';

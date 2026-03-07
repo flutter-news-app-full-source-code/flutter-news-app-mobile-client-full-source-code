@@ -549,7 +549,7 @@ abstract class AppLocalizations {
   /// Headline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Veritas'**
+  /// **'Verity'**
   String get authenticationSignInHeadline;
 
   /// Subheadline for the authentication page during standard sign-in
